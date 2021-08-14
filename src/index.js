@@ -3,6 +3,10 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { createdb } from './data/db';
+
+// database initialize
+createdb()
 
 ReactDOM.render(
   <React.StrictMode>
