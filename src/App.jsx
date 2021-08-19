@@ -4,7 +4,7 @@ import Sider from 'antd/lib/layout/Sider';
 import 'antd/dist/antd.css'
 import './App.css';
 import { Menu } from 'antd';
-import ServantList from './ components/ServantList';
+import ServantList from './components/ServantList';
 
 function App() {
 
@@ -14,6 +14,7 @@ function App() {
   
 
   const handleClick = e => {
+    // TODO 路由
     console.log('click ', e);
     setState({ current: e.key });
   };

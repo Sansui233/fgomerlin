@@ -4,11 +4,12 @@ import ServantItem from './ServantItem';
 import { DOMAIN, parseZipDataset, ICONBASE } from "../../data/utils";
 import { getServantList } from '../../data/db';
 
-// TODO 可以考虑创建用于渲染的 Object 原型，主要是为了有更好的代码提示……以后还是用 TS 定义数据类型吧
+export type Servant = { sId: string, sName: string, sClass: string, sImg: string}
+const initServants: Servant[] = []
 
 export default function ServantList() {
   const [state, setState] = useState({
-    servants: []
+    servants: initServants
   })
 
   function handleClickFetch() {
@@ -16,13 +17,10 @@ export default function ServantList() {
   }
 
   // TODO 这个方法应该放在 onUpdatedLoaded 里面，但我不知道是什么 hook
-  function reloadFromDB() {
-    getServantList().then(
-      servants => {
-        console.log("$$", servants)
-        setState({servants})
-      }
-    )
+  async function reloadFromDB() {
+      const servants = await getServantList()
+      console.log(`[ServantList] reload from db successfully. Total ${servants.length} items` )
+      setState({servants})
   }
 
   return (
@@ -31,8 +29,8 @@ export default function ServantList() {
       <button onClick={reloadFromDB}>加载本地数据</button>
       <List
         dataSource={state.servants}
-        renderItem={(servant) => {
-          return <ServantItem key={servant.sName} {...servant}></ServantItem>
+        renderItem={(s) => {
+          return <ServantItem key={s.sId} {...s}></ServantItem>
         }}
       >
         <div>
@@ -42,4 +40,3 @@ export default function ServantList() {
     </div>
   )
 }
-

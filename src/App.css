@@ -7,6 +7,12 @@
   pointer-events: none;
 }
 
+.ant-layout-sider-children {
+  min-height: 400px;
+  min-width: 350px;
+  background-color: bisque;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;

@@ -2,7 +2,10 @@
 
 ## 数据类型
 
-从者列表条目
+渲染用从者列表条目，用于
+
+- ServantList state
+- ServantDetail
 
 ```
 {
