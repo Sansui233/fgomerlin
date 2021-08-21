@@ -3,11 +3,12 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { createdb } from './data/db';
+import { initdb } from './data/db';
 
-// database initialize
-createdb()
+// Database initialize
+initdb()
 
+// Render APP
 ReactDOM.render(
   <React.StrictMode>
     <App />

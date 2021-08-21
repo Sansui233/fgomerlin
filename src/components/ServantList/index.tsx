@@ -1,42 +1,65 @@
-import React, { useState } from 'react'
-import { List } from "antd";
+import React, { useEffect, useState } from 'react'
+import { message, List } from "antd";
+import Search from 'antd/lib/input/Search';
 import ServantItem from './ServantItem';
-import { DOMAIN, parseZipDataset, ICONBASE } from "../../data/utils";
 import { getServantList } from '../../data/db';
+import { ReloadOutlined } from "@ant-design/icons";
 
-export type Servant = { sId: string, sName: string, sClass: string, sImg: string}
+export type Servant = {
+  sId: number,
+  sNo: number,
+  sName: string,
+  sNameJp: string,
+  sClass: string,
+  sImg: string,
+  skill1: number,
+  skill2: number,
+  skill3: number,
+  isFollow: boolean,
+}
 const initServants: Servant[] = []
 
 export default function ServantList() {
   const [state, setState] = useState({
-    servants: initServants
+    servants: initServants,
+    isLoaded: false
   })
 
-  function handleClickFetch() {
-    return parseZipDataset().then(() => { console.log("[ServantList] FetchData successfully"); })
-  }
+  useEffect(() => {
+    reloadFromDB()
+  }, [])
 
   // TODO 这个方法应该放在 onUpdatedLoaded 里面，但我不知道是什么 hook
   async function reloadFromDB() {
-      const servants = await getServantList()
-      console.log(`[ServantList] reload from db successfully. Total ${servants.length} items` )
-      setState({servants})
+    setState({ servants: state.servants, isLoaded: false })
+    const servants = await getServantList()
+    console.log(`[ServantList] reload from db successfully. Total ${servants.length} items`)
+    setState({ servants, isLoaded: true })
+    message.success('成功载入数据')
+  }
+
+  function onSearch() {
+    // TODO 搜索筛选
   }
 
   return (
-    <div>
-      <button onClick={handleClickFetch}>刷新远程数据</button>
-      <button onClick={reloadFromDB}>加载本地数据</button>
-      <List
+    // TODO Image 进入窗口后加载
+    <div className="servant-list-container">
+      <div className="toolbar">
+        <Search className="search" onSearch={onSearch} />
+        <button className="clear-button reload-button" onClick={reloadFromDB}><ReloadOutlined /></button>
+      </div>
+      {state.isLoaded ? <List
+        className="servant-list-content"
         dataSource={state.servants}
         renderItem={(s) => {
           return <ServantItem key={s.sId} {...s}></ServantItem>
         }}
       >
         <div>
-          <img src={DOMAIN + ICONBASE + "/1星.png"} alt="0星.png" />
         </div>
-      </List>
+      </List> : <p className="loading-placeholder">Loading……</p>}
+
     </div>
   )
 }
