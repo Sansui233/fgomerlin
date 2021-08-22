@@ -2,7 +2,6 @@ import React from 'react'
 import { Servant } from '..'
 import { DOMAIN, ICONBASE } from '../../../data/utils'
 import { HeartOutlined, HeartFilled } from "@ant-design/icons"
-import { relative } from 'path/posix'
 
 export default function ServantItem(props: Servant) {
   const { sId, sNo, sName, sNameJp, sClass, sImg, skill1, skill2, skill3, isFollow } = props

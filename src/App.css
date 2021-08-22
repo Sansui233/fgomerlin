@@ -22,7 +22,7 @@ svg {
   color: var(--icon-gray);
 }
 
-svg.like {
+.like svg{
   color: var(--icon-pink);
 }
 
@@ -209,6 +209,7 @@ p.servant-item-info-other {
   width: 18px;
   margin: 0 10px;
   cursor: pointer;
+  font-size: 1.15em;
 }
 
 /******************************
@@ -245,6 +246,15 @@ p.servant-item-info-other {
 .servant-card-img-container > img {
   height: 100%;
   width: 100%;
+}
+
+.servant-card-like {
+  flex: 0 0 auto;
+  flex-grow: 0;
+  width: 18px;
+  margin: 0 10px;
+  cursor: pointer;
+  font-size: 1.25rem;
 }
 
 .servant-card-setting-list {

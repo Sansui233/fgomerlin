@@ -72,10 +72,10 @@ export default function ServantCard(props: any) {
             <p className="servant-item-info-namejp">{state.basicInfo.sNameJp}</p>
             <p className="servant-item-info-other">No.{state.basicInfo.sNo} {state.basicInfo.sClass}</p>
           </div>
-          <div className="servant-item-like">
+          <div className="servant-card-like">
             {state.userSettings.isFollow ? <HeartFilled className="like" /> : <HeartOutlined />}
           </div>
-          <div className="servant-item-like">
+          <div className="servant-card-like">
             <a href={"https://fgo.wiki/w/" + state.basicInfo.mcLink} target="_blank" rel="noreferrer"><LinkOutlined /></a>
           </div>
         </section>

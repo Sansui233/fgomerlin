@@ -1,3 +1,4 @@
+import { debug } from 'console';
 import Dexie from 'dexie';
 import { ServantDetail } from '../components/ServantCard';
 import { Servant } from '../components/ServantList'
@@ -97,20 +98,26 @@ export async function getServantDetail(id: number): Promise<ServantDetail> {
   return mapServantDetail(s, settings)
 }
 
-function mapServantItem(results: any[]): Servant[] {
-  return results.map((result) => {
-    return {
-      sNo: result.detail.no,
-      sId: result.id,
-      sName: result.detail.info.name,
-      sNameJp: result.detail.info.nameJp,
-      sClass: result.detail.info.className,
-      sImg: result.detail.icon,
-      skill1: 1, // TODO NEXT
-      skill2: 1,
-      skill3: 1,
-      isFollow: false
-    }
+function mapServantItem(results: any[]): Promise<Servant[]> {
+  const queries = results.map(result => db.table('user_setting').where("id").equals(result.id).toArray())
+  return Promise.all(queries).then((queries_res) => {
+    return results.map((result, i) => {
+      // queries_res[i] 为一个 query 查询完毕的结果，是个长度为 0 或 1 的数组，where stores the value corresponded to id in this query
+      // 用 Promise.all 是为了合并结果为 Promise<Servant[]> 的形式
+      const setting = queries_res[i].length !== 0 ? queries_res[i][0].setting : undefined;
+      return {
+        sNo: result.detail.no,
+        sId: result.id,
+        sName: result.detail.info.name,
+        sNameJp: result.detail.info.nameJp,
+        sClass: result.detail.info.className,
+        sImg: result.detail.icon,
+        skill1: setting ? setting.skill1Target : 1,
+        skill2: setting ? setting.skill2Target : 1,
+        skill3: setting ? setting.skill3Target : 1,
+        isFollow: setting ? setting.isFollow : false
+      }
+    })
   })
 }
 
@@ -120,7 +127,6 @@ function mapServantDetail(s: any[], settings: any[]): ServantDetail {
   }
   const setting = settings.length !== 0 ? settings[0].setting : undefined;
   const detail = s[0].detail
-  console.log("[DEBUG] skills", detail.activeSkills[0].skills, detail.activeSkills[1].skills.slice(-1)[0])
   return {
     basicInfo: {
       sId: s[0].id,
@@ -136,9 +142,9 @@ function mapServantDetail(s: any[], settings: any[]): ServantDetail {
         { name: detail.activeSkills[2].skills.slice(-1)[0].name, icon: detail.activeSkills[2].skills.slice(-1)[0].icon },
       ],
       appendskill: [
-        { name: detail.appendSkills[0].name, icon: detail.appendSkills[0].icon+'.png' },
-        { name: detail.appendSkills[1].name, icon: detail.appendSkills[1].icon+'.png' },
-        { name: detail.appendSkills[2].name, icon: detail.appendSkills[2].icon+'.png' },
+        { name: detail.appendSkills[0].name, icon: detail.appendSkills[0].icon + '.png' },
+        { name: detail.appendSkills[1].name, icon: detail.appendSkills[1].icon + '.png' },
+        { name: detail.appendSkills[2].name, icon: detail.appendSkills[2].icon + '.png' },
       ]
     },
     userSettings: {

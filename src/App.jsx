@@ -57,7 +57,6 @@ function App() {
               </Sider>
               <Content>
                 <Route path='/servant/:id' component={ServantCard}>
-                  
                 </Route>
               </Content>
             </Route>
