@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { Link } from "react-router-dom";
 import { message, List } from "antd";
 import Search from 'antd/lib/input/Search';
 import ServantItem from './ServantItem';
@@ -53,7 +54,11 @@ export default function ServantList() {
         className="servant-list-content"
         dataSource={state.servants}
         renderItem={(s) => {
-          return <ServantItem key={s.sId} {...s}></ServantItem>
+          return (
+            <Link key={s.sId} to={`/servant/${s.sId}`}>
+              <ServantItem {...s}></ServantItem>
+            </Link>
+          )
         }}
       >
         <div>

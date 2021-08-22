@@ -1,10 +1,12 @@
 .App {
   --theme--primary: #1890ff;
+  --card-bg: white;
   --text-primary: #2c2c2c;
   --text-gray: #8d8d8d;
   --text-gray-lighter: #b8b8b8;
   --icon-gray: #8d8d8d;
   --icon-pink: #f78e8e;
+  --button-bg-hover: #f3f8ff;
 }
 
 /******************************
@@ -110,16 +112,48 @@ body {
   overflow-y: scroll;
 }
 
+.servant-list-content a {
+  color: var(--text-primary);
+  cursor: unset;
+}
+
 .servant-item-container {
-  background-color: #fff;
+  position: relative;
+  background-color: var(--card-bg);
   height: 76px;
   margin: 7px;
+}
+
+.servant-item-hover-layer {
+  height: 100%;
+  width: 100%;
   border-radius: 5px;
   box-shadow: 0px 4px 4px 0px #00000017;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
+
+.servant-item-hover-layer:hover {
+  box-shadow: 0px 0px 4px 0px var(--theme--primary);
+  background-color: var(--button-bg-hover);
+}
+
+/* .servant-item-hover-layer::before {
+  content: '';
+  background-color: var(--button-bg-hover);
+  mix-blend-mode: multiply;
+  position: absolute;
+  transition: width 0.5s;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+}
+
+.servant-item-hover-layer:hover::before {
+  width: 100%;
+} */
 
 .servant-item-img-container {
   flex: 0 0 auto;
@@ -175,4 +209,75 @@ p.servant-item-info-other {
   width: 18px;
   margin: 0 10px;
   cursor: pointer;
+}
+
+/******************************
+*********** Servant Card *****
+*******************************/
+
+.servant-card-container {
+  background-color: #F0F0F0;
+}
+
+.servant-card {
+  border-radius: 5px;
+  background-color: #f6f6f6;
+  margin: 9px;
+  box-shadow: 2px 4px 4px 0px #ACACAC40;
+}
+
+.servant-card-head {
+  height: 91px;
+  background-color: #FAFAFA;
+  box-shadow: 0px 4px 4px 0px #DCDCDC40;
+  display: flex;
+  align-items: center;
+  padding: auto 28px;
+  justify-content: space-between;
+}
+
+.servant-card-img-container {
+  flex: 0 0 auto;
+  width: 55px;
+  height: 60px;
+}
+
+.servant-card-img-container > img {
+  height: 100%;
+  width: 100%;
+}
+
+.servant-card-setting-list {
+  margin: 33px 0;
+}
+
+.list-item-indentation {
+  padding: 0 18px;
+}
+
+p.list-item-indentation {
+  margin-bottom: 3px;
+}
+
+p.list-title {
+  color: var(--text-gray);
+}
+
+.servant-card-setting-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--card-bg);
+  height: 45px;
+}
+
+.servant-card-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: scale-down;
+}
+
+.servant-card-setting-list-item-name{
+  flex-grow: 1;
+  padding-left: 0.35em;
 }

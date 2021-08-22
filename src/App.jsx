@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Switch, Route, Redirect, Link } from "react-router-dom";
 import Layout, { Content } from 'antd/lib/layout/layout';
 import Sider from 'antd/lib/layout/Sider';
 import { message } from 'antd';
@@ -37,19 +37,32 @@ function App() {
       <Layout className="App">
         <section className="header">
           <Menu className="nav-menu" onClick={handleClick} selectedKeys={[state.current]} mode="horizontal">
-            <Menu.Item key="servant">从者</Menu.Item>
-            <Menu.Item key="sucai">素材</Menu.Item>
-            <Menu.Item key="static">统计</Menu.Item>
+            <Menu.Item key="servant">
+              <Link to="/servant">从者</Link>
+            </Menu.Item>
+            <Menu.Item key="sucai">
+              <Link to="/items">素材</Link>
+            </Menu.Item>
+            <Menu.Item key="statistic">
+              <Link to="/statistic">统计</Link>
+            </Menu.Item>
           </Menu>
           <button className="clear-button" onClick={handleClickFetch}><CloudDownloadOutlined /></button>
         </section>
         <Layout>
-          <Sider>
-            <ServantList></ServantList>
-          </Sider>
-          <Content>
-            <ServantCard></ServantCard>
-          </Content>
+          <Switch>
+            <Route path='/servant'>
+              <Sider>
+                <ServantList />
+              </Sider>
+              <Content>
+                <Route path='/servant/:id' component={ServantCard}>
+                  
+                </Route>
+              </Content>
+            </Route>
+            <Redirect to="/servant" />
+          </Switch>
         </Layout>
       </Layout>
     </BrowserRouter>

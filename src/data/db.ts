@@ -9,22 +9,42 @@ const SERVANT_TABLE = "id, name" // the full table will be with detail, user-set
 const USER_SETTING = "id"
 const SRCINFO_TABLE = "dataversion"
 
+export type ServantBasic = {
+  sId: number,
+  sNo: number,
+  sName: string,
+  sNameJp: string,
+  sClass: string,
+  sImg: string,
+  mcLink: string
+  skills: [
+    { name: string, icon: string },
+    { name: string, icon: string },
+    { name: string, icon: string }
+  ]
+  appendskill: [
+    { name: string, icon: string },
+    { name: string, icon: string },
+    { name: string, icon: string }
+  ]
+}
+
 export type ServantSetting = {
-  isFollow: boolean;
-  level: number; // 0-4
+  isFollow: boolean,
+  level: number, // 0-4
   levelTarget: number; // 0-4
-  skill1: number; // 1-10
-  skill2: number;
-  skill3: number;
-  skill1Target: number;
-  skill2Target: number;
-  skill3Target: number;
-  extraSkill1: number;
-  extraSkill2: number;
-  extraSkill3: number;
-  extraSkill1Target: number;
-  extraSkill2Target: number;
-  extraSkill3Target: number;
+  skill1: number, // 1-10
+  skill2: number,
+  skill3: number,
+  skill1Target: number,
+  skill2Target: number,
+  skill3Target: number,
+  extraSkill1: number,
+  extraSkill2: number,
+  extraSkill3: number,
+  extraSkill1Target: number,
+  extraSkill2Target: number,
+  extraSkill3Target: number,
 }
 
 export function initdb() {
@@ -37,18 +57,27 @@ export function initdb() {
 }
 
 export async function putServant(id: number, name: string, detail: object) {
+  if (typeof (id) == "string") {
+    id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
+  }
   db.table('servants').put({ id, name, detail }).catch(function (e: Error) {
     alert("[db.js] Error: " + (e.stack || e));
   })
 }
 
 export function putSetting(id: number, setting: ServantSetting) {
+  if (typeof (id) == "string") {
+    id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
+  }
   db.table('user_setting').put({ id, setting }).catch(function (e: Error) {
     alert("[db.js] Error: " + (e.stack || e));
   })
 }
 
 export function putVersion(id: number, name: string, detail: object) {
+  if (typeof (id) == "string") {
+    id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
+  }
   db.table('srcinfo').put({ dataversion: version }).catch(function (e: Error) {
     alert("[db.js] Error: " + (e.stack || e));
   })
@@ -60,6 +89,9 @@ export async function getServantList(): Promise<Servant[]> {
 }
 
 export async function getServantDetail(id: number): Promise<ServantDetail> {
+  if (typeof (id) == "string") {
+    id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
+  }
   const s = await db.table('servants').where("id").equals(id).toArray()
   const settings = await db.table('user_setting').where("id").equals(id).toArray()
   return mapServantDetail(s, settings)
@@ -86,8 +118,9 @@ function mapServantDetail(s: any[], settings: any[]): ServantDetail {
   if (s.length === 0) {
     throw new Error("[db.ts] No servant result")
   }
-  const setting = settings[0].setting || undefined;
+  const setting = settings.length !== 0 ? settings[0].setting : undefined;
   const detail = s[0].detail
+  console.log("[DEBUG] skills", detail.activeSkills[0].skills, detail.activeSkills[1].skills.slice(-1)[0])
   return {
     basicInfo: {
       sId: s[0].id,
@@ -96,6 +129,17 @@ function mapServantDetail(s: any[], settings: any[]): ServantDetail {
       sNameJp: detail.info.nameJp,
       sClass: detail.info.className,
       sImg: detail.icon,
+      mcLink: detail.mcLink,
+      skills: [
+        { name: detail.activeSkills[0].skills.slice(-1)[0].name, icon: detail.activeSkills[0].skills.slice(-1)[0].icon },
+        { name: detail.activeSkills[1].skills.slice(-1)[0].name, icon: detail.activeSkills[1].skills.slice(-1)[0].icon },
+        { name: detail.activeSkills[2].skills.slice(-1)[0].name, icon: detail.activeSkills[2].skills.slice(-1)[0].icon },
+      ],
+      appendskill: [
+        { name: detail.appendSkills[0].name, icon: detail.appendSkills[0].icon+'.png' },
+        { name: detail.appendSkills[1].name, icon: detail.appendSkills[1].icon+'.png' },
+        { name: detail.appendSkills[2].name, icon: detail.appendSkills[2].icon+'.png' },
+      ]
     },
     userSettings: {
       isFollow: setting ? setting.isFollow : false,
