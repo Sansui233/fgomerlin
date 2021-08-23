@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from "react-router-dom";
 import { message, List } from "antd";
+import { FixedSizeList} from 'react-window';
 import Search from 'antd/lib/input/Search';
 import ServantItem from './ServantItem';
 import { getServantList } from '../../data/db';
@@ -45,6 +46,17 @@ export default function ServantList() {
     setState({ ...state, filter_str: value })
   }
 
+  function filterServants(): Servant[]{
+    return state.filter_str === "" ? state.servants : state.servants.filter((servant) => {
+      if (servant.sName.includes(state.filter_str)) {
+        return true
+      }
+      return servant.sNickNames.some((nickname) => {
+        return nickname.includes(state.filter_str)
+      })
+    })
+  }
+
   return (
     // TODO Image 进入窗口后加载
     <div className="servant-list-container">
@@ -55,14 +67,7 @@ export default function ServantList() {
       {state.isLoaded ?
         <List
           className="servant-list-content"
-          dataSource={state.filter_str === "" ? state.servants : state.servants.filter((servant) => {
-            if (servant.sName.includes(state.filter_str)) {
-              return true
-            }
-            return servant.sNickNames.some((nickname) => {
-              return nickname.includes(state.filter_str)
-            })
-          })}
+          dataSource={filterServants()}
           renderItem={(s) => {
             return (
               <Link key={s.sId} to={`/servant/${s.sId}`}>

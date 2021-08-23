@@ -174,7 +174,8 @@ body {
 .toolbar {
   flex: 0 0 auto;
   display: flex;
-  margin: 6px 5px;
+  align-items: center;
+  height: 44px;
   position: sticky;
   top: 0;
 }
