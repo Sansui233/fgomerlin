@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { Link } from "react-router-dom";
-import { message, List } from "antd";
-import { FixedSizeList} from 'react-window';
+import { message } from "antd";
+import { FixedSizeList } from 'react-window';
 import Search from 'antd/lib/input/Search';
 import ServantItem from './ServantItem';
 import { getServantList } from '../../data/db';
@@ -46,18 +46,20 @@ export default function ServantList() {
     setState({ ...state, filter_str: value })
   }
 
-  function filterServants(): Servant[]{
-    return state.filter_str === "" ? state.servants : state.servants.filter((servant) => {
-      if (servant.sName.includes(state.filter_str)) {
+  function filterServants(query: string): Servant[] {
+    return query === "" ? state.servants : state.servants.filter((servant) => {
+      if (servant.sName.includes(query)) {
         return true
       }
       return servant.sNickNames.some((nickname) => {
-        return nickname.includes(state.filter_str)
+        return nickname.includes(query)
       })
     })
   }
 
-  function servantItemRenderer(s:Servant){
+  const memServantFilter = useCallback(() => filterServants(state.filter_str), [state.filter_str, state.servants])
+
+  function servantItemRenderer(s: Servant) {
     return (
       <Link key={s.sId} to={`/servant/${s.sId}`}>
         <ServantItem {...s}></ServantItem>
@@ -73,11 +75,21 @@ export default function ServantList() {
         <button className="clear-button reload-button" onClick={reloadFromDB}><ReloadOutlined /></button>
       </div>
       {state.isLoaded ?
-        <List
+        <FixedSizeList
           className="servant-list-content"
-          dataSource={filterServants()}
-          renderItem={servantItemRenderer}
-        /> : <p className="loading-placeholder">Loading……</p>}
+          itemCount={memServantFilter().length}
+          height={800}
+          width={394-6}
+          itemSize={76+7}
+        >
+          {({ index, style }) => {
+            return (
+              <div style={style}>
+                {servantItemRenderer(memServantFilter()[index])}
+              </div>
+            )
+          }}
+        </FixedSizeList> : <p className="loading-placeholder">Loading……</p>}
     </div>
   )
 }

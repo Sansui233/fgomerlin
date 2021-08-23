@@ -223,15 +223,17 @@ body {
 
 .servant-item-container {
   position: relative;
+  border-radius: 5px;
   background-color: var(--item-bg);
   height: 76px;
-  margin: 7px;
+  margin-top: 7px;
+  margin-left: 7px;
+  margin-right: 7px;
 }
 
 .servant-item-hover-layer {
   height: 100%;
   width: 100%;
-  border-radius: 5px;
   box-shadow: 0px 4px 4px 0px #00000017;
   display: flex;
   align-items: center;
@@ -312,6 +314,7 @@ p.servant-item-info-other {
 }
 
 .servant-card-head {
+  border-radius: 5px 5px 0 0;
   height: 91px;
   background-color: var(--content-header-bg);
   box-shadow: 0px 2px 2px 0px var(--box-shadow);
