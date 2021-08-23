@@ -16,6 +16,7 @@ export type ServantBasic = {
   sNameJp: string,
   sClass: string,
   sImg: string,
+  sRarity: number,
   mcLink: string
   skills: [
     { name: string, icon: string },
@@ -31,8 +32,8 @@ export type ServantBasic = {
 
 export type ServantSetting = {
   isFollow: boolean,
-  level: number, // 0-4
-  levelTarget: number; // 0-4
+  level: {current:number, target: number}, // 0-4
+  finalLevel: {current:number, target: number}, //maxLevel-100
   skills: {current:number, target:number}[], // length 3
   appendedSkills: {current:number, target:number}[] // length 3
 }
@@ -87,7 +88,7 @@ export async function getServantDetail(id: number): Promise<ServantDetail> {
   return mapServantDetail(s, settings)
 }
 
-function mapServantItem(results: any[]): Promise<Servant[]> {
+async function mapServantItem(results: any[]): Promise<Servant[]> {
   const queries = results.map(result => db.table('user_setting').where("id").equals(result.id).toArray())
   return Promise.all(queries).then((queries_res) => {
     return results.map((result, i) => {
@@ -124,6 +125,7 @@ function mapServantDetail(s: any[], settings: any[]): ServantDetail {
       sNameJp: detail.info.nameJp,
       sClass: detail.info.className,
       sImg: detail.icon,
+      sRarity: detail.info.rarity2? detail.info.rarity2: detail.info.rarity,
       mcLink: detail.mcLink,
       skills: [
         { name: detail.activeSkills[0].skills.slice(-1)[0].name, icon: detail.activeSkills[0].skills.slice(-1)[0].icon },
@@ -138,8 +140,14 @@ function mapServantDetail(s: any[], settings: any[]): ServantDetail {
     },
     userSettings: {
       isFollow: setting ? setting.isFollow : false,
-      level: setting ? setting.level : 0,
-      levelTarget: setting ? setting.levelTarget : 0,
+      level: {
+        current:setting ? setting.level.current : 0,
+        target: setting ? setting.level.target : 0
+      },
+      finalLevel: {
+        current:setting ? setting.finalLevel.current : 0,
+        target: setting ? setting.finalLevel.target : 0
+      },
       skills: [
         {current: setting? setting.skills[0].current:1, target: setting? setting.skills[0].target:1}, //1-10
         {current: setting? setting.skills[1].current:1, target: setting? setting.skills[1].target:1},
