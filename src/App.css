@@ -1,33 +1,87 @@
-.App {
+@media (prefers-color-scheme: dark) {
+  :root,
+  body {
+    background-color: #000;
+  }
+}
+
+.ant-layout.light {
   --theme--primary: #1890ff;
-  --card-bg: white;
+  --sider-bg: #f0f0f0;
+  --item-bg: white;
+  --content-bg: #e8e8e8;
+  --content-header-bg: #FAFAFA;
   --text-primary: #2c2c2c;
   --text-gray: #8d8d8d;
   --text-gray-lighter: #b8b8b8;
   --icon-gray: #8d8d8d;
-  --icon-pink: #f78e8e;
+  --icon-pink: #ff5757;
   --button-bg-hover: #f3f8ff;
+  --box-shadow: #dcdcdc40;
 }
 
-/******************************
-*********** Common ************
-*******************************/
+.ant-layout.dark{
+  --theme--primary: #1890ff;
+  --item-bg: rgb(49, 49, 49);
+  --sider-bg: rgb(34, 34, 34);
+  --content-bg: rgb(41, 41, 41);
+  --content-header-bg: #3a3a3a;
+  --text-primary: #dddddd;
+  --text-gray: #8d8d8d;
+  --text-gray-lighter: #666666;
+  --icon-gray: #8d8d8d;
+  --icon-pink: #ff5757;
+  --button-bg-hover: #3e3e3e;
+  --box-shadow: #55555540;
+}
+
+/***************************** Framework ********************************/
+/* Not for specific elements */
+
+
+.text-gray {
+  color:var(--text-gray);
+}
 
 .clear-button {
   border: unset;
   background-color: unset;
 }
 
+.list-item-indentation {
+  padding: 0 18px;
+}
+
+p.list-item-indentation {
+  margin-bottom: 3px;
+}
+
+
+/*************************************************************
+*********************** Common *******************************
+**************************************************************/
+
+/* mainly adapt dark mode color */
+
+.ant-layout-content {
+  background-color: var(--sider-bg);
+  color: var(--text-primary);
+}
+
+button {
+  background-color: var(--item-bg);
+}
+
 svg {
   color: var(--icon-gray);
 }
 
-.like svg{
-  color: var(--icon-pink);
-}
-
 button:hover svg {
   color: var(--theme--primary);
+}
+
+.like svg{
+  color: var(--icon-pink);
 }
 
 body {
@@ -42,14 +96,49 @@ body {
   margin-top: 1em;
 }
 
-/******************************
-*********** Header ************
-*******************************/
+::-webkit-scrollbar
+{
+    width:6px;
+    height:16px;
+    background-color:var(--item-bg);
+}
+
+::-webkit-scrollbar-thumb
+{
+    background-color:var(--text-gray-lighter);
+}
+
+.ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  background-color: unset;
+  color: var(--text-primary);
+  border:unset;
+}
+
+/********************************************************************
+*************************** Header **********************************
+*********************************************************************/
 
 .header {
   display: flex;
   align-items: center;
-  background-color: white;
+  background-color: var(--item-bg);
+  color: var(--text-primary);
+}
+
+.ant-menu {
+  background-color: var(--item-bg);
+}
+
+.ant-menu-horizontal {
+  border-bottom: var(--sider-bg);
+}
+
+.ant-menu-horizontal > .ant-menu-item a {
+  color: var(--text-primary);
+}
+
+.ant-menu-horizontal > .ant-menu-item-selected a {
+  color: var(--theme--primary);
 }
 
 .nav-menu {
@@ -58,15 +147,14 @@ body {
 
 .header > button {
   flex-grow: 0;
-  padding-left: 1em;
   padding-right: 1em;
   cursor: pointer;
   font-size: 20px;
 }
 
-/******************************
-*********** Servant Sider *****
-*******************************/
+/**********************************************************************
+*********************** Servant Sider *********************************
+***********************************************************************/
 
 .ant-layout-sider {
   flex: 0 0 394px !important;
@@ -74,7 +162,7 @@ body {
   max-width: 394px !important;
   width: 394px !important;
   height: calc(100vh - 46px);
-  background-color: #f0f0f0;
+  background-color: var(--sider-bg);
 }
 
 .servant-list-container{
@@ -94,6 +182,21 @@ body {
 .search {
   flex-grow: 1;
   padding: 0 3px;
+}
+
+.ant-input {
+  background-color: var(--item-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--text-gray-lighter);
+}
+
+.ant-btn {
+  background-color: var(--item-bg);
+  border-color: var(--text-gray-lighter);
+}
+
+.ant-btn:hover, .ant-btn:focus, .ant-btn:active {
+  background-color: var(--button-bg-hover);
 }
 
 .reload-button {
@@ -119,7 +222,7 @@ body {
 
 .servant-item-container {
   position: relative;
-  background-color: var(--card-bg);
+  background-color: var(--item-bg);
   height: 76px;
   margin: 7px;
 }
@@ -135,25 +238,9 @@ body {
 }
 
 .servant-item-hover-layer:hover {
-  box-shadow: 0px 0px 4px 0px var(--theme--primary);
+  box-shadow: 0px 0px 2px 1px var(--theme--primary);
   background-color: var(--button-bg-hover);
 }
-
-/* .servant-item-hover-layer::before {
-  content: '';
-  background-color: var(--button-bg-hover);
-  mix-blend-mode: multiply;
-  position: absolute;
-  transition: width 0.5s;
-  top: 0;
-  left: 0;
-  width: 0;
-  height: 100%;
-}
-
-.servant-item-hover-layer:hover::before {
-  width: 100%;
-} */
 
 .servant-item-img-container {
   flex: 0 0 auto;
@@ -212,28 +299,23 @@ p.servant-item-info-other {
   font-size: 1.15em;
 }
 
-/******************************
-*********** Servant Card *****
-*******************************/
-
-.servant-card-container {
-  background-color: #F0F0F0;
-}
+/**********************************************************************
+******************************* Servant Card *************************
+***********************************************************************/
 
 .servant-card {
   border-radius: 5px;
-  background-color: #f6f6f6;
+  background-color: var(--content-bg);
   margin: 9px;
-  box-shadow: 2px 4px 4px 0px #ACACAC40;
+  box-shadow: 0px 6px 4px 0px var(--box-shadow);
 }
 
 .servant-card-head {
   height: 91px;
-  background-color: #FAFAFA;
-  box-shadow: 0px 4px 4px 0px #DCDCDC40;
+  background-color: var(--content-header-bg);
+  box-shadow: 0px 2px 2px 0px var(--box-shadow);
   display: flex;
   align-items: center;
-  padding: auto 28px;
   justify-content: space-between;
 }
 
@@ -261,14 +343,6 @@ p.servant-item-info-other {
   margin: 33px 0;
 }
 
-.list-item-indentation {
-  padding: 0 18px;
-}
-
-p.list-item-indentation {
-  margin-bottom: 3px;
-}
-
 p.list-title {
   color: var(--text-gray);
 }
@@ -277,7 +351,7 @@ p.list-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: var(--card-bg);
+  background-color: var(--item-bg);
   height: 45px;
 }
 
@@ -290,4 +364,8 @@ p.list-title {
 .servant-card-setting-list-item-name{
   flex-grow: 1;
   padding-left: 0.35em;
+}
+
+.skill-select {
+  width: 58px;
 }

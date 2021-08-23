@@ -1,4 +1,3 @@
-import { debug } from 'console';
 import Dexie from 'dexie';
 import { ServantDetail } from '../components/ServantCard';
 import { Servant } from '../components/ServantList'
@@ -23,7 +22,7 @@ export type ServantBasic = {
     { name: string, icon: string },
     { name: string, icon: string }
   ]
-  appendskill: [
+  appendedskill: [
     { name: string, icon: string },
     { name: string, icon: string },
     { name: string, icon: string }
@@ -34,18 +33,8 @@ export type ServantSetting = {
   isFollow: boolean,
   level: number, // 0-4
   levelTarget: number; // 0-4
-  skill1: number, // 1-10
-  skill2: number,
-  skill3: number,
-  skill1Target: number,
-  skill2Target: number,
-  skill3Target: number,
-  extraSkill1: number,
-  extraSkill2: number,
-  extraSkill3: number,
-  extraSkill1Target: number,
-  extraSkill2Target: number,
-  extraSkill3Target: number,
+  skills: {current:number, target:number}[], // length 3
+  appendedSkills: {current:number, target:number}[] // length 3
 }
 
 export function initdb() {
@@ -112,9 +101,9 @@ function mapServantItem(results: any[]): Promise<Servant[]> {
         sNameJp: result.detail.info.nameJp,
         sClass: result.detail.info.className,
         sImg: result.detail.icon,
-        skill1: setting ? setting.skill1Target : 1,
-        skill2: setting ? setting.skill2Target : 1,
-        skill3: setting ? setting.skill3Target : 1,
+        skill1: setting ? setting.skills[0].current : 1,
+        skill2: setting ? setting.skills[1].current : 1,
+        skill3: setting ? setting.skills[2].current : 1,
         isFollow: setting ? setting.isFollow : false
       }
     })
@@ -141,7 +130,7 @@ function mapServantDetail(s: any[], settings: any[]): ServantDetail {
         { name: detail.activeSkills[1].skills.slice(-1)[0].name, icon: detail.activeSkills[1].skills.slice(-1)[0].icon },
         { name: detail.activeSkills[2].skills.slice(-1)[0].name, icon: detail.activeSkills[2].skills.slice(-1)[0].icon },
       ],
-      appendskill: [
+      appendedskill: [
         { name: detail.appendSkills[0].name, icon: detail.appendSkills[0].icon + '.png' },
         { name: detail.appendSkills[1].name, icon: detail.appendSkills[1].icon + '.png' },
         { name: detail.appendSkills[2].name, icon: detail.appendSkills[2].icon + '.png' },
@@ -151,18 +140,16 @@ function mapServantDetail(s: any[], settings: any[]): ServantDetail {
       isFollow: setting ? setting.isFollow : false,
       level: setting ? setting.level : 0,
       levelTarget: setting ? setting.levelTarget : 0,
-      skill1: setting ? setting.skill1 : 1,
-      skill2: setting ? setting.skill2 : 1,
-      skill3: setting ? setting.skill3 : 1,
-      skill1Target: setting ? setting.skill1Target : 1,
-      skill2Target: setting ? setting.skill2Target : 1,
-      skill3Target: setting ? setting.skill3Target : 1,
-      extraSkill1: setting ? setting.extraSkill1 : 1,
-      extraSkill2: setting ? setting.extraSkill2 : 1,
-      extraSkill3: setting ? setting.extraSkill3 : 1,
-      extraSkill1Target: setting ? setting.extraSkill1Target : 1,
-      extraSkill2Target: setting ? setting.extraSkill2Target : 1,
-      extraSkill3Target: setting ? setting.extraSkill3Target : 1,
+      skills: [
+        {current: setting? setting.skills[0].current:1, target: setting? setting.skills[0].target:1}, //1-10
+        {current: setting? setting.skills[1].current:1, target: setting? setting.skills[1].target:1},
+        {current: setting? setting.skills[2].current:1, target: setting? setting.skills[2].target:1},
+      ],
+      appendedSkills: [
+        {current: setting? setting.appendedSkills[0].current:1, target: setting? setting.appendedSkills[0].target:1}, //1-10
+        {current: setting? setting.appendedSkills[1].current:1, target: setting? setting.appendedSkills[1].target:1},
+        {current: setting? setting.appendedSkills[2].current:1, target: setting? setting.appendedSkills[2].target:1},
+      ]
     }
   }
 }

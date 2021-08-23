@@ -66,7 +66,7 @@ export async function parseZipDataset() {
 
 // TODO Item
 function storeToDatabase(dataObject: DataSetText) {
-  for (const [num, value] of Object.entries(dataObject.servants)) {
+  for (const value of Object.values(dataObject.servants)) {
     putServant(value.svtId, value.info.name, value)
   }
 }

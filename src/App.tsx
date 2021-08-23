@@ -3,25 +3,21 @@ import { BrowserRouter, Switch, Route, Redirect, Link } from "react-router-dom";
 import Layout, { Content } from 'antd/lib/layout/layout';
 import Sider from 'antd/lib/layout/Sider';
 import { message } from 'antd';
+import { Menu } from 'antd';
+import { CloudDownloadOutlined, FormatPainterOutlined } from "@ant-design/icons";
 import 'antd/dist/antd.css'
 import './App.css';
 import { parseZipDataset } from "./data/utils";
-import { Menu } from 'antd';
+import cookies from "./lib/cookies"
 import ServantList from './components/ServantList';
-import { CloudDownloadOutlined } from "@ant-design/icons";
 import ServantCard from './components/ServantCard';
 
 function App() {
 
   const [state, setState] = useState({
-    current: "servant"
+    current: "servant",
+    isDark: cookies.getCookie('isdark') === "true" ? true:false,
   })
-
-  const handleClick = e => {
-    // TODO 路由
-    console.log('click ', e);
-    setState({ current: e.key });
-  };
 
   function handleClickFetch() {
     return parseZipDataset().then(() => {
@@ -32,11 +28,16 @@ function App() {
     })
   }
 
+  function switchTheme (){
+    document.cookie = "isdark="+!state.isDark;
+    setState({...state, isDark: !state.isDark})
+  }
+
   return (
     <BrowserRouter>
-      <Layout className="App">
+      <Layout className={state.isDark?"App dark":"App light"}>
         <section className="header">
-          <Menu className="nav-menu" onClick={handleClick} selectedKeys={[state.current]} mode="horizontal">
+          <Menu className="nav-menu" selectedKeys={[state.current]} mode="horizontal">
             <Menu.Item key="servant">
               <Link to="/servant">从者</Link>
             </Menu.Item>
@@ -47,6 +48,7 @@ function App() {
               <Link to="/statistic">统计</Link>
             </Menu.Item>
           </Menu>
+          <button className="clear-button" onClick={switchTheme}><FormatPainterOutlined /></button>
           <button className="clear-button" onClick={handleClickFetch}><CloudDownloadOutlined /></button>
         </section>
         <Layout>
