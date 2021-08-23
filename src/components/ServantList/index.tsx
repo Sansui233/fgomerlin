@@ -10,6 +10,7 @@ export type Servant = {
   sId: number,
   sNo: number,
   sName: string,
+  sNickNames: string[],
   sNameJp: string,
   sClass: string,
   sImg: string,
@@ -23,47 +24,53 @@ const initServants: Servant[] = []
 export default function ServantList() {
   const [state, setState] = useState({
     servants: initServants,
-    isLoaded: false
+    isLoaded: false,
+    filter_str: ""
   })
 
   useEffect(() => {
     reloadFromDB()
   }, [])
 
-  // TODO 这个方法应该放在 onUpdatedLoaded 里面，但我不知道是什么 hook
   async function reloadFromDB() {
-    setState({ servants: state.servants, isLoaded: false })
+    setState({ servants: state.servants, isLoaded: false, filter_str: "" })
     const servants = await getServantList()
     console.log(`[ServantList] reload from db successfully. Total ${servants.length} items`)
-    setState({ servants, isLoaded: true })
+    setState({ servants, isLoaded: true, filter_str: "" })
     message.success('成功载入数据')
   }
 
-  function onSearch() {
-    // TODO 搜索筛选
+  function searchOnChange(e: any) {
+    const { value } = e.target;
+    setState({ ...state, filter_str: value })
   }
 
   return (
     // TODO Image 进入窗口后加载
     <div className="servant-list-container">
       <div className="toolbar">
-        <Search className="search" onSearch={onSearch} />
+        <Search className="search" onChange={searchOnChange} />
         <button className="clear-button reload-button" onClick={reloadFromDB}><ReloadOutlined /></button>
       </div>
-      {state.isLoaded ? <List
-        className="servant-list-content"
-        dataSource={state.servants}
-        renderItem={(s) => {
-          return (
-            <Link key={s.sId} to={`/servant/${s.sId}`}>
-              <ServantItem {...s}></ServantItem>
-            </Link>
-          )
-        }}
-      >
-        <div>
-        </div>
-      </List> : <p className="loading-placeholder">Loading……</p>}
+      {state.isLoaded ?
+        <List
+          className="servant-list-content"
+          dataSource={state.filter_str === "" ? state.servants : state.servants.filter((servant) => {
+            if (servant.sName.includes(state.filter_str)) {
+              return true
+            }
+            return servant.sNickNames.some((nickname) => {
+              return nickname.includes(state.filter_str)
+            })
+          })}
+          renderItem={(s) => {
+            return (
+              <Link key={s.sId} to={`/servant/${s.sId}`}>
+                <ServantItem {...s}></ServantItem>
+              </Link>
+            )
+          }}
+        /> : <p className="loading-placeholder">Loading……</p>}
 
     </div>
   )

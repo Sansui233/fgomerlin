@@ -99,6 +99,7 @@ async function mapServantItem(results: any[]): Promise<Servant[]> {
         sNo: result.detail.no,
         sId: result.id,
         sName: result.detail.info.name,
+        sNickNames: result.detail.info.nicknames,
         sNameJp: result.detail.info.nameJp,
         sClass: result.detail.info.className,
         sImg: result.detail.icon,

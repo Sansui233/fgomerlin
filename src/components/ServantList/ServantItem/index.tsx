@@ -25,6 +25,5 @@ export default function ServantItem(props: Servant) {
         </div>
       </div>
     </div>
-
   )
 }
