@@ -57,6 +57,14 @@ export default function ServantList() {
     })
   }
 
+  function servantItemRenderer(s:Servant){
+    return (
+      <Link key={s.sId} to={`/servant/${s.sId}`}>
+        <ServantItem {...s}></ServantItem>
+      </Link>
+    )
+  }
+
   return (
     // TODO Image 进入窗口后加载
     <div className="servant-list-container">
@@ -68,15 +76,8 @@ export default function ServantList() {
         <List
           className="servant-list-content"
           dataSource={filterServants()}
-          renderItem={(s) => {
-            return (
-              <Link key={s.sId} to={`/servant/${s.sId}`}>
-                <ServantItem {...s}></ServantItem>
-              </Link>
-            )
-          }}
+          renderItem={servantItemRenderer}
         /> : <p className="loading-placeholder">Loading……</p>}
-
     </div>
   )
 }
