@@ -3,8 +3,8 @@ import { Servant } from '..'
 import { DOMAIN, ICONBASE } from '../../../utils/fetchdata'
 import { HeartOutlined, HeartFilled } from "@ant-design/icons"
 
-export default function ServantItem(props: Servant) {
-  const { sId, sNo, sName, sNameJp, sClass, sImg, skill1, skill2, skill3, isFollow } = props
+export default function ServantItem(props: {servant: Servant, changeFollow: (sId: number) => void}) {
+  const { sId, sNo, sName, sNameJp, sClass, sImg, skill1, skill2, skill3, isFollow } = props.servant
 
   return (
     <div className="servant-item-container" key={sId}>
@@ -20,7 +20,7 @@ export default function ServantItem(props: Servant) {
         <div className="servant-item-skills">
           {skill1}/{skill2}/{skill3}
         </div>
-        <div className="servant-item-like">
+        <div className="servant-item-like" onClick={(e) => {props.changeFollow(sId);e.preventDefault();}}>
           {isFollow ? <HeartFilled className="like" /> : <HeartOutlined />}
         </div>
       </div>

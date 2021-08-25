@@ -4,6 +4,7 @@ import { getServantDetail, putSetting, ServantSetting, ServantBasic } from '../.
 import Selections from './Selections';
 import { DOMAIN, ICONBASE } from '../../utils/fetchdata';
 import ArrowUp from '../../assets/icons/arrow-up.svg';
+import Emitter, { EvtSources, EvtNames, EvtArgTypes, ServantState } from '../../utils/events';
 
 export type ServantDetail = {
   basicInfo: ServantBasic,
@@ -56,23 +57,47 @@ export default function ServantCard(props: any) {
     })
   }, [id])
 
+  // Subscribe event
+  useEffect(() => {
+    function updateFollow(src: EvtSources, newState: EvtArgTypes) {
+      if (src === EvtSources.ServatContent) {
+        return // ignore events sent by self
+      }
+      const st = newState as ServantState;
+      if (st.id !== state.basicInfo.sId) { return }
+      setstate({ ...state, userSettings: { ...state.userSettings, isFollow: st.isFollow !== undefined ? st.isFollow : state.userSettings.isFollow } })
+    }
+    Emitter.addDataListener(EvtNames.ModifyServant, updateFollow)
+    return () => {
+      Emitter.removeListener(EvtNames.ModifyServant, updateFollow)
+    }
+  }, [state.userSettings.isFollow, state.basicInfo.sId])
+
   function changeFollow() {
     const userSettings: ServantSetting = { ...state.userSettings, isFollow: !state.userSettings.isFollow };
-    setstate({ ...state, userSettings })
-    putSetting(state.basicInfo.sId, userSettings) //TODO 通知 Sidebar 更新 State
+    // save to database
+    putSetting(state.basicInfo.sId, userSettings).then(() => {
+      setstate({ ...state, userSettings })
+      // notify sidebar
+      Emitter.dataEmit(EvtNames.ModifyServant, EvtSources.ServatContent, {
+        id: state.basicInfo.sId,
+        isFollow: !state.userSettings.isFollow,
+      })
+    })
   }
 
-
   function changeLevel(current: number, target: number) {
-    const userSettings: ServantSetting = { ...state.userSettings, level:{current, target}};
-    setstate({ ...state, userSettings })
-    putSetting(state.basicInfo.sId, userSettings) //TODO 通知 Sidebar 更新 State
+    const userSettings: ServantSetting = { ...state.userSettings, level: { current, target } };
+    putSetting(state.basicInfo.sId, userSettings).then(() => {
+      setstate({ ...state, userSettings })
+    })
+
   }
 
   function changeFinalLevel(current: number, target: number) {
-    const userSettings: ServantSetting = { ...state.userSettings, finalLevel:{current, target}};
+    const userSettings: ServantSetting = { ...state.userSettings, finalLevel: { current, target } };
     setstate({ ...state, userSettings })
-    putSetting(state.basicInfo.sId, userSettings) //TODO 通知 Sidebar 更新 State
+    putSetting(state.basicInfo.sId, userSettings)
   }
 
   function changeSkill(skill_index: number) { // 写成高阶函数以保存 index 变量
@@ -84,8 +109,15 @@ export default function ServantCard(props: any) {
       const new_skills = [...state.userSettings.skills];
       new_skills[i] = { current, target };
       const userSettings: ServantSetting = { ...state.userSettings, skills: new_skills };
-      setstate({ ...state, userSettings })
-      putSetting(state.basicInfo.sId, userSettings) //TODO 通知 Sidebar 更新 State
+      putSetting(state.basicInfo.sId, userSettings).then(() => {
+        setstate({ ...state, userSettings })
+        Emitter.dataEmit(EvtNames.ModifyServant, EvtSources.ServatContent, {
+          id: state.basicInfo.sId,
+          skills: new_skills.map((skill) => {
+            return skill.current
+          })
+        })
+      })
     }
   }
 
@@ -99,10 +131,9 @@ export default function ServantCard(props: any) {
       new_appendedskills[i] = { current, target };
       const userSettings: ServantSetting = { ...state.userSettings, appendedSkills: new_appendedskills };
       setstate({ ...state, userSettings })
-      putSetting(state.basicInfo.sId, userSettings) //TODO 通知 Sidebar 更新 State
+      putSetting(state.basicInfo.sId, userSettings)
     }
   }
-
 
   return (
     <div className="servant-card-container">
@@ -129,12 +160,12 @@ export default function ServantCard(props: any) {
           <div className="servant-card-setting-list-item list-item-indentation">
             <img src={ArrowUp} alt="再临" className="servant-card-icon" />
             <span className="servant-card-setting-list-item-name">灵基再临</span>
-            <Selections mode="level" {...state.userSettings.level} changeSelection={changeLevel}/>
+            <Selections mode="level" {...state.userSettings.level} changeSelection={changeLevel} />
           </div>
           <div className="servant-card-setting-list-item list-item-indentation">
             <img src={DOMAIN + ICONBASE + "/圣杯.jpg"} alt="🏆" className="servant-card-icon" />
             <span className="servant-card-setting-list-item-name">圣杯转临</span>
-            <Selections mode="finalLevel" {...state.userSettings.finalLevel} rarity={state.basicInfo.sRarity} changeSelection={changeFinalLevel}/>
+            <Selections mode="finalLevel" {...state.userSettings.finalLevel} rarity={state.basicInfo.sRarity} changeSelection={changeFinalLevel} />
           </div>
         </section>
 

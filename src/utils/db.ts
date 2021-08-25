@@ -51,32 +51,34 @@ export async function putServant(id: number, name: string, detail: object) {
   if (typeof (id) == "string") {
     id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
   }
-  db.table('servants').put({ id, name, detail }).catch(function (e: Error) {
-    alert("[db.js] Error: " + (e.stack || e));
-  })
+  await db.table('servants').put({ id, name, detail })
 }
 
-export function putSetting(id: number, setting: ServantSetting) {
+export async function putSetting(id: number, setting: ServantSetting) {
   if (typeof (id) == "string") {
     id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
   }
-  db.table('user_setting').put({ id, setting }).catch(function (e: Error) {
-    alert("[db.js] Error: " + (e.stack || e));
-  })
+  await db.table('user_setting').put({ id, setting })
 }
 
-export function putVersion(id: number, name: string, detail: object) {
+export async function putVersion(id: number, name: string, detail: object) {
   if (typeof (id) == "string") {
     id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
   }
-  db.table('srcinfo').put({ dataversion: version }).catch(function (e: Error) {
-    alert("[db.js] Error: " + (e.stack || e));
-  })
+  await db.table('srcinfo').put({ dataversion: version })
 }
 
 export async function getServantList(): Promise<Servant[]> {
   const results = await db.table('servants').toArray()
   return mapServantItem(results)
+}
+
+export async function getServantSetting(id: number): Promise<ServantSetting>{
+  if (typeof (id) == "string") {
+    id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
+  }
+  const settings = await db.table('user_setting').where("id").equals(id).toArray()
+  return mapServantSetting(settings)
 }
 
 export async function getServantDetail(id: number): Promise<ServantDetail> {
@@ -160,5 +162,30 @@ function mapServantDetail(s: any[], settings: any[]): ServantDetail {
         {current: setting? setting.appendedSkills[2].current:1, target: setting? setting.appendedSkills[2].target:1},
       ]
     }
+  }
+}
+
+function mapServantSetting(results: any[]):ServantSetting {
+  const setting = results.length !== 0 ? results[0].setting : undefined;
+  return {
+    isFollow: setting ? setting.isFollow : false,
+    level: {
+      current:setting ? setting.level.current : 0,
+      target: setting ? setting.level.target : 0
+    },
+    finalLevel: {
+      current:setting ? setting.finalLevel.current : 0,
+      target: setting ? setting.finalLevel.target : 0
+    },
+    skills: [
+      {current: setting? setting.skills[0].current:1, target: setting? setting.skills[0].target:1}, //1-10
+      {current: setting? setting.skills[1].current:1, target: setting? setting.skills[1].target:1},
+      {current: setting? setting.skills[2].current:1, target: setting? setting.skills[2].target:1},
+    ],
+    appendedSkills: [
+      {current: setting? setting.appendedSkills[0].current:1, target: setting? setting.appendedSkills[0].target:1}, //1-10
+      {current: setting? setting.appendedSkills[1].current:1, target: setting? setting.appendedSkills[1].target:1},
+      {current: setting? setting.appendedSkills[2].current:1, target: setting? setting.appendedSkills[2].target:1},
+    ]
   }
 }
