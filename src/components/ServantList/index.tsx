@@ -2,9 +2,10 @@ import React, { useEffect, useState, useCallback } from 'react'
 import { Link } from "react-router-dom";
 import { message } from "antd";
 import { FixedSizeList } from 'react-window';
+import {} from "events";
 import Search from 'antd/lib/input/Search';
 import ServantItem from './ServantItem';
-import { getServantList } from '../../data/db';
+import { getServantList } from '../../utils/db';
 import { ReloadOutlined } from "@ant-design/icons";
 
 export type Servant = {
@@ -68,7 +69,6 @@ export default function ServantList() {
   }
 
   return (
-    // TODO Image 进入窗口后加载
     <div className="servant-list-container">
       <div className="toolbar">
         <Search className="search" onChange={searchOnChange} />
@@ -79,7 +79,7 @@ export default function ServantList() {
           className="servant-list-content"
           itemCount={memServantFilter().length}
           height={800}
-          width={394-6}
+          width={394}
           itemSize={76+7}
         >
           {({ index, style }) => {

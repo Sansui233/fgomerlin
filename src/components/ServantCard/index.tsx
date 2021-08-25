@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { HeartFilled, HeartOutlined, LinkOutlined } from "@ant-design/icons";
-import { getServantDetail, putSetting, ServantSetting, ServantBasic } from '../../data/db'
+import { getServantDetail, putSetting, ServantSetting, ServantBasic } from '../../utils/db'
 import Selections from './Selections';
-import { DOMAIN, ICONBASE } from '../../data/utils';
+import { DOMAIN, ICONBASE } from '../../utils/fetchdata';
 import ArrowUp from '../../assets/icons/arrow-up.svg';
 
 export type ServantDetail = {

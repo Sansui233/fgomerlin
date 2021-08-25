@@ -7,7 +7,7 @@ import { Menu } from 'antd';
 import { CloudDownloadOutlined, FormatPainterOutlined } from "@ant-design/icons";
 import 'antd/dist/antd.css'
 import './App.css';
-import { parseZipDataset } from "./data/utils";
+import { parseZipDataset } from "./utils/fetchdata";
 import cookies from "./lib/cookies"
 import ServantList from './components/ServantList';
 import ServantCard from './components/ServantCard';

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Servant } from '..'
-import { DOMAIN, ICONBASE } from '../../../data/utils'
+import { DOMAIN, ICONBASE } from '../../../utils/fetchdata'
 import { HeartOutlined, HeartFilled } from "@ant-design/icons"
 
 export default function ServantItem(props: Servant) {
