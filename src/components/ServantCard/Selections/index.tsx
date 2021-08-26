@@ -41,13 +41,13 @@ export default function Selections(props: { mode: "skill" | "level" | "finalLeve
         <div>
           <Select className="skill-select" value={state.current.toString()} onChange={handleSelectionChange(Node.current)}>
             {numbers.map((i) => {
-              return <Option value={i}>{i}</Option>
+              return <Option key={i} value={i}>{i}</Option>
             })}
           </Select>
           <span className="text-gray">→</span>
           <Select className="skill-select" value={state.target.toString()} onChange={handleSelectionChange(Node.target)}>
             {numbers.map((i) => {
-              return <Option value={i}>{i}</Option>
+              return <Option key={i} value={i}>{i}</Option>
             })}
           </Select>
         </div>

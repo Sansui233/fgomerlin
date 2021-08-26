@@ -7,6 +7,7 @@ import Search from 'antd/lib/input/Search';
 import ServantItem from './ServantItem';
 import { getServantList, getServantSetting, putSetting } from '../../utils/db';
 import Emitter, { EvtArgTypes, EvtNames, EvtSources, ServantState } from '../../utils/events'
+import { Pages } from '../../App';
 
 export type Servant = {
   sId: number,
@@ -23,7 +24,7 @@ export type Servant = {
 }
 const initServants: Servant[] = []
 
-export default function ServantList() {
+export default function ServantList(props: {removeTopNavCurrentClass: () => void}) {
   const [state, setState] = useState({
     servants: initServants,
     isLoaded: false,
@@ -113,7 +114,7 @@ export default function ServantList() {
   // TODO
   function servantItemRenderer(s: Servant) {
     return (
-      <Link key={s.sId} to={`/servant/${s.sId}`}>
+      <Link key={s.sId} to={`/${Pages.servantList}/${s.sId}`} onClick={props.removeTopNavCurrentClass}>
         <ServantItem servant={s} changeFollow={changeFollow}></ServantItem>
       </Link>
     )

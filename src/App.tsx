@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { BrowserRouter, Switch, Route, Redirect, Link } from "react-router-dom";
+import { useEffect, useState, useRef } from 'react';
+import { withRouter, Switch, Route, Redirect, Link } from "react-router-dom";
 import Layout, { Content } from 'antd/lib/layout/layout';
 import Sider from 'antd/lib/layout/Sider';
 import { message } from 'antd';
@@ -12,12 +12,52 @@ import cookies from "./lib/cookies"
 import ServantList from './components/ServantList';
 import ServantCard from './components/ServantCard';
 
-function App() {
+
+export const Pages = {
+  // For router
+  servantList: "servants",
+  itemList: "item",
+  statistic: "statistic",
+  // Not for router
+  servantContent: "servant-content",
+  itemContent: "item-content",
+}
+
+let navCurrent = Pages.servantList // header selection controller
+let pageCurrent = Pages.servantList // class controller
+
+function App(props: any) {
+  const servantSiderEl = useRef<HTMLDivElement>(null);
 
   const [state, setState] = useState({
-    current: "servant",
-    isDark: cookies.getCookie('isdark') === "true" ? true:false,
+    navCurrent,
+    pageCurrent,
+    isDark: cookies.getCookie('isdark') === "true" ? true : false,
   })
+
+  useEffect(() => {
+    pageOnChange()
+  }, [props.location.pathname])
+
+  function pageOnChange() {
+    const paths = window.location.pathname.split('/') // Format: ["", "servants", "100100"]
+    if (paths.length === 2) {
+      setState({ ...state, navCurrent: paths[1], pageCurrent: paths[1] })
+    }
+    if (paths.length === 3) {
+      setState({ ...state, navCurrent: paths[1], pageCurrent: paths[1] })
+      switch (paths[1]) {
+        case Pages.servantList:
+          setState({ ...state, navCurrent: paths[1], pageCurrent: Pages.servantContent })
+          break;
+        case Pages.itemList:
+          setState({ ...state, navCurrent: paths[1], pageCurrent: Pages.itemContent })
+          break;
+        default:
+          break;
+      }
+    }
+  }
 
   function handleClickFetch() {
     return parseZipDataset().then(() => {
@@ -28,46 +68,79 @@ function App() {
     })
   }
 
-  function switchTheme (){
-    document.cookie = "isdark="+!state.isDark;
-    setState({...state, isDark: !state.isDark})
+
+  function switchTheme() {
+    document.cookie = "isdark=" + !state.isDark;
+    setState({ ...state, isDark: !state.isDark })
+  }
+
+  /**
+   * For Mobile view experience, do not re-render the page when click top route
+   * 
+   * @param topNavTarget DO NOT start with "/"
+   * @returns 
+   */
+  function handleSubNav (topNavTarget: string){
+    if (window.location.pathname.split("/")[1] === topNavTarget){
+      return `${window.location.pathname}`
+    }
+    return `/${topNavTarget}`
+  }
+
+  /**
+   * For Mobile View issue. remove top nav "current-page class"
+   */
+  function addCurrentOnSidebar(){
+      // add class
+      if (servantSiderEl.current != null) {
+        servantSiderEl.current.classList.add('current-page')
+      }
+  }
+
+  function removeCurrentOnSidebar (){
+    if (servantSiderEl.current != null) {
+      servantSiderEl.current.classList.remove('current-page')
+    }
   }
 
   return (
-    <BrowserRouter>
-      <Layout className={state.isDark?"App dark":"App light"}>
-        <section className="header">
-          <Menu className="nav-menu" selectedKeys={[state.current]} mode="horizontal">
-            <Menu.Item key="servant">
-              <Link to="/servant">从者</Link>
-            </Menu.Item>
-            <Menu.Item key="sucai">
-              <Link to="/items">素材</Link>
-            </Menu.Item>
-            <Menu.Item key="statistic">
-              <Link to="/statistic">统计</Link>
-            </Menu.Item>
-          </Menu>
-          <button className="clear-button" onClick={switchTheme}><FormatPainterOutlined /></button>
-          <button className="clear-button" onClick={handleClickFetch}><CloudDownloadOutlined /></button>
-        </section>
-        <Layout>
-          <Switch>
-            <Route path='/servant'>
-              <Sider>
-                <ServantList />
-              </Sider>
-              <Content>
-                <Route path='/servant/:id' component={ServantCard}>
-                </Route>
-              </Content>
-            </Route>
-            <Redirect to="/servant" />
-          </Switch>
-        </Layout>
+    <Layout className={state.isDark ? "app dark" : "app light"}>
+      <Menu className="menu" selectedKeys={[state.navCurrent]} mode="horizontal">
+        <Menu.Item className="menu-item" key={Pages.servantList}>
+          <Link to={handleSubNav(Pages.servantList)} onClick={addCurrentOnSidebar}>从者</Link>
+        </Menu.Item>
+        <Menu.Item className="menu-item" key={Pages.itemList}>
+          <Link to={`/${Pages.itemList}`}>素材</Link>
+        </Menu.Item>
+        <Menu.Item className="menu-item" key={Pages.statistic}>
+          <Link to={`/${Pages.statistic}`}>统计</Link>
+        </Menu.Item>
+        <div className="more-operations">
+          <button className="clear-button menu-button" onClick={handleClickFetch}><CloudDownloadOutlined /></button>
+          <button className="clear-button menu-button" onClick={switchTheme}><FormatPainterOutlined /></button>
+        </div>
+      </Menu>
+      <Layout className="app-content">
+        <Switch>
+          <Route path={`/${Pages.servantList}`}>
+            <Sider ref={servantSiderEl} className={state.pageCurrent === Pages.servantList ?"servant-sider current-page":"servant-sider"}>
+              <ServantList removeTopNavCurrentClass={removeCurrentOnSidebar}/>
+            </Sider>
+            <Content className={state.pageCurrent === Pages.servantContent ?"servant-content current-page":"servant-content"}>
+              <Route path={`/${Pages.servantList}/:id`} component={ServantCard} />
+            </Content>
+          </Route>
+          <Route path={`/${Pages.itemList}`}>
+            <div> items </div>
+          </Route>
+          <Route path={`/${Pages.statistic}`}>
+            <div> Statistic </div>
+          </Route>
+          <Redirect to={`/${Pages.servantList}`} />
+        </Switch>
       </Layout>
-    </BrowserRouter>
+    </Layout>
   );
 }
 
-export default App;
+export default withRouter(App);

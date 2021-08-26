@@ -5,12 +5,12 @@
   }
 }
 
-.ant-layout.light {
+.app.light {
   --theme--primary: #1890ff;
   --sider-bg: #f0f0f0;
   --item-bg: white;
   --content-bg: #f7f7f7;
-  --content-header-bg: #FAFAFA;
+  --content-header-bg: #fafafa;
   --text-primary: #2c2c2c;
   --text-gray: #8d8d8d;
   --text-gray-lighter: #b8b8b8;
@@ -20,7 +20,7 @@
   --box-shadow: #dcdcdc40;
 }
 
-.ant-layout.dark{
+.app.dark {
   --theme--primary: #1890ff;
   --item-bg: rgb(49, 49, 49);
   --sider-bg: rgb(34, 34, 34);
@@ -35,12 +35,11 @@
   --box-shadow: #55555540;
 }
 
-/***************************** Framework ********************************/
+/** Framework *****************************************************************************************************************/
 /* Not for specific elements */
 
-
 .text-gray {
-  color:var(--text-gray);
+  color: var(--text-gray);
 }
 
 .clear-button {
@@ -56,12 +55,21 @@ p.list-item-indentation {
   margin-bottom: 3px;
 }
 
+/** Desktop *****************************************************************************************************************/
 
 /*************************************************************
 *********************** Common *******************************
 **************************************************************/
 
 /* mainly adapt dark mode color */
+
+.menu {
+  height: 46px;
+}
+
+.app-content {
+  height: calc(100vh - 46px);
+}
 
 .ant-layout-content {
   background-color: var(--sider-bg);
@@ -80,7 +88,7 @@ button:hover svg {
   color: var(--theme--primary);
 }
 
-.like svg{
+.like svg {
   color: var(--icon-pink);
 }
 
@@ -96,41 +104,32 @@ body {
   margin-top: 1em;
 }
 
-::-webkit-scrollbar
-{
-    width:6px;
-    height:16px;
-    background-color:var(--item-bg);
+::-webkit-scrollbar {
+  width: 6px;
+  height: 16px;
+  background-color: var(--item-bg);
 }
 
-::-webkit-scrollbar-thumb
-{
-    background-color:var(--text-gray-lighter);
+::-webkit-scrollbar-thumb {
+  background-color: var(--text-gray-lighter);
 }
 
 .ant-select:not(.ant-select-customize-input) .ant-select-selector {
   background-color: unset;
   color: var(--text-primary);
-  border:unset;
+  border: unset;
 }
 
 /********************************************************************
 *************************** Header **********************************
 *********************************************************************/
 
-.header {
-  display: flex;
-  align-items: center;
-  background-color: var(--item-bg);
-  color: var(--text-primary);
-}
-
 .ant-menu {
   background-color: var(--item-bg);
 }
 
 .ant-menu-horizontal {
-  border-bottom: var(--sider-bg);
+  border-bottom: 1px solid var(--sider-bg);
 }
 
 .ant-menu-horizontal > .ant-menu-item a {
@@ -141,15 +140,21 @@ body {
   color: var(--theme--primary);
 }
 
-.nav-menu {
- flex-grow: 1;
+.menu-item {
+  flex-grow: 0;
 }
 
-.header > button {
-  flex-grow: 0;
+.more-operations {
+  flex-grow: 1;
+  order: 99;
+}
+
+.menu-button {
+  float: right;
   padding-right: 1em;
   cursor: pointer;
   font-size: 20px;
+  order: 99;
 }
 
 /**********************************************************************
@@ -161,11 +166,10 @@ body {
   min-width: 394px !important;
   max-width: 394px !important;
   width: 394px !important;
-  height: calc(100vh - 46px);
   background-color: var(--sider-bg);
 }
 
-.servant-list-container{
+.servant-list-container {
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -196,7 +200,9 @@ body {
   border-color: var(--text-gray-lighter);
 }
 
-.ant-btn:hover, .ant-btn:focus, .ant-btn:active {
+.ant-btn:hover,
+.ant-btn:focus,
+.ant-btn:active {
   background-color: var(--button-bg-hover);
 }
 
@@ -259,10 +265,10 @@ body {
 }
 
 .servant-item-info {
-  height: 60px;
   margin-left: 6px;
-  margin-bottom: 5px; /* For visual justify*/
-  flex:1 1 auto;
+  height: 64px;
+  margin-bottom: 2px; /* for visual justify */
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -275,7 +281,10 @@ body {
 }
 
 p.servant-item-info-name {
+  text-overflow: ellipsis;
   padding-bottom: 2px;
+  overflow: hidden;
+  height: 26px;
 }
 
 p.servant-item-info-namejp,
@@ -284,7 +293,7 @@ p.servant-item-info-other {
   font-size: 13px;
   color: var(--text-gray);
   overflow: hidden;
-    height: 1.5em;
+  height: 28px;
 }
 
 .servant-item-skills {
@@ -365,11 +374,40 @@ p.list-title {
   object-fit: scale-down;
 }
 
-.servant-card-setting-list-item-name{
+.servant-card-setting-list-item-name {
   flex-grow: 1;
   padding-left: 0.35em;
 }
 
 .skill-select {
   width: 58px;
+}
+
+/* Mobile Card **************************************************************************************************/
+
+@media screen and (max-width: 640px) {
+  .app-content {
+    width: 100%;
+  }
+
+  .servant-sider {
+    flex: 0 0 100vw !important;
+    min-width: 100vw!important;
+    max-width: 100vw !important;
+    width: 100vw !important;
+    transform: translateX(-100%);
+    transition: transform 0.2s;
+    z-index: 2;
+  }
+
+  .servant-sider.current-page {
+    transform: translateX(0);
+  }
+
+  .servant-content {
+    width: 100vw !important;
+    position: fixed;
+    left: 0;
+    z-index: 1;
+  }
 }
