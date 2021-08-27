@@ -8,16 +8,18 @@
 .app.light {
   --theme--primary: #1890ff;
   --sider-bg: #f0f0f0;
+  --sider-bg-darker: #eaeaea;
   --item-bg: white;
   --content-bg: #f7f7f7;
-  --content-header-bg: #fafafa;
+  --content-header-bg: #fdfdfd;
   --text-primary: #2c2c2c;
+  --text-bold: #333;
   --text-gray: #8d8d8d;
   --text-gray-lighter: #b8b8b8;
   --icon-gray: #8d8d8d;
   --icon-pink: #ff5757;
   --button-bg-hover: #f3f8ff;
-  --box-shadow: #dcdcdc40;
+  --box-shadow: #00000012;
 }
 
 .app.dark {
@@ -27,12 +29,13 @@
   --content-bg: rgb(41, 41, 41);
   --content-header-bg: #3a3a3a;
   --text-primary: #dddddd;
+  --text-bold: #dddddd;
   --text-gray: #8d8d8d;
   --text-gray-lighter: #666666;
   --icon-gray: #8d8d8d;
   --icon-pink: #ff5757;
   --button-bg-hover: #3e3e3e;
-  --box-shadow: #55555540;
+  --box-shadow: #00000012;
 }
 
 /** Framework *****************************************************************************************************************/
@@ -45,6 +48,16 @@
 .clear-button {
   border: unset;
   background-color: unset;
+}
+
+img.small {
+  width: 23px;
+  height: 23px;
+}
+
+.justify-center {
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .list-item-indentation {
@@ -63,16 +76,34 @@ p.list-item-indentation {
 
 /* mainly adapt dark mode color */
 
-.menu {
+.app-menu {
   height: 46px;
 }
 
 .app-content {
-  height: calc(100vh - 46px);
+  height: calc(100vh - 48px);
+  overflow-y: hidden;
+  background-color: var(--content-bg);
+}
+
+.sider {
+  flex: 0 0 394px !important;
+  min-width: 394px !important;
+  max-width: 394px !important;
+  width: 394px !important;
+  background-color: var(--sider-bg);
+}
+
+.ant-layout-sider-children {
+  box-shadow: 4px 0 4px 0 #00000017;
+}
+
+.item-sider {
+  background-color: var(--sider-bg);
 }
 
 .ant-layout-content {
-  background-color: var(--sider-bg);
+  background-color: var(--content-bg);
   color: var(--text-primary);
 }
 
@@ -161,14 +192,6 @@ body {
 *********************** Servant Sider *********************************
 ***********************************************************************/
 
-.ant-layout-sider {
-  flex: 0 0 394px !important;
-  min-width: 394px !important;
-  max-width: 394px !important;
-  width: 394px !important;
-  background-color: var(--sider-bg);
-}
-
 .servant-list-container {
   height: 100%;
   display: flex;
@@ -227,7 +250,7 @@ body {
   cursor: unset;
 }
 
-.servant-item-container {
+.sidebar-item-container {
   position: relative;
   border-radius: 5px;
   background-color: var(--item-bg);
@@ -237,7 +260,7 @@ body {
   margin-right: 7px;
 }
 
-.servant-item-hover-layer {
+.sidebar-item-hover-layer {
   height: 100%;
   width: 100%;
   box-shadow: 0px 4px 4px 0px #00000017;
@@ -246,19 +269,19 @@ body {
   justify-content: space-between;
 }
 
-.servant-item-hover-layer:hover {
+.sidebar-item-hover-layer:hover {
   box-shadow: 0px 0px 2px 1px var(--theme--primary);
   background-color: var(--button-bg-hover);
 }
 
-.servant-item-img-container {
+.sidebar-item-img-container {
   flex: 0 0 auto;
   width: 55px;
   height: 60px;
   margin-left: 9px;
 }
 
-.servant-item-img-container img {
+.sidebar-item-img-container img {
   width: 100%;
   height: 100%;
   border-radius: 6px;
@@ -390,7 +413,7 @@ p.list-title {
     width: 100%;
   }
 
-  .servant-sider {
+  .sider {
     flex: 0 0 100vw !important;
     min-width: 100vw !important;
     max-width: 100vw !important;
@@ -400,7 +423,7 @@ p.list-title {
     z-index: 2;
   }
 
-  .servant-sider.current-page {
+  .sider.current-page {
     transform: translateX(0);
   }
 
@@ -408,10 +431,45 @@ p.list-title {
     width: 100% !important;
   }
 
-  .servant-content {
+  .content {
     width: 100vw !important;
     position: fixed;
     left: 0;
     z-index: 1;
   }
+}
+
+/**********************************************************************
+*********************** Item Sider *************************************
+***********************************************************************/
+
+.currency-top {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 7px;
+}
+
+.item-category-container {
+  height: 100%;
+  color: var(--text-primary);
+}
+
+.item-category-info {
+  margin-left: 6px;
+  height: 64px;
+  margin-bottom: 2px; /* for visual justify */
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.item-category-info .item-name {
+  margin: auto 5px;
+  padding: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-bold);
 }

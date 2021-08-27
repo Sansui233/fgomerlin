@@ -1,6 +1,6 @@
 import Dexie from 'dexie';
-import { ServantDetail } from '../components/ServantCard';
-import { Servant } from '../components/ServantList'
+import { ServantDetail } from '../pages/ServantCard';
+import { Servant } from '../pages/ServantList'
 
 var db: Dexie;
 var version = 2;

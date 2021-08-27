@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { Link } from "react-router-dom";
-import { message } from "antd";
 import { ReloadOutlined } from "@ant-design/icons";
 import { FixedSizeList } from 'react-window';
 import Search from 'antd/lib/input/Search';
@@ -24,7 +23,7 @@ export type Servant = {
 }
 const initServants: Servant[] = []
 
-export default function ServantList(props: {removeTopNavCurrentClass: () => void}) {
+export default function ServantList(props: {removeCurrentOnSidebar: () => void}) {
   const [state, setState] = useState({
     servants: initServants,
     isLoaded: false,
@@ -70,7 +69,6 @@ export default function ServantList(props: {removeTopNavCurrentClass: () => void
     const servants = await getServantList()
     console.log(`[ServantList] reload from db successfully. Total ${servants.length} items`)
     setState({ servants, isLoaded: true, filter_str: "" })
-    message.success('成功载入数据')
   }
 
   function searchOnChange(e: any) {
@@ -111,10 +109,9 @@ export default function ServantList(props: {removeTopNavCurrentClass: () => void
 
   const memServantFilter = useCallback(() => filterServants(state.filter_str), [state.filter_str, state.servants])
 
-  // TODO
   function servantItemRenderer(s: Servant) {
     return (
-      <Link key={s.sId} to={`/${Pages.servantList}/${s.sId}`} onClick={props.removeTopNavCurrentClass}>
+      <Link key={s.sId} to={`/${Pages.servantList}/${s.sId}`} onClick={props.removeCurrentOnSidebar}>
         <ServantItem servant={s} changeFollow={changeFollow}></ServantItem>
       </Link>
     )
@@ -130,7 +127,7 @@ export default function ServantList(props: {removeTopNavCurrentClass: () => void
         <FixedSizeList
           className="servant-list-content"
           itemCount={memServantFilter().length}
-          height={800}
+          height={1080}
           width={394}
           itemSize={76 + 7}
         >

@@ -9,8 +9,9 @@ import 'antd/dist/antd.css'
 import './App.css';
 import { parseZipDataset } from "./utils/fetchdata";
 import cookies from "./lib/cookies"
-import ServantList from './components/ServantList';
-import ServantCard from './components/ServantCard';
+import ServantList from './pages/ServantList';
+import ServantCard from './pages/ServantCard';
+import ItemCategory from './pages/ItemCategory';
 
 
 export const Pages = {
@@ -19,7 +20,7 @@ export const Pages = {
   itemList: "item",
   statistic: "statistic",
   // Not for router
-  servantContent: "servant-content",
+  servantContent: "content",
   itemContent: "item-content",
 }
 
@@ -80,8 +81,8 @@ function App(props: any) {
    * @param topNavTarget DO NOT start with "/"
    * @returns 
    */
-  function handleSubNav (topNavTarget: string){
-    if (window.location.pathname.split("/")[1] === topNavTarget){
+  function handleSubNav(topNavTarget: string) {
+    if (window.location.pathname.split("/")[1] === topNavTarget) {
       return `${window.location.pathname}`
     }
     return `/${topNavTarget}`
@@ -90,14 +91,14 @@ function App(props: any) {
   /**
    * For Mobile View issue. remove top nav "current-page class"
    */
-  function addCurrentOnSidebar(){
-      // add class
-      if (servantSiderEl.current != null) {
-        servantSiderEl.current.classList.add('current-page')
-      }
+  function addCurrentOnSidebar() {
+    // add class
+    if (servantSiderEl.current != null) {
+      servantSiderEl.current.classList.add('current-page')
+    }
   }
 
-  function removeCurrentOnSidebar (){
+  function removeCurrentOnSidebar() {
     if (servantSiderEl.current != null) {
       servantSiderEl.current.classList.remove('current-page')
     }
@@ -105,7 +106,7 @@ function App(props: any) {
 
   return (
     <Layout className={state.isDark ? "app dark" : "app light"}>
-      <Menu className="menu" selectedKeys={[state.navCurrent]} mode="horizontal">
+      <Menu className="app-menu" selectedKeys={[state.navCurrent]} mode="horizontal">
         <Menu.Item className="menu-item" key={Pages.servantList}>
           <Link to={handleSubNav(Pages.servantList)} onClick={addCurrentOnSidebar}>从者</Link>
         </Menu.Item>
@@ -123,15 +124,19 @@ function App(props: any) {
       <Layout className="app-content">
         <Switch>
           <Route path={`/${Pages.servantList}`}>
-            <Sider ref={servantSiderEl} className={state.pageCurrent === Pages.servantList ?"servant-sider current-page":"servant-sider"}>
-              <ServantList removeTopNavCurrentClass={removeCurrentOnSidebar}/>
+            <Sider ref={servantSiderEl} className={state.pageCurrent === Pages.servantList ? "sider current-page" : "sider"}>
+              <ServantList removeCurrentOnSidebar={removeCurrentOnSidebar} />
             </Sider>
-            <Content className={state.pageCurrent === Pages.servantContent ?"servant-content current-page":"servant-content"}>
+            <Content className={state.pageCurrent === Pages.servantContent ? "content current-page" : "content"}>
               <Route path={`/${Pages.servantList}/:id`} component={ServantCard} />
             </Content>
           </Route>
           <Route path={`/${Pages.itemList}`}>
-            <div> items </div>
+            <Sider ref={servantSiderEl} className={state.pageCurrent === Pages.itemList ? "item-sider current-page" : "item-sider"}>
+            <ItemCategory />
+            </Sider>
+            <Content className={state.pageCurrent === Pages.itemContent ? "content current-page" : "content"}>
+            </Content>
           </Route>
           <Route path={`/${Pages.statistic}`}>
             <div> Statistic </div>
