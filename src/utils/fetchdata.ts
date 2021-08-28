@@ -1,6 +1,6 @@
 import axios from "axios";
 import JSZip, { } from "jszip"
-import { putServant } from "./db";
+import { putItems, putServant } from "./db";
 
 // TODO 测试配置文件之后单独分离
 export const DOMAIN = "http://localhost:8080"
@@ -39,34 +39,32 @@ async function fetchTextDataSet(): Promise<{ [key: string]: JSZip.JSZipObject; }
 }
 
 export async function parseZipDataset() {
-  try {
-    const files = await fetchTextDataSet()
-    for (const filename of Object.keys(files)) {
-      const file = files[filename]
-      switch (filename) {
-        case "dataset-text/VERSION":
-          // Print Version
-          file.async("string").then((result) => {
-            console.log("[utils.ts] Current Data Version: ", result)
-          })
-          break;
-        case "dataset-text/dataset.json":
-          file.async("string").then((result) => {
-            storeToDatabase(JSON.parse(result))
-          })
-          break;
-        default:
-          break;
-      }
+  const files = await fetchTextDataSet()
+  for (const filename of Object.keys(files)) {
+    const file = files[filename]
+    switch (filename) {
+      case "dataset-text/VERSION":
+        // Print Version
+        file.async("string").then((result) => {
+          console.log("[utils.ts] Current Data Version: ", result)
+        })
+        break;
+      case "dataset-text/dataset.json":
+        const result = await file.async("string")
+        return storeToDatabase(JSON.parse(result))
+      default:
+        break;
     }
-  } catch (error) {
-    console.log("[util.js] ", error)
   }
 }
 
-// TODO Item
-function storeToDatabase(dataObject: DataSetText) {
+async function storeToDatabase(dataObject: DataSetText) {
+  const arr:Promise<void>[] = []
   for (const value of Object.values(dataObject.servants)) {
-    putServant(value.svtId, value.info.name, value)
+    arr.push(putServant(value.svtId, value.info.name, value))
   }
+  for (const value of Object.values(dataObject.items)) {
+    arr.push(putItems(value.id, value.category, value.name, value))
+  }
+  return Promise.all(arr)
 }

@@ -12,6 +12,7 @@ import cookies from "./lib/cookies"
 import ServantList from './pages/ServantList';
 import ServantCard from './pages/ServantCard';
 import ItemCategory from './pages/ItemCategory';
+import ItemContents from './pages/ItemContents';
 
 
 export const Pages = {
@@ -60,10 +61,14 @@ function App(props: any) {
     }
   }
 
-  function handleClickFetch() {
+  async function handleClickFetch() {
+    message.info('正在获取并处理数据...');
     return parseZipDataset().then(() => {
-      message.success('成功获取远程数据');
+      message.success('更新数据库成功');
       console.log("[ServantList] FetchData successfully");
+      setTimeout(() => {
+        window.location.reload()
+      }, 500)
     }).catch((err) => {
       message.error('获取远程数据失败\n 错误信息：' + err)
     })
@@ -111,15 +116,17 @@ function App(props: any) {
           <Link to={handleSubNav(Pages.servantList)} onClick={addCurrentOnSidebar}>从者</Link>
         </Menu.Item>
         <Menu.Item className="menu-item" key={Pages.itemList}>
-          <Link to={`/${Pages.itemList}`}>素材</Link>
+          <Link to={`/${Pages.itemList}/materials`}>素材</Link>
         </Menu.Item>
         <Menu.Item className="menu-item" key={Pages.statistic}>
           <Link to={`/${Pages.statistic}`}>统计</Link>
         </Menu.Item>
-        <div className="more-operations">
-          <button className="clear-button menu-button" onClick={handleClickFetch}><CloudDownloadOutlined /></button>
-          <button className="clear-button menu-button" onClick={switchTheme}><FormatPainterOutlined /></button>
-        </div>
+        <Menu.Item style={{ marginLeft: "auto" }} className="menu-button">
+          <button className="clear-button"  onClick={switchTheme}><FormatPainterOutlined /></button>
+        </Menu.Item>
+        <Menu.Item style={{ marginRight: "10px" }} className="menu-button">
+          <button className="clear-button" onClick={handleClickFetch}><CloudDownloadOutlined /></button>
+        </Menu.Item>
       </Menu>
       <Layout className="app-content">
         <Switch>
@@ -133,9 +140,10 @@ function App(props: any) {
           </Route>
           <Route path={`/${Pages.itemList}`}>
             <Sider ref={servantSiderEl} className={state.pageCurrent === Pages.itemList ? "item-sider current-page" : "item-sider"}>
-            <ItemCategory />
+              <ItemCategory />
             </Sider>
             <Content className={state.pageCurrent === Pages.itemContent ? "content current-page" : "content"}>
+            <Route path={`/${Pages.itemList}/:category`} component={ItemContents} />
             </Content>
           </Route>
           <Route path={`/${Pages.statistic}`}>

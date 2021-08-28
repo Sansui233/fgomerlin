@@ -20,6 +20,7 @@
   --icon-pink: #ff5757;
   --button-bg-hover: #f3f8ff;
   --box-shadow: #00000012;
+  --underline: #dcdcdc;
 }
 
 .app.dark {
@@ -36,6 +37,7 @@
   --icon-pink: #ff5757;
   --button-bg-hover: #3e3e3e;
   --box-shadow: #00000012;
+  --underline: #464646;
 }
 
 /** Framework *****************************************************************************************************************/
@@ -53,6 +55,22 @@
 img.small {
   width: 23px;
   height: 23px;
+}
+
+input.number {
+  border: unset;
+  border-bottom: 1px solid var(--underline);
+  background-color: unset;
+  max-width: 8rem;
+}
+
+input.number:focus,
+input.number:focus-visible
+{
+  outline: unset;
+  background-color: var(--item-bg);
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--theme--primary);
 }
 
 .justify-center {
@@ -78,10 +96,11 @@ p.list-item-indentation {
 
 .app-menu {
   height: 46px;
+  z-index: 99;
 }
 
 .app-content {
-  height: calc(100vh - 48px);
+  height: calc(100vh - 46px);
   overflow-y: hidden;
   background-color: var(--content-bg);
 }
@@ -105,6 +124,11 @@ p.list-item-indentation {
 .ant-layout-content {
   background-color: var(--content-bg);
   color: var(--text-primary);
+}
+
+.content {
+  height: 100%;
+  overflow-y: auto;
 }
 
 button {
@@ -151,6 +175,8 @@ body {
   border: unset;
 }
 
+
+
 /********************************************************************
 *************************** Header **********************************
 *********************************************************************/
@@ -175,17 +201,14 @@ body {
   flex-grow: 0;
 }
 
-.more-operations {
-  flex-grow: 1;
-  order: 99;
+.menu-button {
+  padding-right: 10px !important;
+  padding-left: 10px !important;
 }
 
-.menu-button {
-  float: right;
-  padding-right: 1em;
-  cursor: pointer;
+.menu-button svg {
   font-size: 20px;
-  order: 99;
+  transform: translateY(3px);
 }
 
 /**********************************************************************
@@ -406,38 +429,6 @@ p.list-title {
   width: 58px;
 }
 
-/* Mobile Card **************************************************************************************************/
-
-@media screen and (max-width: 640px) {
-  .app-content {
-    width: 100%;
-  }
-
-  .sider {
-    flex: 0 0 100vw !important;
-    min-width: 100vw !important;
-    max-width: 100vw !important;
-    width: 100vw !important;
-    transform: translateX(-100%);
-    transition: transform 0.2s;
-    z-index: 2;
-  }
-
-  .sider.current-page {
-    transform: translateX(0);
-  }
-
-  .servant-list-content {
-    width: 100% !important;
-  }
-
-  .content {
-    width: 100vw !important;
-    position: fixed;
-    left: 0;
-    z-index: 1;
-  }
-}
 
 /**********************************************************************
 *********************** Item Sider *************************************
@@ -472,4 +463,159 @@ p.list-title {
   font-size: 16px;
   font-weight: 500;
   color: var(--text-bold);
+}
+
+
+/**********************************************************************
+*********************** Item Content *************************************
+***********************************************************************/
+
+.items-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.items-item {
+  background-color: var(--item-bg);
+  color: var(--text-primary);
+  margin: 7px;
+  min-width: 175px;
+  height: 76px;
+  flex-grow: 1;
+  border-radius: 5px;
+  box-shadow: 0px 4px 4px 0px var(--box-shadow);
+  display: flex;
+  align-items: center;
+}
+
+
+div.blank-item-placeholder {
+  background-color: var(--item-bg);
+  color: var(--text-primary);
+  margin: 9px;
+  min-width: 200px;
+  height: 0px;
+  flex-grow: 1;
+}
+
+.items-item-name {
+  width: 5em;
+}
+
+.items-item-img {
+  width: 55px;
+  height: 60px;
+  border-radius: 6px;
+  object-fit: scale-down;
+  margin: auto 7px;
+}
+
+.items-item-count {
+  margin-right: .6rem;
+  margin-left: auto;
+  width: 3rem;
+  text-align: right;
+}
+
+/* Mobile Card **************************************************************************************************/
+
+@media screen and (max-width: 720px) {
+  .app-content {
+    width: 100%;
+  }
+
+  .sider {
+    flex: 0 0 100vw !important;
+    min-width: 100vw !important;
+    max-width: 100vw !important;
+    width: 100vw !important;
+    transform: translateX(-100%);
+    transition: transform 0.2s;
+    z-index: 2;
+  }
+
+  .sider.current-page {
+    transform: translateX(0);
+  }
+
+  .servant-list-content {
+    width: 100% !important;
+  }
+
+  .content {
+    width: 100vw !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding-top: 60px;
+    z-index: 1;
+  }
+
+  .item-sider {
+    z-index: 2;
+    height: 60px;
+    width: 100% !important;
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .item-category-container {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .item-category-container .currency-top {
+    order: 4;
+    height: unset;
+    margin: unset;
+    width: 100%;
+  }
+
+  .item-category-container > a {
+    flex-grow: 1;
+  }
+
+  .item-category-container .sidebar-item-container{
+    background-color: var(--item-bg);
+    height: 1.8rem;
+    margin: unset;
+    border-radius: unset;
+    flex-grow: 1;
+  }
+
+  .item-category-container .sidebar-item-container:hover .item-category-info .item-name{
+    color:var(--theme--primary);
+    cursor: default;
+  }
+
+  .item-category-container .sidebar-item-hover-layer:hover {
+    box-shadow: 0px 2px 0px 0px var(--theme--primary);
+    background-color: unset;
+}
+
+  .item-category-container .item-category-info {
+    margin-left: unset;
+    height: unset;
+    margin-bottom: unset;
+    flex: 1 1 auto;
+    display: block;
+  }
+
+  .item-category-container .item-category-info .item-name {
+    text-align: center;
+    font-size: 13px;
+    font-weight: normal;
+  }
+
+  .item-category-container .sidebar-item-container .sidebar-item-img-container {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  .items-container {
+    margin-top: 60px;
+  }
 }
