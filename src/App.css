@@ -252,15 +252,29 @@ body {
   background-color: var(--button-bg-hover);
 }
 
-.reload-button {
-  margin: 0 0.5em;
+.filter-like-button {
   padding: unset;
+  padding-left: 0.5em;
+  padding-right: 0.4em;
   flex-grow: 0;
   color: var(--text-gray);
   cursor: pointer;
 }
 
-.reload-button:hover {
+.filter-like-button:hover svg{
+  color: var(--icon-pink);
+}
+
+.reload-button {
+  padding: unset;
+  padding-left: 0.4em;
+  padding-right: 0.8em;
+  flex-grow: 0;
+  color: var(--text-gray);
+  cursor: pointer;
+}
+
+.reload-button:hover svg{
   color: var(--theme--primary);
 }
 

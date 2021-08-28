@@ -1,6 +1,6 @@
 import axios from "axios";
 import JSZip, { } from "jszip"
-import { putItems, putServant } from "./db";
+import { putItems, putServant, putVersion } from "./db";
 
 // TODO 测试配置文件之后单独分离
 export const DOMAIN = "http://localhost:8080"
@@ -47,6 +47,7 @@ export async function parseZipDataset() {
         // Print Version
         file.async("string").then((result) => {
           console.log("[utils.ts] Current Data Version: ", result)
+          putVersion(result)
         })
         break;
       case "dataset-text/dataset.json":
@@ -64,7 +65,7 @@ async function storeToDatabase(dataObject: DataSetText) {
     arr.push(putServant(value.svtId, value.info.name, value))
   }
   for (const value of Object.values(dataObject.items)) {
-    arr.push(putItems(value.id, value.category, value.name, value))
+    arr.push(putItems(value.id, value.name,value.category,  value))
   }
   return Promise.all(arr)
 }

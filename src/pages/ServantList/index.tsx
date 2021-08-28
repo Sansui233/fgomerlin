@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { Link } from "react-router-dom";
-import { ReloadOutlined } from "@ant-design/icons";
+import { HeartFilled, HeartOutlined, ReloadOutlined } from "@ant-design/icons";
 import { FixedSizeList } from 'react-window';
 import Search from 'antd/lib/input/Search';
 import ServantItem from './ServantItem';
@@ -22,12 +22,21 @@ export type Servant = {
   isFollow: boolean,
 }
 const initServants: Servant[] = []
+type FilterOption =  {
+  needFollow: boolean,
+  sClass: string
+}
+const initFilter:FilterOption = {
+  needFollow: false,
+  sClass: ""
+}
 
 export default function ServantList(props: {removeCurrentOnSidebar: () => void}) {
   const [state, setState] = useState({
     servants: initServants,
     isLoaded: false,
-    filter_str: ""
+    filter_str: "",
+    filter_options: initFilter
   })
 
   // Load when mounted
@@ -65,10 +74,10 @@ export default function ServantList(props: {removeCurrentOnSidebar: () => void})
   }, [state.servants]) // Unless state will always be 0
 
   async function reloadFromDB() {
-    setState({ servants: state.servants, isLoaded: false, filter_str: "" })
+    setState({ servants: state.servants, isLoaded: false, filter_str: "", filter_options: state.filter_options})
     const servants = await getServantList()
     console.log(`[ServantList] reload from db successfully. Total ${servants.length} items`)
-    setState({ servants, isLoaded: true, filter_str: "" })
+    setState({ servants, isLoaded: true, filter_str: "", filter_options: state.filter_options})
   }
 
   function searchOnChange(e: any) {
@@ -84,7 +93,7 @@ export default function ServantList(props: {removeCurrentOnSidebar: () => void})
       const newServants = [...state.servants]
       newServants[i] = { ...s, isFollow: !s.isFollow}
       getServantSetting(sId).then((setting) => {
-        putSetting(sId, UserSettingType.Servant ,{ ...setting, isFollow: !s.isFollow }).then(() => {
+        putSetting(sId, s.sName, UserSettingType.Servant ,{ ...setting, isFollow: !s.isFollow }).then(() => {
           setState({ ...state, servants: newServants })
           Emitter.dataEmit(EvtNames.ModifyServant, EvtSources.ServantSidebar, {
             id: sId,
@@ -96,18 +105,36 @@ export default function ServantList(props: {removeCurrentOnSidebar: () => void})
       })
   }
 
-  function filterServants(query: string): Servant[] {
-    return query === "" ? state.servants : state.servants.filter((servant) => {
-      if (servant.sName.includes(query)) {
-        return true
+  function changeFilterFollow (){
+    setState({...state, filter_options: {...state.filter_options, needFollow: !state.filter_options.needFollow}})
+  }
+
+  // 纯函数，不要在里面依赖 state
+  function filterQuery(query: string, servants: Servant[], options: FilterOption): Servant[] {
+    return servants.filter((servant) => {
+      if (options.needFollow === true && servant.isFollow === false) {
+        return false
       }
-      return servant.sNickNames.some((nickname) => {
-        return nickname.includes(query)
-      })
+      if (options.sClass !== "" && servant.sClass !== options.sClass) {
+        return false
+      }
+      if(query !== ""){
+        if(servant.sName.includes(query)) {
+          return true
+        }
+        if(servant.sNickNames.some((nickname) => {
+          return nickname.includes(query)
+        })){
+          return true
+        }
+        return false
+      }
+      // No filter
+      return true
     })
   }
 
-  const memServantFilter = useCallback(() => filterServants(state.filter_str), [state.filter_str, state.servants])
+  const memServantFilter = useCallback(() => filterQuery(state.filter_str, state.servants, state.filter_options), [state.filter_str, state.filter_options, state.servants])
 
   function servantItemRenderer(s: Servant) {
     return (
@@ -121,7 +148,10 @@ export default function ServantList(props: {removeCurrentOnSidebar: () => void})
     <div className="servant-list-container">
       <div className="toolbar">
         <Search className="search" onChange={searchOnChange} />
-        <button className="clear-button reload-button" onClick={reloadFromDB}><ReloadOutlined /></button>
+        <button className="clear-button filter-like-button" onClick={changeFilterFollow}>
+          {state.filter_options.needFollow? <HeartFilled className="like"/>:<HeartOutlined/>}
+        </button>
+        <button className="clear-button reload-button" onClick={reloadFromDB}><ReloadOutlined/></button>
       </div>
       {state.isLoaded ?
         <FixedSizeList

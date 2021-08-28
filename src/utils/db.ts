@@ -6,13 +6,22 @@ import { Servant } from '../pages/ServantList'
 import { parseZipDataset } from './fetchdata';
 
 var db: Dexie;
-var version = 1.1;
+var version = 1.2;
+
+/**
+ * Table(Object Store) Structure
+ * 
+ * Servant Tabel:     id: number, name: string, detail: object
+ * Item Table:        id: number, name: string, category: ItemType, detail: object
+ * User Setting:      id: number, name: string, type: UserSettingType, setting: ServantSetting | ItemSetting | QP's number
+ * srcinfo:           dataversion: string
+ */
 
 // Define table indexing
-const SERVANT_TABLE = "id, name" // id: number, name: string. And one more column: detail: object
-const ITEM_TABLE = "id, category" // id: number, category: string
-const USER_SETTING = "id, type" // id: number, setting: ServantSetting | ItemSetting | QP's number
-const SRCINFO_TABLE = "dataversion" // dataversion: string
+const SERVANT_TABLE = "id, name" 
+const ITEM_TABLE = "id, name, category"
+const USER_SETTING = "id, name, type" 
+const SRCINFO_TABLE = "dataversion"
 
 export type ServantBasic = {
   sId: number,
@@ -94,8 +103,8 @@ export function initdb() {
   });
 }
 
-export async function putVersion() {
-  await db.table('srcinfo').put({ dataversion: version })
+export async function putVersion(dataVer: string) {
+  await db.table('srcinfo').put({ dataversion: dataVer })
 }
 
 export async function getServantList(): Promise<Servant[]> {
@@ -132,26 +141,26 @@ export async function getItemList(category: ItemType): Promise<ItemInfo[]> {
   return mapItemList(results)
 }
 
-export async function putItems(id: number, category: ItemType, name: string, detail: object) {
+export async function putItems(id: number,name: string,category: ItemType,  detail: object) {
   if (typeof (id) == "string") {
     id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
   }
   if (typeof (category) == "string") {
     category = parseInt(category, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
   }
-  await db.table('items').put({ id, category, name, detail })
+  await db.table('items').put({ id, name,category, detail })
 }
 
-export async function putSetting(id: number, settingType: UserSettingType,setting: ServantSetting | ItemSetting) {
+export async function putSetting(id: number, name:string, settingType: UserSettingType,setting: ServantSetting | ItemSetting) {
   if (typeof (id) == "string") {
     id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
   }
-  await db.table('user_setting').put({ id, type: settingType,setting })
+  await db.table('user_setting').put({ id, name, type: settingType,setting })
 }
 
 export async function putQpSetting(setting: number) {
   const settingtype = UserSettingType.QP
-  await db.table('user_setting').put({ id: QPID, type: settingtype, setting })
+  await db.table('user_setting').put({ id: QPID, name:"QP", type: settingtype, setting })
 }
 
 export async function getQpSetting():Promise<number> {

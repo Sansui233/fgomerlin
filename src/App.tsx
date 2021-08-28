@@ -121,10 +121,10 @@ function App(props: any) {
         <Menu.Item className="menu-item" key={Pages.statistic}>
           <Link to={`/${Pages.statistic}`}>统计</Link>
         </Menu.Item>
-        <Menu.Item style={{ marginLeft: "auto" }} className="menu-button">
-          <button className="clear-button"  onClick={switchTheme}><FormatPainterOutlined /></button>
+        <Menu.Item style={{ marginLeft: "auto" }} key="theme" className="menu-button">
+          <button className="clear-button" onClick={switchTheme}><FormatPainterOutlined /></button>
         </Menu.Item>
-        <Menu.Item style={{ marginRight: "10px" }} className="menu-button">
+        <Menu.Item style={{ marginRight: "10px" }} key="fetch-data" className="menu-button">
           <button className="clear-button" onClick={handleClickFetch}><CloudDownloadOutlined /></button>
         </Menu.Item>
       </Menu>
@@ -143,7 +143,7 @@ function App(props: any) {
               <ItemCategory />
             </Sider>
             <Content className={state.pageCurrent === Pages.itemContent ? "content current-page" : "content"}>
-            <Route path={`/${Pages.itemList}/:category`} component={ItemContents} />
+              <Route path={`/${Pages.itemList}/:category`} component={ItemContents} />
             </Content>
           </Route>
           <Route path={`/${Pages.statistic}`}>

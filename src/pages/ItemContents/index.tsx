@@ -51,17 +51,16 @@ export default function ItemContents(props: any) {
   // submit data to database
   function handleInputOnBlur(e: React.FocusEvent<HTMLInputElement>) {
     const i = e.target.dataset.index ? parseInt(e.target.dataset.index) : -1;
-    const id = itemstates[i].id
     const num = parseInt(e.target.value)
     if (isNaN(num)) {
       return
     }
-    putSetting(id, UserSettingType.Item, { count: num })
+    putSetting(itemstates[i].id, itemstates[i].name ,UserSettingType.Item, { count: num })
   }
 
   // focus on next item when press enter
   function handleOnKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Enter" || e.key === "ArrowDown" || e.key === "ArrowRight") {
+    if (e.key === "Enter") {
       const activeEl = document.activeElement ? document.activeElement as HTMLInputElement : null
       if (!activeEl) { return }
       const currentIndex = activeEl.dataset.index !== undefined ? parseInt(activeEl.dataset.index) : undefined
