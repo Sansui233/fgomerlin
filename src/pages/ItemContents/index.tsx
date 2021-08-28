@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { getItemList, ItemType } from '../../utils/db'
+import React, { useState, useEffect } from 'react'
+import { getItemList, ItemType, putSetting, UserSettingType } from '../../utils/db'
 import { DOMAIN, ICONBASE } from '../../utils/fetchdata'
 
 export type ItemInfo = {
@@ -27,22 +27,65 @@ export default function ItemContents(props: any) {
 
   const [itemstates, setstate] = useState(initstate)
 
+  // Component on mount
   useEffect(() => {
     getItemList(category).then((infos) => {
       setstate(infos)
     })
   }, [category])
 
+  // Only number is accepted
+  function handleInputOnChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const i = e.target.dataset.index ? parseInt(e.target.dataset.index) : -1;
+    if (e.target.value === "") {
+      changeItemState(i, 0)
+      return
+    }
+    const num = parseInt(e.target.value)
+    if (isNaN(num)) {
+      return
+    }
+    changeItemState(i, num)
+  }
+
+  // submit data to database
+  function handleInputOnBlur(e: React.FocusEvent<HTMLInputElement>) {
+    const i = e.target.dataset.index ? parseInt(e.target.dataset.index) : -1;
+    const id = itemstates[i].id
+    const num = parseInt(e.target.value)
+    if (isNaN(num)) {
+      return
+    }
+    putSetting(id, UserSettingType.Item, { count: num })
+  }
+
+  // focus on next item when press enter
+  function handleOnKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "Enter" || e.key === "ArrowDown" || e.key === "ArrowRight") {
+      const activeEl = document.activeElement ? document.activeElement as HTMLInputElement : null
+      if (!activeEl) { return }
+      const currentIndex = activeEl.dataset.index !== undefined ? parseInt(activeEl.dataset.index) : undefined
+      if (currentIndex === undefined) { return }
+      const nextEl = document.querySelector(`input[data-index="${currentIndex + 1}"]`)
+      if (!nextEl) { return }
+      (nextEl as HTMLInputElement).focus()
+    }
+  }
+
+  function changeItemState(index: number, count: number) {
+    const new_itemstates = [...itemstates]
+    new_itemstates[index].count = count
+    setstate(new_itemstates)
+  }
+
   return (
     <div className="items-container">
-      {itemstates.map((item) => {
+      {itemstates.map((item, i) => {
         return (
           <div className="items-item" key={item.id}>
             <img className="items-item-img" src={`${DOMAIN}${ICONBASE}/${item.name}.jpg`} alt={item.name} />
             <span className="items-item-name">{item.name}</span>
-  
-              <input type="text" className="number items-item-count" name="qp" id="qp-input" defaultValue={0} />
-
+            <input type="text" className="number items-item-count" data-index={i} onKeyDown={handleOnKeyDown} onBlur={handleInputOnBlur} onChange={handleInputOnChange} value={item.count} />
           </div>
         )
       })}

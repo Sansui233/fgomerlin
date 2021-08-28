@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { HeartFilled, HeartOutlined, LinkOutlined } from "@ant-design/icons";
-import { getServantDetail, putSetting, ServantSetting, ServantBasic } from '../../utils/db'
+import { getServantDetail, putSetting, ServantSetting, ServantBasic, UserSettingType } from '../../utils/db'
 import Selections from './Selections';
 import { DOMAIN, ICONBASE } from '../../utils/fetchdata';
 import ArrowUp from '../../assets/icons/arrow-up.svg';
@@ -76,7 +76,7 @@ export default function ServantCard(props: any) {
   function changeFollow() {
     const userSettings: ServantSetting = { ...state.userSettings, isFollow: !state.userSettings.isFollow };
     // save to database
-    putSetting(state.basicInfo.sId, userSettings).then(() => {
+    putSetting(state.basicInfo.sId, UserSettingType.Servant, userSettings).then(() => {
       setstate({ ...state, userSettings })
       // notify sidebar
       Emitter.dataEmit(EvtNames.ModifyServant, EvtSources.ServatContent, {
@@ -88,7 +88,7 @@ export default function ServantCard(props: any) {
 
   function changeLevel(current: number, target: number) {
     const userSettings: ServantSetting = { ...state.userSettings, level: { current, target } };
-    putSetting(state.basicInfo.sId, userSettings).then(() => {
+    putSetting(state.basicInfo.sId, UserSettingType.Servant, userSettings).then(() => {
       setstate({ ...state, userSettings })
     })
 
@@ -97,7 +97,7 @@ export default function ServantCard(props: any) {
   function changeFinalLevel(current: number, target: number) {
     const userSettings: ServantSetting = { ...state.userSettings, finalLevel: { current, target } };
     setstate({ ...state, userSettings })
-    putSetting(state.basicInfo.sId, userSettings)
+    putSetting(state.basicInfo.sId, UserSettingType.Servant, userSettings)
   }
 
   function changeSkill(skill_index: number) { // 写成高阶函数以保存 index 变量
@@ -109,7 +109,7 @@ export default function ServantCard(props: any) {
       const new_skills = [...state.userSettings.skills];
       new_skills[i] = { current, target };
       const userSettings: ServantSetting = { ...state.userSettings, skills: new_skills };
-      putSetting(state.basicInfo.sId, userSettings).then(() => {
+      putSetting(state.basicInfo.sId, UserSettingType.Servant, userSettings).then(() => {
         setstate({ ...state, userSettings })
         Emitter.dataEmit(EvtNames.ModifyServant, EvtSources.ServatContent, {
           id: state.basicInfo.sId,
@@ -131,7 +131,7 @@ export default function ServantCard(props: any) {
       new_appendedskills[i] = { current, target };
       const userSettings: ServantSetting = { ...state.userSettings, appendedSkills: new_appendedskills };
       setstate({ ...state, userSettings })
-      putSetting(state.basicInfo.sId, userSettings)
+      putSetting(state.basicInfo.sId, UserSettingType.Servant, userSettings)
     }
   }
 

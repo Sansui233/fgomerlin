@@ -6,12 +6,12 @@ import { Servant } from '../pages/ServantList'
 import { parseZipDataset } from './fetchdata';
 
 var db: Dexie;
-var version = 1.0;
+var version = 1.1;
 
 // Define table indexing
 const SERVANT_TABLE = "id, name" // id: number, name: string. And one more column: detail: object
 const ITEM_TABLE = "id, category" // id: number, category: string
-const USER_SETTING = "id" // id: number, setting: ServantSetting | ItemSetting
+const USER_SETTING = "id, type" // id: number, setting: ServantSetting | ItemSetting | QP's number
 const SRCINFO_TABLE = "dataversion" // dataversion: string
 
 export type ServantBasic = {
@@ -33,6 +33,13 @@ export type ServantBasic = {
     { name: string, icon: string },
     { name: string, icon: string }
   ]
+}
+const QPID: number = 99999999
+
+export enum UserSettingType {
+  Servant = "servant",
+  Item = "item",
+  QP = "qp",
 }
 
 export type ServantSetting = {
@@ -87,30 +94,6 @@ export function initdb() {
   });
 }
 
-export async function putServant(id: number, name: string, detail: object) {
-  if (typeof (id) == "string") {
-    id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
-  }
-  await db.table('servants').put({ id, name, detail })
-}
-
-export async function putItems(id: number, category: ItemType, name: string, detail: object) {
-  if (typeof (id) == "string") {
-    id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
-  }
-  if (typeof (category) == "string") {
-    category = parseInt(category, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
-  }
-  await db.table('items').put({ id, category, name, detail })
-}
-
-export async function putSetting(id: number, setting: ServantSetting | ItemSetting) {
-  if (typeof (id) == "string") {
-    id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
-  }
-  await db.table('user_setting').put({ id, setting })
-}
-
 export async function putVersion() {
   await db.table('srcinfo').put({ dataversion: version })
 }
@@ -118,11 +101,6 @@ export async function putVersion() {
 export async function getServantList(): Promise<Servant[]> {
   const results = await db.table('servants').toArray()
   return mapServantItems(results)
-}
-
-export async function getItemList(category: ItemType): Promise<ItemInfo[]> {
-  const results = await db.table('items').where("category").equals(category).toArray()
-  return mapItemList(results)
 }
 
 export async function getServantSetting(id: number): Promise<ServantSetting> {
@@ -140,6 +118,48 @@ export async function getServantDetail(id: number): Promise<ServantDetail> {
   const s = await db.table('servants').where("id").equals(id).toArray()
   const settings = await db.table('user_setting').where("id").equals(id).toArray()
   return mapServantDetail(s, settings)
+}
+
+export async function putServant(id: number, name: string, detail: object) {
+  if (typeof (id) == "string") {
+    id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
+  }
+  await db.table('servants').put({ id, name, detail })
+}
+
+export async function getItemList(category: ItemType): Promise<ItemInfo[]> {
+  const results = await db.table('items').where("category").equals(category).toArray()
+  return mapItemList(results)
+}
+
+export async function putItems(id: number, category: ItemType, name: string, detail: object) {
+  if (typeof (id) == "string") {
+    id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
+  }
+  if (typeof (category) == "string") {
+    category = parseInt(category, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
+  }
+  await db.table('items').put({ id, category, name, detail })
+}
+
+export async function putSetting(id: number, settingType: UserSettingType,setting: ServantSetting | ItemSetting) {
+  if (typeof (id) == "string") {
+    id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
+  }
+  await db.table('user_setting').put({ id, type: settingType,setting })
+}
+
+export async function putQpSetting(setting: number) {
+  const settingtype = UserSettingType.QP
+  await db.table('user_setting').put({ id: QPID, type: settingtype, setting })
+}
+
+export async function getQpSetting():Promise<number> {
+  const results = await db.table('user_setting').where('id').equals(QPID).toArray()
+  if (results.length === 0){
+    return 0
+  }
+  return results[0].setting
 }
 
 async function mapServantItems(results: any[]): Promise<Servant[]> {

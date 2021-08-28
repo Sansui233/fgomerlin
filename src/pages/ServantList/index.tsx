@@ -4,7 +4,7 @@ import { ReloadOutlined } from "@ant-design/icons";
 import { FixedSizeList } from 'react-window';
 import Search from 'antd/lib/input/Search';
 import ServantItem from './ServantItem';
-import { getServantList, getServantSetting, putSetting } from '../../utils/db';
+import { getServantList, getServantSetting, putSetting, UserSettingType } from '../../utils/db';
 import Emitter, { EvtArgTypes, EvtNames, EvtSources, ServantState } from '../../utils/events'
 import { Pages } from '../../App';
 
@@ -84,7 +84,7 @@ export default function ServantList(props: {removeCurrentOnSidebar: () => void})
       const newServants = [...state.servants]
       newServants[i] = { ...s, isFollow: !s.isFollow}
       getServantSetting(sId).then((setting) => {
-        putSetting(sId, { ...setting, isFollow: !s.isFollow }).then(() => {
+        putSetting(sId, UserSettingType.Servant ,{ ...setting, isFollow: !s.isFollow }).then(() => {
           setState({ ...state, servants: newServants })
           Emitter.dataEmit(EvtNames.ModifyServant, EvtSources.ServantSidebar, {
             id: sId,
