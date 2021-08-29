@@ -1,10 +1,31 @@
 import React, { useState, useEffect } from 'react'
 import { HeartFilled, HeartOutlined, LinkOutlined } from "@ant-design/icons";
-import { getServantDetail, putSetting, ServantSetting, ServantBasic, UserSettingType } from '../../utils/db'
+import { getServantDetail, putSetting, ServantSetting, UserSettingType } from '../../utils/db'
 import Selections from './Selections';
 import { DOMAIN, ICONBASE } from '../../utils/fetchdata';
 import ArrowUp from '../../assets/icons/arrow-up.svg';
 import Emitter, { EvtSources, EvtNames, EvtArgTypes, ServantState } from '../../utils/events';
+
+type ServantBasic = {
+  sId: number,
+  sNo: number,
+  sName: string,
+  sNameJp: string,
+  sClass: string,
+  sImg: string,
+  sRarity: number,
+  mcLink: string
+  skills: [
+    { name: string, icon: string },
+    { name: string, icon: string },
+    { name: string, icon: string }
+  ]
+  appendedskill: [
+    { name: string, icon: string },
+    { name: string, icon: string },
+    { name: string, icon: string }
+  ]
+}
 
 export type ServantDetail = {
   basicInfo: ServantBasic,

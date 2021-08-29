@@ -8,41 +8,12 @@ import { parseZipDataset } from './fetchdata';
 var db: Dexie;
 var version = 1.2;
 
-/**
- * Table(Object Store) Structure
- * 
- * Servant Tabel:     id: number, name: string, detail: object
- * Item Table:        id: number, name: string, category: ItemType, detail: object
- * User Setting:      id: number, name: string, type: UserSettingType, setting: ServantSetting | ItemSetting | QP's number
- * srcinfo:           dataversion: string
- */
-
-// Define table indexing
+// Define table key (indexing)
 const SERVANT_TABLE = "id, name" 
 const ITEM_TABLE = "id, name, category"
 const USER_SETTING = "id, name, type" 
 const SRCINFO_TABLE = "dataversion"
 
-export type ServantBasic = {
-  sId: number,
-  sNo: number,
-  sName: string,
-  sNameJp: string,
-  sClass: string,
-  sImg: string,
-  sRarity: number,
-  mcLink: string
-  skills: [
-    { name: string, icon: string },
-    { name: string, icon: string },
-    { name: string, icon: string }
-  ]
-  appendedskill: [
-    { name: string, icon: string },
-    { name: string, icon: string },
-    { name: string, icon: string }
-  ]
-}
 const QPID: number = 99999999
 
 export enum UserSettingType {

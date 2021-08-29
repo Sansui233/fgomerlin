@@ -18,7 +18,7 @@ import ItemContents from './pages/ItemContents';
 export const Pages = {
   // For router
   servantList: "servants",
-  itemList: "item",
+  itemList: "items v3456wsC",
   statistic: "statistic",
   // Not for router
   servantContent: "content",
