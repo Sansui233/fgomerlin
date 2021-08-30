@@ -1,6 +1,6 @@
 import React from 'react'
 import { Servant } from '..'
-import { DOMAIN, ICONBASE } from '../../../utils/fetchdata'
+import { DOMAIN, ICONBASE } from '../../../utils/dataset-conf'
 import { HeartOutlined, HeartFilled } from "@ant-design/icons"
 import SidebarItem from '../../../components/SidebarItemContainer'
 
@@ -24,6 +24,5 @@ export default function ServantItem(props: { servant: Servant, changeFollow: (sI
         {isFollow ? <HeartFilled className="like" /> : <HeartOutlined />}
       </div>
     </SidebarItem>
-
   )
 }

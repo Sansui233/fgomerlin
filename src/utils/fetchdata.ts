@@ -1,30 +1,8 @@
 import axios from "axios";
 import JSZip, { } from "jszip"
+import { DataSetFormat, DATASET_TEXT, DOMAIN } from "./dataset-conf";
 import { putItems, putServant, putVersion } from "./db";
 
-// TODO 测试配置文件之后单独分离
-export const DOMAIN = "http://localhost:8080"
-export const DATASET_TEXT = "/dataset-text.zip"
-export const ICONBASE = "/icons"
-
-// The json format of dataset-text
-type DataSetText = {
-  version: string,
-  unavailableSvts: Array<number>,
-  servants: object,
-  custumes: object,
-  crafts: object,
-  cmdCodes: object,
-  events: object,
-  items: object,
-  icons: object,
-  freeQuests: object,
-  svtQuests: object,
-  glpk: object,
-  mysticCodes: object,
-  summons: object,
-  fsmSvtIdMapping: object
-}
 
 async function fetchTextDataSet(): Promise<{ [key: string]: JSZip.JSZipObject; }> {
   console.log("[data/util.js] Getting text pack...")
@@ -59,7 +37,7 @@ export async function parseZipDataset() {
   }
 }
 
-async function storeToDatabase(dataObject: DataSetText) {
+async function storeToDatabase(dataObject: DataSetFormat) {
   const arr:Promise<void>[] = []
   for (const value of Object.values(dataObject.servants)) {
     arr.push(putServant(value.svtId, value.info.name, value))

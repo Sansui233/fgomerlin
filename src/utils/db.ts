@@ -4,14 +4,16 @@ import { ItemInfo } from '../pages/ItemContents';
 import { ServantDetail } from '../pages/ServantCard';
 import { Servant } from '../pages/ServantList'
 import { parseZipDataset } from './fetchdata';
+import { CalcItemState } from '../redux/calc-state';
+
 
 var db: Dexie;
 var version = 1.2;
 
 // Define table key (indexing)
-const SERVANT_TABLE = "id, name" 
+const SERVANT_TABLE = "id, name"
 const ITEM_TABLE = "id, name, category"
-const USER_SETTING = "id, name, type" 
+const USER_SETTING = "id, name, type"
 const SRCINFO_TABLE = "dataversion"
 
 const QPID: number = 99999999
@@ -112,31 +114,63 @@ export async function getItemList(category: ItemType): Promise<ItemInfo[]> {
   return mapItemList(results)
 }
 
-export async function putItems(id: number,name: string,category: ItemType,  detail: object) {
+/**
+ * Get from item detail from database according to id or name
+ * id = 0 means name only
+ */
+export async function getItemInfo(id?: number, name?: string): Promise<ItemInfo> {
+  if (typeof (id) == "string") {
+    id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
+  }
+  if (id && id !== 0) {
+    const item = (await db.table('items').where('id').equals(id).toArray())[0]
+    const itemSetting = (await db.table('user_setting').where('id').equals(id).toArray())[0]
+    return mapItemState(item, itemSetting)
+  }
+  if (name && name !== "") {
+    const item = (await db.table('items').where('name').equals(name).toArray())[0]
+    const itemSetting = (await db.table('user_setting').where('name').equals(name).toArray())[0]
+    return mapItemState(item, itemSetting)
+  }
+  throw new Error('No item key matched in database')
+}
+
+function mapItemState(item: any, itemSetting: any): ItemInfo {
+  return {
+    id: item.id,
+    name: item.name,
+    category: item.detail.category,
+    rarity: item.detail.rarity,
+    count: (itemSetting.setting as ItemSetting).count,
+    iconWithSuffix: `${item.name}.jpg`,
+  }
+}
+
+export async function putItems(id: number, name: string, category: ItemType, detail: object) {
   if (typeof (id) == "string") {
     id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
   }
   if (typeof (category) == "string") {
     category = parseInt(category, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
   }
-  await db.table('items').put({ id, name,category, detail })
+  await db.table('items').put({ id, name, category, detail })
 }
 
-export async function putSetting(id: number, name:string, settingType: UserSettingType,setting: ServantSetting | ItemSetting) {
+export async function putSetting(id: number, name: string, settingType: UserSettingType, setting: ServantSetting | ItemSetting) {
   if (typeof (id) == "string") {
     id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
   }
-  await db.table('user_setting').put({ id, name, type: settingType,setting })
+  await db.table('user_setting').put({ id, name, type: settingType, setting })
 }
 
 export async function putQpSetting(setting: number) {
   const settingtype = UserSettingType.QP
-  await db.table('user_setting').put({ id: QPID, name:"QP", type: settingtype, setting })
+  await db.table('user_setting').put({ id: QPID, name: "QP", type: settingtype, setting })
 }
 
-export async function getQpSetting():Promise<number> {
+export async function getQpSetting(): Promise<number> {
   const results = await db.table('user_setting').where('id').equals(QPID).toArray()
-  if (results.length === 0){
+  if (results.length === 0) {
     return 0
   }
   return results[0].setting
@@ -183,15 +217,17 @@ function mapServantDetail(s: any[], settings: any[]): ServantDetail {
       sRarity: detail.info.rarity2 ? detail.info.rarity2 : detail.info.rarity,
       mcLink: detail.mcLink,
       skills: [
-        { name: detail.activeSkills[0].skills.slice(-1)[0].name, icon: detail.activeSkills[0].skills.slice(-1)[0].icon },
-        { name: detail.activeSkills[1].skills.slice(-1)[0].name, icon: detail.activeSkills[1].skills.slice(-1)[0].icon },
-        { name: detail.activeSkills[2].skills.slice(-1)[0].name, icon: detail.activeSkills[2].skills.slice(-1)[0].icon },
+        detail.activeSkills[0].skills.slice(-1)[0],
+        detail.activeSkills[1].skills.slice(-1)[0],
+        detail.activeSkills[2].skills.slice(-1)[0],
+        
       ],
       appendedskill: [
-        { name: detail.appendSkills[0].name, icon: detail.appendSkills[0].icon + '.png' },
-        { name: detail.appendSkills[1].name, icon: detail.appendSkills[1].icon + '.png' },
-        { name: detail.appendSkills[2].name, icon: detail.appendSkills[2].icon + '.png' },
-      ]
+        detail.appendSkills[0],
+        detail.appendSkills[1],
+        detail.appendSkills[2],
+      ],
+      itemcost: detail.itemcost,
     },
     userSettings: {
       isFollow: setting ? setting.isFollow : false,
@@ -254,7 +290,10 @@ async function mapItemList(results: any[]): Promise<ItemInfo[]> {
       return {
         id: result.id,
         name: result.name,
-        count: setting ? setting.count : 0
+        count: setting ? setting.count : 0,
+        category: result.category,
+        rarity: result.rarity,
+        iconWithSuffix: `${result.name}.jpg`,
       }
     })
   })

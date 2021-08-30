@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { HeartFilled, HeartOutlined, LinkOutlined } from "@ant-design/icons";
 import { getServantDetail, putSetting, ServantSetting, UserSettingType } from '../../utils/db'
 import Selections from './Selections';
-import { DOMAIN, ICONBASE } from '../../utils/fetchdata';
+import { DOMAIN, ICONBASE, SkillDetailFormat } from '../../utils/dataset-conf';
 import ArrowUp from '../../assets/icons/arrow-up.svg';
 import Emitter, { EvtSources, EvtNames, EvtArgTypes, ServantState } from '../../utils/events';
 
@@ -15,16 +15,13 @@ type ServantBasic = {
   sImg: string,
   sRarity: number,
   mcLink: string
-  skills: [
-    { name: string, icon: string },
-    { name: string, icon: string },
-    { name: string, icon: string }
-  ]
-  appendedskill: [
-    { name: string, icon: string },
-    { name: string, icon: string },
-    { name: string, icon: string }
-  ]
+  skills: SkillDetailFormat[];
+  appendedskill: SkillDetailFormat[];
+  itemcost: {
+    ascension: [],
+    skill: [],
+    appendSkill: []
+  }
 }
 
 export type ServantDetail = {
@@ -42,8 +39,13 @@ const initDetail: ServantDetail = {
     sImg: "Here",
     sRarity: 3,
     mcLink: "",
-    skills: [{ name: "", icon: "" }, { name: "", icon: "" }, { name: "", icon: "" }],
-    appendedskill: [{ name: "", icon: "" }, { name: "", icon: "" }, { name: "", icon: "" }]
+    skills: [],
+    appendedskill: [],
+    itemcost: {
+      ascension: [],
+      skill: [],
+      appendSkill: []
+    }
   },
   userSettings: {
     isFollow: false,
@@ -59,7 +61,7 @@ const initDetail: ServantDetail = {
       { current: 1, target: 1 },
       { current: 1, target: 1 },
     ]
-  }
+  },
 }
 
 export default function ServantCard(props: any) {

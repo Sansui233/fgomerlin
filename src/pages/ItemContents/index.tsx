@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { getItemList, ItemType, putSetting, UserSettingType } from '../../utils/db'
-import { DOMAIN, ICONBASE } from '../../utils/fetchdata'
+import { DOMAIN, ICONBASE } from '../../utils/dataset-conf'
 
 export type ItemInfo = {
   id: number,
   name: string,
   count: number,
+  category: number,
+  rarity: number,
+  iconWithSuffix: string,
 }
 const initstate: ItemInfo[] = []
 
@@ -82,7 +85,7 @@ export default function ItemContents(props: any) {
       {itemstates.map((item, i) => {
         return (
           <div className="items-item" key={item.id}>
-            <img className="items-item-img" src={`${DOMAIN}${ICONBASE}/${item.name}.jpg`} alt={item.name} />
+            <img className="items-item-img" src={`${DOMAIN}${ICONBASE}/${item.iconWithSuffix}`} alt={item.name} />
             <span className="items-item-name">{item.name}</span>
             <input type="text" className="number items-item-count" data-index={i} onKeyDown={handleOnKeyDown} onBlur={handleInputOnBlur} onChange={handleInputOnChange} value={item.count} />
           </div>

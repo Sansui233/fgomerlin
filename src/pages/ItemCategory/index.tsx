@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import SidebarItem from '../../components/SidebarItemContainer'
 import { Link } from 'react-router-dom'
-import { DOMAIN, ICONBASE } from '../../utils/fetchdata'
+import { DOMAIN, ICONBASE } from '../../utils/dataset-conf'
 import { Pages } from '../../App'
 import { getQpSetting, putQpSetting } from '../../utils/db'
 
