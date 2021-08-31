@@ -1,9 +1,9 @@
 // Dynamically add property into state
 // to avoid massive computation of array
 export type CalcState  = {
-  [key: string]: CalcItemState
+  qp: number,
+  [itemName: string]: CalcItemState | number
 }
-
 
 export type CalcItemState = {
   id: number,
@@ -19,6 +19,6 @@ export type CalcItemState = {
 export type ServantInItemInCalc = {
   id: number,
   name: string,
-  needed: number
+  need: number,
   iconWithSuffix: string,
 }

@@ -125,17 +125,17 @@ export async function getItemInfo(id?: number, name?: string): Promise<ItemInfo>
   if (id && id !== 0) {
     const item = (await db.table('items').where('id').equals(id).toArray())[0]
     const itemSetting = (await db.table('user_setting').where('id').equals(id).toArray())[0]
-    return mapItemState(item, itemSetting)
+    return mapItemInfo(item, itemSetting)
   }
   if (name && name !== "") {
     const item = (await db.table('items').where('name').equals(name).toArray())[0]
     const itemSetting = (await db.table('user_setting').where('name').equals(name).toArray())[0]
-    return mapItemState(item, itemSetting)
+    return mapItemInfo(item, itemSetting)
   }
   throw new Error('No item key matched in database')
 }
 
-function mapItemState(item: any, itemSetting: any): ItemInfo {
+function mapItemInfo(item: any, itemSetting: any): ItemInfo {
   return {
     id: item.id,
     name: item.name,
