@@ -13,6 +13,7 @@ import ServantList from './pages/ServantList';
 import ServantCard from './pages/ServantCard';
 import ItemCategory from './pages/ItemCategory';
 import ItemContents from './pages/ItemContents';
+import Statistic from './pages/Statistic';
 
 
 export const Pages = {
@@ -147,7 +148,7 @@ function App(props: any) {
             </Content>
           </Route>
           <Route path={`/${Pages.statistic}`}>
-            <div> Statistic </div>
+            <Statistic/>
           </Route>
           <Redirect to={`/${Pages.servantList}`} />
         </Switch>

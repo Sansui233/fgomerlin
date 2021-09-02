@@ -1,5 +1,6 @@
-import { ServantDetail } from "../pages/ServantCard"
-import { QPItemName, ServantSetting } from "./db"
+import { ItemInfo } from "../pages/ItemContents"
+import { ServantBasic, ServantDetail } from "../pages/ServantCard"
+import { getItemInfo, getServantBasic, QPItemName, ServantSetting } from "./db"
 
 export type Cell = {
   // indexes
@@ -165,6 +166,53 @@ function scanFinalLevel(servantId: number, rarity: number, setting: ServantSetti
   })
 
   return cells
+}
+
+export async function countItemsNeeded(cells: Cell[]){
+  const items: {
+    itemName: string,
+    itemInfo: ItemInfo,
+    itemNeeded: number,
+  }[] = []
+
+  for (const cell of cells) {
+    const i = items.findIndex((item) => {return item.itemName === cell.itemName})
+    if(i === -1){
+      const itemInfo = await getItemInfo(0, cell.itemName)
+      items.push({
+        itemName: cell.itemName,
+        itemInfo,
+        itemNeeded: cell.itemNum
+      })
+    }else{
+      items[i].itemNeeded += cell.itemNum
+    }
+  }
+
+  return items
+}
+
+export async function countServantInItem(itemName: string, cells: Cell[]){
+  const servants: {
+    servantInfo: ServantBasic,
+    itemNeeded: number
+  }[] = []
+
+  for (const cell of cells) {
+    if(cell.itemName === itemName){
+      const i = servants.findIndex(s=> {return s.servantInfo.sId === cell.servantId})
+      if(i === -1){
+        servants.push({
+          servantInfo: await getServantBasic(cell.servantId),
+          itemNeeded: cell.itemNum
+        })
+      }else {
+        servants[i].itemNeeded += cell.itemNum
+      }
+    }
+  }
+  
+  return servants
 }
 
 const qpCostGenerator = (rarity: number): { levelStage: number[], qpCost: number[] } => {

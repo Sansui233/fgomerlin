@@ -7,7 +7,7 @@ import ArrowUp from '../../assets/icons/arrow-up.svg';
 import Emitter, { EvtSources, EvtNames, EvtArgTypes, ServantState } from '../../utils/events';
 import { composeCalcCells } from '../../utils/calculator';
 
-type ServantBasic = {
+export type ServantBasic = {
   sId: number,
   sNo: number,
   sName: string,

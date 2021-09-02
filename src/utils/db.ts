@@ -1,7 +1,7 @@
 import Dexie from 'dexie';
 import { message } from 'antd';
 import { ItemInfo } from '../pages/ItemContents';
-import { ServantDetail } from '../pages/ServantCard';
+import { ServantBasic, ServantDetail } from '../pages/ServantCard';
 import { Servant } from '../pages/ServantList'
 import { parseZipDataset } from './fetchdata';
 import { Cell } from './calculator';
@@ -19,6 +19,8 @@ const CALCULATOR_TABLE = "[servantId+cellType+cellTargetLevel+itemName]" // See 
 
 export const QPItemName = 'QP'
 export const QPItemID = 99999999
+export const CoinItemName = '从者硬币'
+export const CoinItemID = 999999999
 
 export enum UserSettingType {
   Servant = "servant",
@@ -88,6 +90,35 @@ export async function getServantList(): Promise<Servant[]> {
   return mapServantItems(results)
 }
 
+export async function getServantBasic(id: number): Promise<ServantBasic> {
+  if (typeof (id) == "string") {
+    id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
+  }
+  const s = await db.table('servants').get(id)
+  const detail = s.detail
+  return {
+    sId: s.id,
+    sNo: detail.no,
+    sName: s.name,
+    sNameJp: detail.info.nameJp,
+    sClass: detail.info.className,
+    sImg: detail.icon,
+    sRarity: detail.info.rarity2 ? detail.info.rarity2 : detail.info.rarity,
+    mcLink: detail.mcLink,
+    skills: [
+      detail.activeSkills[0].skills.slice(-1)[0],
+      detail.activeSkills[1].skills.slice(-1)[0],
+      detail.activeSkills[2].skills.slice(-1)[0],
+    ],
+    appendedskill: [
+      detail.appendSkills[0],
+      detail.appendSkills[1],
+      detail.appendSkills[2],
+    ],
+    itemCost: detail.itemCost,
+  }
+}
+
 export async function getServantSetting(id: number): Promise<ServantSetting> {
   if (typeof (id) == "string") {
     id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
@@ -118,22 +149,46 @@ export async function getItemList(category: ItemType): Promise<ItemInfo[]> {
 }
 
 /**
- * Get from item detail from database according to id or name
+ * Get from item detail from database according to id or name  
  * id = 0 means name only
  */
 export async function getItemInfo(id?: number, name?: string): Promise<ItemInfo> {
   if (typeof (id) == "string") {
     id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
   }
-  if (id && id !== 0) {
+  if (id && id !== 0 && id !== QPItemID && id !== CoinItemID) {
     const item = (await db.table('items').where('id').equals(id).toArray())[0]
+    if (!item) {
+      throw new Error('Unknow item ' + id + 'in database')
+    }
     const itemSetting = (await db.table('user_setting').where('id').equals(id).toArray())[0]
     return mapItemInfo(item, itemSetting)
   }
-  if (name && name !== "") {
+  if (name && name !== "" && name !== QPItemName && name !== CoinItemName) {
     const item = (await db.table('items').where('name').equals(name).toArray())[0]
+    if (!item) {
+      throw new Error('Unknow item ' + name + 'in database')
+    }
     const itemSetting = (await db.table('user_setting').where('name').equals(name).toArray())[0]
     return mapItemInfo(item, itemSetting)
+  } else if (name === QPItemName) {
+    return {
+      id: QPItemID,
+      name: QPItemName,
+      count: await getQpSetting(),
+      category: -1,
+      rarity: -1,
+      iconWithSuffix: "QP.jpg"
+    }
+  } else if (name === CoinItemName) {
+    return {
+      id: CoinItemID,
+      name: CoinItemName,
+      count: 0, //TODO  还没搞清楚从者硬币的机制
+      category: -1,
+      rarity: -1,
+      iconWithSuffix: "从者硬币.jpg"
+    }
   }
   throw new Error('No item key matched in database')
 }
@@ -144,7 +199,7 @@ function mapItemInfo(item: any, itemSetting: any): ItemInfo {
     name: item.name,
     category: item.detail.category,
     rarity: item.detail.rarity,
-    count: (itemSetting.setting as ItemSetting).count,
+    count: itemSetting?(itemSetting.setting as ItemSetting).count : 0,
     iconWithSuffix: `${item.name}.jpg`,
   }
 }
@@ -163,7 +218,7 @@ export async function putSetting(id: number, name: string, settingType: UserSett
   if (typeof (id) == "string") {
     id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
   }
-  if(calcCells){
+  if (calcCells) {
     // put servant setting
     await db.transaction('rw', db.table('user_setting'), db.table('calculator'), async () => {
       await db.table('user_setting').put({ id, name, type: settingType, setting })
@@ -181,10 +236,18 @@ export async function putSetting(id: number, name: string, settingType: UserSett
       console.error('[db.ts]', e)
       throw e
     })
-  }else {
+  } else {
     // put item setting
     await db.table('user_setting').put({ id, name, type: settingType, setting })
   }
+}
+
+export async function getItemSettings(): Promise<{ id: number, name: string, type: UserSettingType, setting: ItemSetting }[]> {
+  return await db.table('user_setting').where('type').equals(UserSettingType.Item).toArray()
+}
+
+export async function getCalcCells(): Promise<Cell[]> {
+  return await db.table('calculator').toArray()
 }
 
 export async function putQpSetting(setting: number) {
@@ -228,7 +291,7 @@ function mapServantDetail(s: any[], settings: any[]): ServantDetail {
   if (s.length === 0) {
     throw new Error("[db.ts] No servant result")
   }
-  const setting = settings.length !== 0 ? (settings[0].setting as ServantSetting): undefined;
+  const setting = settings.length !== 0 ? (settings[0].setting as ServantSetting) : undefined;
   const detail = s[0].detail
   return {
     basicInfo: {
@@ -244,7 +307,7 @@ function mapServantDetail(s: any[], settings: any[]): ServantDetail {
         detail.activeSkills[0].skills.slice(-1)[0],
         detail.activeSkills[1].skills.slice(-1)[0],
         detail.activeSkills[2].skills.slice(-1)[0],
-        
+
       ],
       appendedskill: [
         detail.appendSkills[0],
