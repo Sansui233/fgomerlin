@@ -602,11 +602,11 @@ div.blank-item-placeholder {
     margin: unset;
     border-radius: unset;
     flex-grow: 1;
+    cursor: pointer;
   }
 
   .item-category-container .sidebar-item-container:hover .item-category-info .item-name {
     color: var(--theme--primary);
-    cursor: default;
   }
 
   .item-category-container .sidebar-item-hover-layer:hover {
