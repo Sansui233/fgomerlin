@@ -40,12 +40,13 @@ Item：素材，包括了
 
 从远程下载的数据文件存入 indexDB 遵循以下的结构。
 
-| Table Name   | Property(Primary Key)            | Property(Key)     | Property(Key)              | Property                                             |
-| ------------ | -------------------------------- | ----------------- | -------------------------- | ---------------------------------------------------- |
-| servants     | id(Primary Key): number          | name(Key): string |                            | detail: object                                       |
-| Items        | id(Primary Key): number          | name(Key): string | category(Key): ItemType    | detail: object                                       |
-| user_setting | id(Primary Key): number          | name(Key): string | type(Key): UserSettingType | setting: ServantSetting \| ItemSetting \| number(QP) |
-| srcinfo      | dataversion(Primary Key): string |                   |                            |                                                      |
+| Table Name   | Property(Primary Key)            | Property(Key)     | Property(Key)              | Property                                             | Property       |
+| ------------ | -------------------------------- | ----------------- | -------------------------- | ---------------------------------------------------- | -------------- |
+| servants     | id(Primary Key): number          | name(Key): string |                            | detail: object                                       |                |
+| items        | id(Primary Key): number          | name(Key): string | category(Key): ItemType    | detail: object                                       |                |
+| user_setting | id(Primary Key): number          | name(Key): string | type(Key): UserSettingType | setting: ServantSetting \| ItemSetting \| number(QP) |                |
+| srcinfo      | dataversion(Primary Key): string |                   |                            |                                                      |                |
+| calculator   | cellType                         | servantId: number | itemName: string           | itemNum: number                                      | qpCost: number |
 
 上表中的自定义类型均在 db.ts中定义为 type 或 enum。其中的`UserSettingType`除了有 Servant 和 Item，还有一个 QP，为纯数字。
 
@@ -69,41 +70,28 @@ Item：素材，包括了
 
 为了响应速度和计算速度，使用一个全局的 state 保存计算器实时信息，中心化修改，可以用 Redux。
 
-如果不实时计算，则每次切换到统计页面都很耗时
-
-如果不用 Redux，修改一次每次都从 IndexedDB 取出数据，然后同样……好像也是可以的。CPU 换内存。但是要写的CRUD变多了。
-
-启动 App 时开始计算，计算期间的 user_setting 修改发送到 Redux，发送完后再修改数据库（类似于计算时对数据库操作加锁，不知道能不能实现）。从者设定起统计所需材料匮乏信息(name 和 count, 需求从者的 ID 、Name、count, icon)，再查找所需材料的用户设定(id, name, count)，最后查找材料的附加信息(金银铜技能石棋子什么的)，然后进行数据结构 map。
+修改一次每次都从 IndexedDB 取出数据渲染展示，好像也是可以的。CPU 换内存。但是要写的CRUD变多了。
 
 ### 数据结构
 
+计算器为高维统计，每个 cell 以对象结构存储
+
 ```json
 {
-  "素材名": {
-    id: number,
-    name: string, 
-    needed: number,
-    count: number,
-    category: number,
-    rarity: number,
-    iconWithSuffix: string,
-    servants: ServantInItemInCalc
-      [
-       {
-         id:
-         name: "从者名",
-         iconWithSuffix:
-         needed:
-       }
-     ]
-  },
-  {
-    "素材名":{...}
-  }
+  servantId: number
+  cellType: cellType
+  cellTargetLevel: number
+  itemName: string,
+  itemNum: number
 }
 ```
 
+以上 cell 数成数组。不加 key 索引的原因在于，有时候要以 servant 为索引，有时候要以 itemName 为索引。倒是和 indexedDB 的索引不谋而合。所以可以用 indexedDB 存计算器的中间值，顺便加上事务。
+
+![](./assets/calculator-datastructure.jpeg)
+
 最终的展示结果结构。以材料分类为起点
+
 ``` json
 {
 "铜素材":

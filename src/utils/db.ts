@@ -4,19 +4,21 @@ import { ItemInfo } from '../pages/ItemContents';
 import { ServantDetail } from '../pages/ServantCard';
 import { Servant } from '../pages/ServantList'
 import { parseZipDataset } from './fetchdata';
-import { CalcItemState } from '../redux/calc-state';
+import { Cell } from './calculator';
 
 
 var db: Dexie;
-var version = 1.2;
+var version = 1.7;
 
 // Define table key (indexing)
 const SERVANT_TABLE = "id, name"
 const ITEM_TABLE = "id, name, category"
 const USER_SETTING = "id, name, type"
 const SRCINFO_TABLE = "dataversion"
+const CALCULATOR_TABLE = "[servantId+cellType+cellTargetLevel+itemName]" // See doc for details
 
-const QPID: number = 99999999
+export const QPItemName = 'QP'
+export const QPItemID = 99999999
 
 export enum UserSettingType {
   Servant = "servant",
@@ -26,7 +28,7 @@ export enum UserSettingType {
 
 export type ServantSetting = {
   isFollow: boolean,
-  level: { current: number, target: number }, // 0-4
+  ascension: { current: number, target: number }, // 0-4
   finalLevel: { current: number, target: number }, //maxLevel-100
   skills: { current: number, target: number }[], // length 3
   appendedSkills: { current: number, target: number }[] // length 3
@@ -49,10 +51,11 @@ export function initdb() {
     items: ITEM_TABLE,
     user_setting: USER_SETTING,
     srcinfo: SRCINFO_TABLE,
+    calculator: CALCULATOR_TABLE,
   }).upgrade(trans => {
     message.info("正在更新数据库")
     parseZipDataset().then(() => {
-      message.success(`数据库版本已更新至${version}, 刷新以重新载入数据库`)
+      message.success(`数据库版本已更新至${version}, 刷新生效`)
     }).catch((e) => {
       message.error("数据库版本未更新，错误信息：" + e)
     })
@@ -156,20 +159,41 @@ export async function putItems(id: number, name: string, category: ItemType, det
   await db.table('items').put({ id, name, category, detail })
 }
 
-export async function putSetting(id: number, name: string, settingType: UserSettingType, setting: ServantSetting | ItemSetting) {
+export async function putSetting(id: number, name: string, settingType: UserSettingType, setting: ServantSetting | ItemSetting, calcCells?: Cell[]) {
   if (typeof (id) == "string") {
     id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
   }
-  await db.table('user_setting').put({ id, name, type: settingType, setting })
+  if(calcCells){
+    // put servant setting
+    await db.transaction('rw', db.table('user_setting'), db.table('calculator'), async () => {
+      await db.table('user_setting').put({ id, name, type: settingType, setting })
+      // Delete servant-related setting
+      await db.table('calculator').where('[servantId+cellType+cellTargetLevel+itemName]').between(
+        [id, Dexie.minKey, Dexie.minKey, Dexie.minKey],
+        [id, Dexie.maxKey, Dexie.maxKey, Dexie.maxKey]
+      ).delete().then((deleteCount) => {
+        console.debug(`[db.ts] delete ${deleteCount} calc cells for servant ${id}`)
+      })
+      calcCells.forEach(async (c) => {
+        await db.table('calculator').put(c)
+      })
+    }).catch((e: Error) => {
+      console.error('[db.ts]', e)
+      throw e
+    })
+  }else {
+    // put item setting
+    await db.table('user_setting').put({ id, name, type: settingType, setting })
+  }
 }
 
 export async function putQpSetting(setting: number) {
   const settingtype = UserSettingType.QP
-  await db.table('user_setting').put({ id: QPID, name: "QP", type: settingtype, setting })
+  await db.table('user_setting').put({ id: QPItemID, name: QPItemName, type: settingtype, setting })
 }
 
 export async function getQpSetting(): Promise<number> {
-  const results = await db.table('user_setting').where('id').equals(QPID).toArray()
+  const results = await db.table('user_setting').where('id').equals(QPItemID).toArray()
   if (results.length === 0) {
     return 0
   }
@@ -204,7 +228,7 @@ function mapServantDetail(s: any[], settings: any[]): ServantDetail {
   if (s.length === 0) {
     throw new Error("[db.ts] No servant result")
   }
-  const setting = settings.length !== 0 ? settings[0].setting : undefined;
+  const setting = settings.length !== 0 ? (settings[0].setting as ServantSetting): undefined;
   const detail = s[0].detail
   return {
     basicInfo: {
@@ -227,13 +251,13 @@ function mapServantDetail(s: any[], settings: any[]): ServantDetail {
         detail.appendSkills[1],
         detail.appendSkills[2],
       ],
-      itemcost: detail.itemcost,
+      itemCost: detail.itemCost,
     },
     userSettings: {
       isFollow: setting ? setting.isFollow : false,
-      level: {
-        current: setting ? setting.level.current : 0,
-        target: setting ? setting.level.target : 0
+      ascension: {
+        current: setting ? setting.ascension.current : 0,
+        target: setting ? setting.ascension.target : 0
       },
       finalLevel: {
         current: setting ? setting.finalLevel.current : 0,
@@ -245,21 +269,21 @@ function mapServantDetail(s: any[], settings: any[]): ServantDetail {
         { current: setting ? setting.skills[2].current : 1, target: setting ? setting.skills[2].target : 1 },
       ],
       appendedSkills: [
-        { current: setting ? setting.appendedSkills[0].current : 1, target: setting ? setting.appendedSkills[0].target : 1 }, //1-10
-        { current: setting ? setting.appendedSkills[1].current : 1, target: setting ? setting.appendedSkills[1].target : 1 },
-        { current: setting ? setting.appendedSkills[2].current : 1, target: setting ? setting.appendedSkills[2].target : 1 },
+        { current: setting ? setting.appendedSkills[0].current : 0, target: setting ? setting.appendedSkills[0].target : 0 }, //0-10
+        { current: setting ? setting.appendedSkills[1].current : 0, target: setting ? setting.appendedSkills[1].target : 0 },
+        { current: setting ? setting.appendedSkills[2].current : 0, target: setting ? setting.appendedSkills[2].target : 0 },
       ]
     }
   }
 }
 
 function mapServantSetting(results: any[]): ServantSetting {
-  const setting = results.length !== 0 ? results[0].setting : undefined;
+  const setting = results.length !== 0 ? (results[0].setting as ServantSetting) : undefined;
   return {
     isFollow: setting ? setting.isFollow : false,
-    level: {
-      current: setting ? setting.level.current : 0,
-      target: setting ? setting.level.target : 0
+    ascension: {
+      current: setting ? setting.ascension.current : 0,
+      target: setting ? setting.ascension.target : 0
     },
     finalLevel: {
       current: setting ? setting.finalLevel.current : 0,
@@ -271,9 +295,9 @@ function mapServantSetting(results: any[]): ServantSetting {
       { current: setting ? setting.skills[2].current : 1, target: setting ? setting.skills[2].target : 1 },
     ],
     appendedSkills: [
-      { current: setting ? setting.appendedSkills[0].current : 1, target: setting ? setting.appendedSkills[0].target : 1 }, //1-10
-      { current: setting ? setting.appendedSkills[1].current : 1, target: setting ? setting.appendedSkills[1].target : 1 },
-      { current: setting ? setting.appendedSkills[2].current : 1, target: setting ? setting.appendedSkills[2].target : 1 },
+      { current: setting ? setting.appendedSkills[0].current : 0, target: setting ? setting.appendedSkills[0].target : 0 }, //0-10
+      { current: setting ? setting.appendedSkills[1].current : 0, target: setting ? setting.appendedSkills[1].target : 0 },
+      { current: setting ? setting.appendedSkills[2].current : 0, target: setting ? setting.appendedSkills[2].target : 0 },
     ]
   }
 }

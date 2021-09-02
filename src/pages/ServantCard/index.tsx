@@ -5,6 +5,7 @@ import Selections from './Selections';
 import { DOMAIN, ICONBASE, SkillDetailFormat } from '../../utils/dataset-conf';
 import ArrowUp from '../../assets/icons/arrow-up.svg';
 import Emitter, { EvtSources, EvtNames, EvtArgTypes, ServantState } from '../../utils/events';
+import { composeCalcCells } from '../../utils/calculator';
 
 type ServantBasic = {
   sId: number,
@@ -17,7 +18,7 @@ type ServantBasic = {
   mcLink: string
   skills: SkillDetailFormat[];
   appendedskill: SkillDetailFormat[];
-  itemcost: {
+  itemCost: {
     ascension: [],
     skill: [],
     appendSkill: []
@@ -41,7 +42,7 @@ const initDetail: ServantDetail = {
     mcLink: "",
     skills: [],
     appendedskill: [],
-    itemcost: {
+    itemCost: {
       ascension: [],
       skill: [],
       appendSkill: []
@@ -49,7 +50,7 @@ const initDetail: ServantDetail = {
   },
   userSettings: {
     isFollow: false,
-    level: { current: 0, target: 0 },
+    ascension: { current: 0, target: 0 },
     finalLevel: { current: 0, target: 0 },
     skills: [
       { current: 1, target: 1 }, //1-10
@@ -109,30 +110,32 @@ export default function ServantCard(props: any) {
     })
   }
 
+  // TODO
   function changeLevel(current: number, target: number) {
-    const userSettings: ServantSetting = { ...state.userSettings, level: { current, target } };
-    putSetting(state.basicInfo.sId, state.basicInfo.sName, UserSettingType.Servant, userSettings).then(() => {
+    const userSettings: ServantSetting = { ...state.userSettings, ascension: { current, target } };
+    putSetting(state.basicInfo.sId, state.basicInfo.sName, UserSettingType.Servant, userSettings, composeCalcCells({ ...state, userSettings })).then(() => {
       setstate({ ...state, userSettings })
     })
 
   }
 
   function changeFinalLevel(current: number, target: number) {
-    const userSettings: ServantSetting = { ...state.userSettings, finalLevel: { current, target } };
-    setstate({ ...state, userSettings })
-    putSetting(state.basicInfo.sId, state.basicInfo.sName, UserSettingType.Servant, userSettings)
+    const userSettings: ServantSetting = { ...state.userSettings, finalLevel: { current, target }};
+    putSetting(state.basicInfo.sId, state.basicInfo.sName, UserSettingType.Servant, userSettings, composeCalcCells({ ...state, userSettings })).then(() => {
+      setstate({ ...state, userSettings })
+    })
   }
 
   function changeSkill(skill_index: number) { // 写成高阶函数以保存 index 变量
     if (skill_index > 2) {
-      console.error(`[ServantCard] skill_index ${skill_index} out of rang`)
+      console.error(`[ServantCard] skill_index ${skill_index} out of range`)
     }
     const i = skill_index
     return (current: number, target: number) => {
       const new_skills = [...state.userSettings.skills];
       new_skills[i] = { current, target };
       const userSettings: ServantSetting = { ...state.userSettings, skills: new_skills };
-      putSetting(state.basicInfo.sId, state.basicInfo.sName, UserSettingType.Servant, userSettings).then(() => {
+      putSetting(state.basicInfo.sId, state.basicInfo.sName, UserSettingType.Servant, userSettings, composeCalcCells({ ...state, userSettings })).then(() => {
         setstate({ ...state, userSettings })
         Emitter.dataEmit(EvtNames.ModifyServant, EvtSources.ServatContent, {
           id: state.basicInfo.sId,
@@ -146,15 +149,16 @@ export default function ServantCard(props: any) {
 
   function changeAppendedSkill(skill_index: number) {
     if (skill_index > 2) {
-      console.error(`[ServantCard] appended skill_index ${skill_index} out of rang`)
+      console.error(`[ServantCard] appended skill_index ${skill_index} out of range`)
     }
     const i = skill_index
     return (current: number, target: number) => {
       const new_appendedskills = [...state.userSettings.appendedSkills];
       new_appendedskills[i] = { current, target };
       const userSettings: ServantSetting = { ...state.userSettings, appendedSkills: new_appendedskills };
-      setstate({ ...state, userSettings })
-      putSetting(state.basicInfo.sId, state.basicInfo.sName, UserSettingType.Servant, userSettings)
+      putSetting(state.basicInfo.sId, state.basicInfo.sName, UserSettingType.Servant, userSettings, composeCalcCells({ ...state, userSettings })).then(() => {
+        setstate({ ...state, userSettings })
+      })
     }
   }
 
@@ -183,7 +187,7 @@ export default function ServantCard(props: any) {
           <div className="servant-card-setting-list-item list-item-indentation">
             <img src={ArrowUp} alt="再临" className="servant-card-icon" />
             <span className="servant-card-setting-list-item-name">灵基再临</span>
-            <Selections mode="level" {...state.userSettings.level} changeSelection={changeLevel} />
+            <Selections mode="level" {...state.userSettings.ascension} changeSelection={changeLevel} />
           </div>
           <div className="servant-card-setting-list-item list-item-indentation">
             <img src={DOMAIN + ICONBASE + "/圣杯.jpg"} alt="🏆" className="servant-card-icon" />
@@ -211,7 +215,7 @@ export default function ServantCard(props: any) {
           {state.basicInfo.appendedskill.map((skill, index) => {
             return (
               <div className="servant-card-setting-list-item list-item-indentation" key={index}>
-                <img src={DOMAIN + ICONBASE + "/" + skill.icon} alt="skill1" className="servant-card-icon" />
+                <img src={DOMAIN + ICONBASE + "/" + skill.icon + '.png'} alt="skill1" className="servant-card-icon" />
                 <span className="servant-card-setting-list-item-name">{skill.name}</span>
                 <Selections mode="skill" {...state.userSettings.appendedSkills[index]} changeSelection={changeAppendedSkill(index)} />
               </div>

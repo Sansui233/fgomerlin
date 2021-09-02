@@ -23,10 +23,9 @@ export async function parseZipDataset() {
     switch (filename) {
       case "dataset-text/VERSION":
         // Print Version
-        file.async("string").then((result) => {
-          console.log("[utils.ts] Current Data Version: ", result)
-          putVersion(result)
-        })
+        const version = await file.async("string")
+        console.log("[utils.ts] Current Data Version: ", version)
+        await putVersion(version)
         break;
       case "dataset-text/dataset.json":
         const result = await file.async("string")

@@ -65,8 +65,7 @@ input.number {
 }
 
 input.number:focus,
-input.number:focus-visible
-{
+input.number:focus-visible {
   outline: unset;
   background-color: var(--item-bg);
   color: var(--text-primary);
@@ -169,14 +168,6 @@ body {
   background-color: var(--text-gray-lighter);
 }
 
-.ant-select:not(.ant-select-customize-input) .ant-select-selector {
-  background-color: unset;
-  color: var(--text-primary);
-  border: unset;
-}
-
-
-
 /********************************************************************
 *************************** Header **********************************
 *********************************************************************/
@@ -261,7 +252,7 @@ body {
   cursor: pointer;
 }
 
-.filter-like-button:hover svg{
+.filter-like-button:hover svg {
   color: var(--icon-pink);
 }
 
@@ -274,7 +265,7 @@ body {
   cursor: pointer;
 }
 
-.reload-button:hover svg{
+.reload-button:hover svg {
   color: var(--theme--primary);
 }
 
@@ -440,9 +431,25 @@ p.list-title {
 }
 
 .skill-select {
-  width: 58px;
+  width:78px;
 }
 
+.skill-select .ant-select-selection-item {
+  text-align: right;
+}
+.skill-select .ant-select-selector {
+  align-items: flex-end;
+}
+.skill-select.ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  background-color: unset;
+  color: var(--text-primary);
+  border: unset;
+  height: 27px;
+}
+
+.skill-select .ant-select-selection-search {
+  border-bottom: 1px solid var(--underline);
+}
 
 /**********************************************************************
 *********************** Item Sider *************************************
@@ -479,7 +486,6 @@ p.list-title {
   color: var(--text-bold);
 }
 
-
 /**********************************************************************
 *********************** Item Content *************************************
 ***********************************************************************/
@@ -501,7 +507,6 @@ p.list-title {
   display: flex;
   align-items: center;
 }
-
 
 div.blank-item-placeholder {
   background-color: var(--item-bg);
@@ -525,7 +530,7 @@ div.blank-item-placeholder {
 }
 
 .items-item-count {
-  margin-right: .6rem;
+  margin-right: 0.6rem;
   margin-left: auto;
   width: 3rem;
   text-align: right;
@@ -591,7 +596,7 @@ div.blank-item-placeholder {
     flex-grow: 1;
   }
 
-  .item-category-container .sidebar-item-container{
+  .item-category-container .sidebar-item-container {
     background-color: var(--item-bg);
     height: 1.8rem;
     margin: unset;
@@ -599,15 +604,15 @@ div.blank-item-placeholder {
     flex-grow: 1;
   }
 
-  .item-category-container .sidebar-item-container:hover .item-category-info .item-name{
-    color:var(--theme--primary);
+  .item-category-container .sidebar-item-container:hover .item-category-info .item-name {
+    color: var(--theme--primary);
     cursor: default;
   }
 
   .item-category-container .sidebar-item-hover-layer:hover {
     box-shadow: 0px 2px 0px 0px var(--theme--primary);
     background-color: unset;
-}
+  }
 
   .item-category-container .item-category-info {
     margin-left: unset;

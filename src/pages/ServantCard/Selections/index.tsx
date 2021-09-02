@@ -7,7 +7,7 @@ enum Node {
   target
 }
 
-export default function Selections(props: { mode: "skill" | "level" | "finalLevel", current: number, target: number, rarity?: number, changeSelection: (current: number, target: number) => void }) {
+export default function Selections(props: { mode: "skill" | "appendedskill" | "level" | "finalLevel", current: number, target: number, rarity?: number, changeSelection: (current: number, target: number) => void }) {
   const [state, setstate] = useState({ current: props.current, target: props.target })
 
   // Component will receive props
@@ -52,19 +52,36 @@ export default function Selections(props: { mode: "skill" | "level" | "finalLeve
           </Select>
         </div>
       )
+    case "appendedskill":
+      numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+      return (
+        <div>
+          <Select className="skill-select" value={state.current.toString()} onChange={handleSelectionChange(Node.current)}>
+            {numbers.map((i) => {
+              return <Option key={i} value={i}>{i}</Option>
+            })}
+          </Select>
+          <span className="text-gray">→</span>
+          <Select className="skill-select" value={state.target.toString()} onChange={handleSelectionChange(Node.target)}>
+            {numbers.map((i) => {
+              return <Option key={i} value={i}>{i}</Option>
+            })}
+          </Select>
+        </div>
+      )
     case "level":
       numbers = [0, 1, 2, 3, 4];
       return (
         <div>
           <Select className="skill-select" value={state.current.toString()} onChange={handleSelectionChange(Node.current)}>
             {numbers.map((i) => {
-              return <Option value={i}>{i}</Option>
+              return <Option key={i} value={i}>{i}</Option>
             })}
           </Select>
           <span className="text-gray">→</span>
           <Select className="skill-select" value={state.target.toString()} onChange={handleSelectionChange(Node.target)}>
             {numbers.map((i) => {
-              return <Option value={i}>{i}</Option>
+              return <Option key={i} value={i}>{i}</Option>
             })}
           </Select>
         </div>
@@ -101,13 +118,13 @@ export default function Selections(props: { mode: "skill" | "level" | "finalLeve
         <div>
           <Select className="skill-select" value={state.current.toString()} onChange={handleSelectionChange(Node.current)}>
             {numbers.map((i) => {
-              return <Option value={i}>{i}</Option>
+              return <Option key={`flc${i}`} value={i}>{i}</Option>
             })}
           </Select>
           <span className="text-gray">→</span>
           <Select className="skill-select" value={state.target.toString()} onChange={handleSelectionChange(Node.target)}>
             {numbers.map((i) => {
-              return <Option value={i}>{i}</Option>
+              return <Option key={`flt${i}`} value={i}>{i}</Option>
             })}
           </Select>
         </div>

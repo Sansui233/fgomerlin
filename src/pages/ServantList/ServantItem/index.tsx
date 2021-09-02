@@ -20,7 +20,7 @@ export default function ServantItem(props: { servant: Servant, changeFollow: (sI
       <div className="servant-item-skills">
         {skill1}/{skill2}/{skill3}
       </div>
-      <div className="servant-item-like" onClick={(e) => { props.changeFollow(sId); e.preventDefault(); }}>
+      <div className="servant-item-like" onClick={(e) => { props.changeFollow(sId); e.preventDefault(); e.stopPropagation();}}>
         {isFollow ? <HeartFilled className="like" /> : <HeartOutlined />}
       </div>
     </SidebarItem>
