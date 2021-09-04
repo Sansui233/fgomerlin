@@ -1,9 +1,8 @@
 import { Checkbox } from 'antd'
-import { count } from 'console'
-import React, { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { Cell, countItemsNeeded, countServantInItem } from '../../utils/calculator'
-import { DOMAIN, ICONBASE } from '../../utils/dataset-conf'
-import { getCalcCells, getItemSettings, getQpSetting, ItemType, QPItemName } from '../../utils/db'
+import { ICONBASE } from '../../utils/dataset-conf'
+import { getCalcCells, getItemSettings } from '../../utils/db'
 import { ItemInfo } from '../ItemContents'
 import { ServantBasic } from '../ServantCard'
 import ItemStat from './ItemStat/ index'
@@ -27,7 +26,6 @@ export default function Statistic() {
   const [cellState, setState] = useState(initState)
   const [itemsNeeded, setItemsNeed] = useState(initItems)
   const [itemsCounts, setItemsCount] = useState(initItemCount)
-  const [qpCount, setQpCount] = useState(0)
   const [servantsInItem, setServants] = useState(initServants)
   const [viewState, setView] = useState({
     isInsufficientOnly: false
@@ -46,8 +44,7 @@ export default function Statistic() {
         })
         setItemsCount(items)
       })
-      getQpSetting().then(result => { setQpCount(result) })
-
+      getItemSettings()
     })
   }, [])
 
@@ -82,11 +79,18 @@ export default function Statistic() {
     })
   }
 
-  const BaseURL = DOMAIN + ICONBASE
+  const  qpNeeded = () => {
+    const qpItem = itemsNeeded.find(item => { return item.itemName === "QP" })
+    return qpItem?qpItem.itemNeeded : 0
+  }
+
+  const  qpCount = () => {
+    const qpItem = itemsCounts.find(item => { return item.itemName === "QP" })
+    return qpItem?qpItem.itemCount : 0
+  }
 
   const qpLeft = () => {
-    const qpItem = itemsNeeded.find(item => { return item.itemName === QPItemName })
-    return qpItem ? qpCount - qpItem?.itemNeeded : 0
+    return qpCount() - qpNeeded()
   }
 
   return (
@@ -95,12 +99,11 @@ export default function Statistic() {
         <div className="statistic-toolbar">
           <Checkbox checked={viewState.isInsufficientOnly} onChange={handleSetView} /> 仅显示不足
         </div>
-        {/* TODO QP 从者硬币 */}
         <div className="stats-qp">
-          <img className="small" src={`${BaseURL}/QP.png`} alt="qp" />
+          <img className="small" src={`${ICONBASE}/QP.png`} alt="qp" />
           <span>QP</span>
           <div style={{ textAlign: 'left' }}>
-            <span>所需：{qpCount}<br /></span>
+            <span>所需：{qpNeeded()}<br /></span>
             <span>剩余：<span className={qpLeft() < 0? 'insufficient': ''}>{qpLeft()}</span></span>
           </div>
         </div>

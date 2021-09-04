@@ -560,7 +560,7 @@ div.blank-item-placeholder {
 }
 
 .statistic-content p.list-title {
-  margin-top: 1.2em;
+
   margin-bottom: 0.5em;
   padding-left: 18px;
   background-color: var(--content-bg);
@@ -583,7 +583,6 @@ div.blank-item-placeholder {
   background-color: var(--item-bg);
   text-align: center;
   padding: 6px 0;
-  margin-bottom: -1.2em;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -601,7 +600,7 @@ div.blank-item-placeholder {
   width: 100%;
   display: flex;
   flex-wrap: wrap;
-  padding: 0 10px;
+  padding: 0 10px 1.2em 10px;
   background-color: var(--item-bg);
 }
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { getItemList, ItemType, putSetting, UserSettingType } from '../../utils/db'
-import { DOMAIN, ICONBASE } from '../../utils/dataset-conf'
+import {ICONBASE } from '../../utils/dataset-conf'
 
 export type ItemInfo = {
   id: number,
@@ -63,7 +63,7 @@ export default function ItemContents(props: any) {
 
   // focus on next item when press enter
   function handleOnKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" || e.key === "Tab") {
       const activeEl = document.activeElement ? document.activeElement as HTMLInputElement : null
       if (!activeEl) { return }
       const currentIndex = activeEl.dataset.index !== undefined ? parseInt(activeEl.dataset.index) : undefined
@@ -85,7 +85,7 @@ export default function ItemContents(props: any) {
       {itemstates.map((item, i) => {
         return (
           <div className="items-item" key={item.id}>
-            <img className="items-item-img" src={`${DOMAIN}${ICONBASE}/${item.iconWithSuffix}`} alt={item.name} />
+            <img className="items-item-img" src={`${ICONBASE}/${item.iconWithSuffix}`} alt={item.name} />
             <span className="items-item-name">{item.name}</span>
             <input type="text" className="number items-item-count" data-index={i} onKeyDown={handleOnKeyDown} onBlur={handleInputOnBlur} onChange={handleInputOnChange} value={item.count} />
           </div>

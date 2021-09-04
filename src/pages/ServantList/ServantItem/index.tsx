@@ -1,6 +1,6 @@
 import React from 'react'
 import { Servant } from '..'
-import { DOMAIN, ICONBASE } from '../../../utils/dataset-conf'
+import { ICONBASE } from '../../../utils/dataset-conf'
 import { HeartOutlined, HeartFilled } from "@ant-design/icons"
 import SidebarItem from '../../../components/SidebarItemContainer'
 
@@ -10,7 +10,7 @@ export default function ServantItem(props: { servant: Servant, changeFollow: (sI
   return (
     <SidebarItem key={sId}>
       <div className="sidebar-item-img-container">
-        <img src={DOMAIN + ICONBASE + "/" + sImg} alt={sName} />
+        <img src={ICONBASE + "/" + sImg} alt={sName} />
       </div>
       <div className="servant-item-info">
         <p className="servant-item-info-name">{sName}</p>

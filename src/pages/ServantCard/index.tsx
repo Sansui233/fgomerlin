@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { HeartFilled, HeartOutlined, LinkOutlined } from "@ant-design/icons";
 import { getServantDetail, putSetting, ServantSetting, UserSettingType } from '../../utils/db'
 import Selections from './Selections';
-import { DOMAIN, ICONBASE, SkillDetailFormat } from '../../utils/dataset-conf';
+import { ICONBASE, SkillDetailFormat } from '../../utils/dataset-conf';
 import ArrowUp from '../../assets/icons/arrow-up.svg';
 import Emitter, { EvtSources, EvtNames, EvtArgTypes, ServantState } from '../../utils/events';
 import { composeCalcCells } from '../../utils/calculator';
@@ -15,6 +15,7 @@ export type ServantBasic = {
   sClass: string,
   sImg: string,
   sRarity: number,
+  sObtain: string,
   mcLink: string
   skills: SkillDetailFormat[];
   appendedskill: SkillDetailFormat[];
@@ -39,6 +40,7 @@ const initDetail: ServantDetail = {
     sClass: "Saber",
     sImg: "Here",
     sRarity: 3,
+    sObtain:"",
     mcLink: "",
     skills: [],
     appendedskill: [],
@@ -120,7 +122,7 @@ export default function ServantCard(props: any) {
   }
 
   function changeFinalLevel(current: number, target: number) {
-    const userSettings: ServantSetting = { ...state.userSettings, finalLevel: { current, target }};
+    const userSettings: ServantSetting = { ...state.userSettings, finalLevel: { current, target } };
     putSetting(state.basicInfo.sId, state.basicInfo.sName, UserSettingType.Servant, userSettings, composeCalcCells({ ...state, userSettings })).then(() => {
       setstate({ ...state, userSettings })
     })
@@ -167,7 +169,7 @@ export default function ServantCard(props: any) {
       <div className="servant-card">
         <section className="servant-card-head list-item-indentation">
           <div className="servant-card-img-container">
-            <img src={DOMAIN + ICONBASE + "/" + state.basicInfo.sImg} alt="avatar" />
+            <img src={ICONBASE + "/" + state.basicInfo.sImg} alt="avatar" />
           </div>
           <div className="servant-item-info">
             <p className="servant-item-info-name">{state.basicInfo.sName}</p>
@@ -181,48 +183,52 @@ export default function ServantCard(props: any) {
             <a href={"https://fgo.wiki/w/" + state.basicInfo.mcLink} target="_blank" rel="noreferrer"><LinkOutlined /></a>
           </div>
         </section>
+        {
+          state.basicInfo.sObtain === "无法召唤" || state.basicInfo.sObtain === "无法获得" ? '' : (<React.Fragment>
 
-        <section className="servant-card-setting-list">
-          <p className="list-item-indentation list-title">等级提升</p>
-          <div className="servant-card-setting-list-item list-item-indentation">
-            <img src={ArrowUp} alt="再临" className="servant-card-icon" />
-            <span className="servant-card-setting-list-item-name">灵基再临</span>
-            <Selections mode="level" {...state.userSettings.ascension} changeSelection={changeLevel} />
-          </div>
-          <div className="servant-card-setting-list-item list-item-indentation">
-            <img src={DOMAIN + ICONBASE + "/圣杯.jpg"} alt="🏆" className="servant-card-icon" />
-            <span className="servant-card-setting-list-item-name">圣杯转临</span>
-            <Selections mode="finalLevel" {...state.userSettings.finalLevel} rarity={state.basicInfo.sRarity} changeSelection={changeFinalLevel} />
-          </div>
-        </section>
-
-
-        <section className="servant-card-setting-list">
-          <p className="list-item-indentation list-title">技能强化</p>
-          {state.basicInfo.skills.map((skill, index) => {
-            return (
-              <div className="servant-card-setting-list-item list-item-indentation" key={index}>
-                <img src={DOMAIN + ICONBASE + "/" + skill.icon} alt="skill1" className="servant-card-icon" />
-                <span className="servant-card-setting-list-item-name">{skill.name}</span>
-                <Selections mode="skill" {...state.userSettings.skills[index]} changeSelection={changeSkill(index)} />
+            <section className="servant-card-setting-list">
+              <p className="list-item-indentation list-title">等级提升</p>
+              <div className="servant-card-setting-list-item list-item-indentation">
+                <img src={ArrowUp} alt="再临" className="servant-card-icon" />
+                <span className="servant-card-setting-list-item-name">灵基再临</span>
+                <Selections mode="level" {...state.userSettings.ascension} changeSelection={changeLevel} />
               </div>
-            )
-          })}
-        </section>
-
-        <section className="servant-card-setting-list">
-          <p className="list-item-indentation list-title">附加技能</p>
-          {state.basicInfo.appendedskill.map((skill, index) => {
-            return (
-              <div className="servant-card-setting-list-item list-item-indentation" key={index}>
-                <img src={DOMAIN + ICONBASE + "/" + skill.icon + '.png'} alt="skill1" className="servant-card-icon" />
-                <span className="servant-card-setting-list-item-name">{skill.name}</span>
-                <Selections mode="skill" {...state.userSettings.appendedSkills[index]} changeSelection={changeAppendedSkill(index)} />
+              <div className="servant-card-setting-list-item list-item-indentation">
+                <img src={ICONBASE + "/圣杯.jpg"} alt="🏆" className="servant-card-icon" />
+                <span className="servant-card-setting-list-item-name">圣杯转临</span>
+                <Selections mode="finalLevel" {...state.userSettings.finalLevel} rarity={state.basicInfo.sRarity} changeSelection={changeFinalLevel} />
               </div>
-            )
-          })}
-        </section>
+            </section>
 
+
+            <section className="servant-card-setting-list">
+              <p className="list-item-indentation list-title">技能强化</p>
+              {state.basicInfo.skills.map((skill, index) => {
+                return (
+                  <div className="servant-card-setting-list-item list-item-indentation" key={index}>
+                    <img src={ICONBASE + "/" + skill.icon} alt="skill1" className="servant-card-icon" />
+                    <span className="servant-card-setting-list-item-name">{skill.name}</span>
+                    <Selections mode="skill" {...state.userSettings.skills[index]} changeSelection={changeSkill(index)} />
+                  </div>
+                )
+              })}
+            </section>
+
+            <section className="servant-card-setting-list">
+              <p className="list-item-indentation list-title">附加技能</p>
+              {state.basicInfo.appendedskill.map((skill, index) => {
+                return (
+                  <div className="servant-card-setting-list-item list-item-indentation" key={index}>
+                    <img src={ICONBASE + "/" + skill.icon + '.png'} alt="skill1" className="servant-card-icon" />
+                    <span className="servant-card-setting-list-item-name">{skill.name}</span>
+                    <Selections mode="skill" {...state.userSettings.appendedSkills[index]} changeSelection={changeAppendedSkill(index)} />
+                  </div>
+                )
+              })}
+            </section>
+
+          </React.Fragment>)
+        }
       </div>
     </div>
   )

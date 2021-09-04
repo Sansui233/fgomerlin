@@ -1,5 +1,5 @@
 import React from 'react'
-import { DOMAIN, ICONBASE } from '../../../utils/dataset-conf'
+import { ICONBASE } from '../../../utils/dataset-conf'
 
 export default function ItemStat(props: {
   title: string, isInsufficientOnly: boolean, items: {
@@ -29,7 +29,7 @@ export default function ItemStat(props: {
     const left = itemCount - itemNeeded
     return (
       <div className="stats-item-container">
-        <img src={`${DOMAIN}${ICONBASE}/${itemIconWithSuffix}`} alt="" className="items-item-img" />
+        <img src={`${ICONBASE}/${itemIconWithSuffix}`} alt="" className="items-item-img" />
         <p>{itemName}</p>
         <div className="stats-info">
           <span>所需：</span>
@@ -43,12 +43,12 @@ export default function ItemStat(props: {
   const placeHolderRender = () => {
     return (
       <div className="stats-item-container" style={{height:0, margin:0, padding:0,visibility:'hidden'}}>
-        <img src={`${DOMAIN}${ICONBASE}/`} alt="" className="items-item-img" />
-        <p>剑之魔力</p>
+        <img src={`${ICONBASE}/`} alt="" className="items-item-img" />
+        <p>占位占位</p>
         <div className="stats-info">
-          <span>所需：</span>
+          <span>占位：</span>
           <span style={{ textAlign: "right" }}>1234</span>
-          <span>剩余：</span>
+          <span>占位</span>
           <span style={{ textAlign: "right" }}>1234</span>
         </div>
       </div>)

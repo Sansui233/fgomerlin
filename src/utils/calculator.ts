@@ -1,6 +1,6 @@
 import { ItemInfo } from "../pages/ItemContents"
 import { ServantBasic, ServantDetail } from "../pages/ServantCard"
-import { getItemInfo, getServantBasic, QPItemName, ServantSetting } from "./db"
+import { getItemInfo, getServantBasic, ServantSetting } from "./db"
 
 export type Cell = {
   // indexes
@@ -152,7 +152,7 @@ function scanFinalLevel(servantId: number, rarity: number, setting: ServantSetti
         servantId,
         cellType: CellType.finalLevel,
         cellTargetLevel: levelStage[index + 1],
-        itemName: QPItemName,
+        itemName: 'QP',
         itemNum: qp
       })
       cells.push({
@@ -178,7 +178,7 @@ export async function countItemsNeeded(cells: Cell[]){
   for (const cell of cells) {
     const i = items.findIndex((item) => {return item.itemName === cell.itemName})
     if(i === -1){
-      const itemInfo = await getItemInfo(0, cell.itemName)
+      const itemInfo = await getItemInfo(-1, cell.itemName)
       items.push({
         itemName: cell.itemName,
         itemInfo,

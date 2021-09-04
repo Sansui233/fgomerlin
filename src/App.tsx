@@ -7,7 +7,7 @@ import { Menu } from 'antd';
 import { CloudDownloadOutlined, FormatPainterOutlined } from "@ant-design/icons";
 import 'antd/dist/antd.css'
 import './App.css';
-import { parseZipDataset } from "./utils/fetchdata";
+import { parseZipDataset } from "./utils/dataset-resolve";
 import cookies from "./lib/cookies"
 import ServantList from './pages/ServantList';
 import ServantCard from './pages/ServantCard';
@@ -66,7 +66,7 @@ function App(props: any) {
     message.info('正在获取并处理数据...');
     return parseZipDataset().then(() => {
       message.success('更新数据库成功');
-      console.log("[ServantList] FetchData successfully");
+      console.log("[App.tsx] DONE database updated");
       setTimeout(() => {
         window.location.reload()
       }, 500)

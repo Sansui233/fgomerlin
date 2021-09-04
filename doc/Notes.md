@@ -38,15 +38,16 @@ Item：素材，包括了
 
 ### 表(Object Store)结构
 
-从远程下载的数据文件存入 indexDB 遵循以下的结构。
+数据文件存入 indexDB 遵循以下的结构。
 
-| Table Name   | Property(Primary Key)            | Property(Key)     | Property(Key)              | Property                                             | Property       |
-| ------------ | -------------------------------- | ----------------- | -------------------------- | ---------------------------------------------------- | -------------- |
-| servants     | id(Primary Key): number          | name(Key): string |                            | detail: object                                       |                |
-| items        | id(Primary Key): number          | name(Key): string | category(Key): ItemType    | detail: object                                       |                |
-| user_setting | id(Primary Key): number          | name(Key): string | type(Key): UserSettingType | setting: ServantSetting \| ItemSetting \| number(QP) |                |
-| srcinfo      | dataversion(Primary Key): string |                   |                            |                                                      |                |
-| calculator   | cellType                         | servantId: number | itemName: string           | itemNum: number                                      | qpCost: number |
+| Table Name   | Property(Primary Key)                                        | Property(Key) | Property(Key)         | Property                                             | Property       |
+| ------------ | ------------------------------------------------------------ | ------------- | --------------------- | ---------------------------------------------------- | -------------- |
+| servants     | id number                                                    | name: string  |                       | detail: object                                       |                |
+| items        | id: number                                                   | name: string  | category: ItemType    | detail: object                                       |                |
+| user_setting | id: number                                                   | name: string  | type: UserSettingType | setting: ServantSetting \| ItemSetting \| number(QP) |                |
+| srcinfo      | dataversion: string                                          |               |                       |                                                      |                |
+| calculator   | servantId: number<br />cellType<br />cellTargetLevel:number<br />itemName: string |               |                       |                                                      | qpCost: number |
+| glpk         | item: string<br />                                           |               |                       | quet: string<br />appq: number<br />appi: number     |                |
 
 上表中的自定义类型均在 db.ts中定义为 type 或 enum。其中的`UserSettingType`除了有 Servant 和 Item，还有一个 QP，为纯数字。
 
@@ -68,13 +69,15 @@ Item：素材，包括了
 
 ##  计算器
 
-为了响应速度和计算速度，使用一个全局的 state 保存计算器实时信息，中心化修改，可以用 Redux。
+为了减少内存占用，所需数据都存到了 indexedDB 里。因此需要把数据集划分成 IndexedDB 的 Object Store 格式。
 
-修改一次每次都从 IndexedDB 取出数据渲染展示，好像也是可以的。CPU 换内存。但是要写的CRUD变多了。
+感谢数据集的提供者，dataset 里的数据非常全，算是整个 wiki + 效率剧场的数据集。我只用到很小的一部分。之后会对数据集按自己所需要的结构进行拆分。
+
+数据集里的结构定义在了 dataset-conf.ts 中。 Indexdb 的结构定义在了 db.ts 中。
 
 ### 数据结构
 
-计算器为高维统计，每个 cell 以对象结构存储
+计算器为高维统计，每个 cell 里只有 itemNum 值，其余全是索引。
 
 ```json
 {
@@ -86,40 +89,23 @@ Item：素材，包括了
 }
 ```
 
-以上 cell 数成数组。不加 key 索引的原因在于，有时候要以 servant 为索引，有时候要以 itemName 为索引。倒是和 indexedDB 的索引不谋而合。所以可以用 indexedDB 存计算器的中间值，顺便加上事务。
+以上 cell 组成数组。不加 key 索引的原因在于，有时候要以 servant 为索引，有时候要以 itemName 为索引。倒是和 indexedDB 的索引不谋而合。所以可以用 indexedDB 存计算器的中间值，顺便加上事务。
 
 ![](./assets/calculator-datastructure.jpeg)
 
-最终的展示结果结构。以材料分类为起点
+最终的展示结果是用的函数对 cell 实时计算，以页面呈现结果要求为准。具体结构定义在统计页的 Pages 里。
 
-``` json
-{
-"铜素材":
-    {
-      "素材名":{
-        id:
-        name:
-        needed:
-        count:
-        servants:
-          [
-            {
-              id:
-              name:
-              icon:
-              needed:
-            },
-            {...}
-          ],
-      }
-    },
-  "银素材":[..]
-  {...}
-  }
-```
-计算结果不打算存入数据库(看花费的时间)，要持久化可能又要多做一大堆的工作……但也不一定，让 Reducer 监听一下全局的 state 就好了。
+### 效率表
 
-由于这回三个表都要查找，手动编写 Transaction
+数据集中的 glpk 字段为效率表。
+
+如果按下图的方式，2w 多个的 put 事务会让初始化过程卡死
+
+![dataset-glpk](assets/dataset-glpk.jpeg)
+
+差不多就是维度灾难，所以修改为如下结构
+
+![dataset-glpk](assets/dataset-glpkv2.jpeg)
 
 ### 导入导出
 

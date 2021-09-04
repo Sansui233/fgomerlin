@@ -1,6 +1,5 @@
-export const DOMAIN = "http://localhost:8080"
-export const DATASET_TEXT = "/dataset-text.zip"
-export const ICONBASE = "/icons"
+export const DATASET_TEXT = "http://localhost:8080/dataset-text.zip"
+export const ICONBASE = "http://localhost:8080/icons"
 
 // The json format of dataset-text
 export type DataSetFormat = {
@@ -15,7 +14,7 @@ export type DataSetFormat = {
   icons: object,
   freeQuests: object,
   svtQuests: object,
-  glpk: object,
+  glpk: GlpkFormat,
   mysticCodes: object,
   summons: object,
   fsmSvtIdMapping: object
@@ -29,13 +28,20 @@ export type SkillDetailFormat = {
   "rank": string,
   "icon": string,
   "cd": number,
-  "effects": SkillEffectFormat[]
+  "effects": {
+    "description": string,
+    "descriptionJp": string | null,
+    "descriptionEn": string | null,
+    "lvData": string[] // length = 10
+  }[]
 }
 
-type SkillEffectFormat = {
-  "description": string,
-  "descriptionJp": string | null,
-  "descriptionEn": string | null,
-  "lvData": string[] // length = 10
+export type GlpkFormat = {
+  'freeCounts': { [key: string]: number },
+  'colNames': string[], // quest name
+  'rowNames': string[], // Item names
+  'costs': number[],  // quest ap cost. ap per quest
+  'matrix': number[][], // quest efficiency cost. unit: ap per item
+  'weeklyMissionData': object[],
 }
 
