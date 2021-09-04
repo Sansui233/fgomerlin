@@ -1,6 +1,8 @@
 import { ItemInfo } from "../pages/ItemContents"
 import { ServantBasic, ServantDetail } from "../pages/ServantCard"
-import { getItemInfo, getServantBasic, ServantSetting } from "./db"
+import { ItemCostFormat } from "./dataset-conf"
+import { getItemInfo, getServantBasic} from "./db"
+import { ServantSetting } from "./db-type"
 
 export type Cell = {
   // indexes
@@ -35,7 +37,7 @@ export function composeCalcCells(s: ServantDetail): Cell[] {
     .concat(scanFinalLevel(sId, rarity, setting))
 }
 
-function scanSkills(servantId: number, setting: ServantSetting, itemCost: { ascension: [], skill: [], appendSkill: [] }): Cell[] {
+function scanSkills(servantId: number, setting: ServantSetting, itemCost: ItemCostFormat): Cell[] {
   const cells: Cell[] = []
   // Iterate skill
   setting.skills.forEach((skillSetting, i) => {
@@ -65,7 +67,7 @@ function scanSkills(servantId: number, setting: ServantSetting, itemCost: { asce
   return cells
 }
 
-function scanAppendedSkills(servantId: number, setting: ServantSetting, itemCost: { ascension: [], skill: [], appendSkill: [] }): Cell[] {
+function scanAppendedSkills(servantId: number, setting: ServantSetting, itemCost: ItemCostFormat): Cell[] {
   const cells: Cell[] = []
   // Iterate skill
   setting.appendedSkills.forEach((skillSetting, i) => {
@@ -109,7 +111,7 @@ function scanAppendedSkills(servantId: number, setting: ServantSetting, itemCost
   return cells
 }
 
-function scanAscention(servantId: number, setting: ServantSetting, itemCost: { ascension: [], skill: [], appendSkill: [] }): Cell[] {
+function scanAscention(servantId: number, setting: ServantSetting, itemCost: ItemCostFormat): Cell[] {
   const cells: Cell[] = []
 
   const start = setting.ascension.current
