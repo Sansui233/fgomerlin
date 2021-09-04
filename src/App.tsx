@@ -19,7 +19,7 @@ import Statistic from './pages/Statistic';
 export const Pages = {
   // For router
   servantList: "servants",
-  itemList: "items v3456wsC",
+  itemList: "items",
   statistic: "statistic",
   // Not for router
   servantContent: "content",

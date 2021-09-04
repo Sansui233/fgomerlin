@@ -4,7 +4,6 @@
     background-color: #000;
   }
 }
-
 .app.light {
   --theme--primary: #1890ff;
   --sider-bg: #f0f0f0;
@@ -21,6 +20,7 @@
   --button-bg-hover: #f3f8ff;
   --box-shadow: #00000012;
   --underline: #dcdcdc;
+  --toolbar-bg: var(--sider-bg);
 }
 
 .app.dark {
@@ -38,6 +38,12 @@
   --button-bg-hover: #3e3e3e;
   --box-shadow: #00000012;
   --underline: #464646;
+  --toolbar-bg: #292929;
+}
+
+body {
+  background-color: #000;
+  color: var(--text-primary);
 }
 
 /** Framework *****************************************************************************************************************/
@@ -540,8 +546,96 @@ div.blank-item-placeholder {
 ******************************* Statistics *************************
 ***********************************************************************/
 
+.content-scroll-container {
+  overflow-y: auto;
+}
 
+.statistic-content {
+  max-width: 800px;
+  color: var(--text-primary);
+  background-color: var(--item-bg);
+  margin: 0 auto;
+  box-shadow: 2px 4px 4px 0px var(--box-shadow);
+  background-color: var(--item-bg);
+}
 
+.statistic-content p.list-title {
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  padding-left: 18px;
+  background-color: var(--content-bg);
+  border-bottom: 1px solid var(--sider-bg);
+}
+
+.statistic-toolbar {
+  background-color: var(--toolbar-bg);
+  color: var(--text-gray);
+  padding: 2px 7px;
+  width: 100%;
+  line-height: 22px;
+  text-align: right;
+  font-size: 0.9em;
+  position: sticky;
+  top: 0px;
+  /* box-shadow: 0px 2px 2px 0px #9A9A9A40; */
+}
+ .stats-qp {
+  background-color: var(--item-bg);
+  text-align: center;
+  padding: 6px 0;
+  margin-bottom: -1.2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+ }
+
+ .stats-qp > span {
+  padding:0px 10px 0px 2px;
+ }
+
+ .stats-qp > div {
+   font-size: 0.9em;
+ }
+
+.stat-items-container {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0 10px;
+  background-color: var(--item-bg);
+}
+
+.stats-item-container {
+  height: 72px;
+  box-shadow: 0px 4px 4px 0px var(--box-shadow);
+  min-width: 205px;
+  display: flex;
+  align-items: center;
+  background-color: var(--item-bg);
+  color: var(--text-primary);
+  flex-grow: 1;
+  margin: 3px;
+}
+.stats-item-container > p {
+  margin-left: 4px;
+  margin-bottom: 0;
+  margin-right: auto;
+  width: 6rem;
+  font-size: 15px;
+}
+
+.stats-item-container .stats-info {
+  min-width: 5em;
+  margin-right: 7px;
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-row-gap: 1px;
+  row-gap: 1px;
+}
+
+.insufficient {
+  color: var(--icon-pink);
+}
 
 /* Mobile Card **************************************************************************************************/
 
