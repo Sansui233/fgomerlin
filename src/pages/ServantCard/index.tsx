@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { HeartFilled, HeartOutlined, LinkOutlined } from "@ant-design/icons";
-import { getServantDetail, putSetting, ServantSetting, UserSettingType } from '../../utils/db'
+import { getServantDetail, putSetting } from '../../utils/db'
+import { UserSettingType, ServantSetting } from '../../utils/db-type'
 import Selections from './Selections';
-import { ICONBASE, SkillDetailFormat } from '../../utils/dataset-conf';
+import { ICONBASE, ItemCostFormat, SkillDetailFormat } from '../../utils/dataset-conf';
 import ArrowUp from '../../assets/icons/arrow-up.svg';
 import Emitter, { EvtSources, EvtNames, EvtArgTypes, ServantState } from '../../utils/events';
 import { composeCalcCells } from '../../utils/calculator';
@@ -19,11 +20,7 @@ export type ServantBasic = {
   mcLink: string
   skills: SkillDetailFormat[];
   appendedskill: SkillDetailFormat[];
-  itemCost: {
-    ascension: [],
-    skill: [],
-    appendSkill: []
-  }
+  itemCost: ItemCostFormat
 }
 
 export type ServantDetail = {
@@ -40,7 +37,7 @@ const initDetail: ServantDetail = {
     sClass: "Saber",
     sImg: "Here",
     sRarity: 3,
-    sObtain:"",
+    sObtain: "",
     mcLink: "",
     skills: [],
     appendedskill: [],

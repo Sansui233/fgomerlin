@@ -65,7 +65,7 @@ function App(props: any) {
   async function handleClickFetch() {
     message.info('正在获取并处理数据...');
     return parseZipDataset().then(() => {
-      message.success('更新数据库成功');
+      message.success('更新数据成功');
       console.log("[App.tsx] DONE database updated");
       setTimeout(() => {
         window.location.reload()

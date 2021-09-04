@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { getItemList, ItemType, putSetting, UserSettingType } from '../../utils/db'
+import { getItemList, putSetting } from '../../utils/db'
+import {UserSettingType} from '../../utils/db-type'
+import { ItemType } from "../../utils/db-type";
 import {ICONBASE } from '../../utils/dataset-conf'
 
 export type ItemInfo = {

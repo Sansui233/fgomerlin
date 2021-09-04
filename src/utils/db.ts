@@ -5,12 +5,13 @@ import { ServantBasic, ServantDetail } from '../pages/ServantCard';
 import { Servant } from '../pages/ServantList'
 import { parseZipDataset } from './dataset-resolve';
 import { Cell } from './calculator';
-
+import { ItemType, TableGlpkRow, TableNames, TableServantsRow, TableUserSettingRow, UserSettingType, ServantSetting, ItemSetting, TableItemsRow } from "./db-type";
+import { ItemsFormat, ServantsFormat } from './dataset-conf';
 
 export var db: Dexie;
-export var version = 1.9;
+export var version = 2021.0904;
 
-// Define table key (indexing)
+// Define table key (indexing) see db-type.ts to fetch
 const SERVANT_TABLE = "id, name"
 const ITEM_TABLE = "id, name, category"
 const USER_SETTING = "id, name, type"
@@ -21,18 +22,18 @@ const GLPK_TABLE = "item" // See dataset-conf
 export function initdb() {
   db = new Dexie("FGOTEST")
   db.version(version).stores({
-    'servants': SERVANT_TABLE, // This is key column declaration. you can store any other value.
-    'items': ITEM_TABLE,
-    'user_setting': USER_SETTING,
-    'srcinfo': SRCINFO_TABLE,
-    'calculator': CALCULATOR_TABLE,
-    'glpk': GLPK_TABLE
+    [TableNames.servants]: SERVANT_TABLE, // This is key column declaration. you can store any other value.
+    [TableNames.items]: ITEM_TABLE,
+    [TableNames.user_setting]: USER_SETTING,
+    [TableNames.src_info]: SRCINFO_TABLE,
+    [TableNames.calculator]: CALCULATOR_TABLE,
+    [TableNames.glpk]: GLPK_TABLE
   }).upgrade(trans => {
-    message.info("正在更新数据库")
+    message.info("正在更新数据")
     parseZipDataset().then(() => {
-      message.success(`数据库版本已更新至${version}, 刷新生效`)
+      message.success(`数据版本已更新至${version}, 刷新生效`)
     }).catch((e) => {
-      message.error("数据库版本未更新，错误信息：" + e)
+      message.error("数据版本未更新，错误信息：" + e)
     })
   });
 
@@ -40,58 +41,89 @@ export function initdb() {
   db.on("populate", function () {
     Dexie.ignoreTransaction(() => {
       // Init your DB with some default statuses:
-      message.info("正在获取并处理数据……")
+      message.info("正在获取并导入数据……")
       parseZipDataset().then(() => {
-        message.success("数据库创建成功")
+        message.success("数据导入成功")
         console.log("[db.ts] Database is successfully created")
         setTimeout(() => {
           window.location.reload()
         }, 500)
       }).catch((e) => {
-        message.error("数据库版未初始化，错误信息：" + e)
+        message.error("数据未初始化，错误信息：" + e)
       })
     })
   });
 }
 
-export enum UserSettingType {
-  Servant = "servant",
-  Item = "item",
-}
-
-export type ServantSetting = {
-  isFollow: boolean,
-  ascension: { current: number, target: number }, // 0-4
-  finalLevel: { current: number, target: number }, //maxLevel-100
-  skills: { current: number, target: number }[], // length 3
-  appendedSkills: { current: number, target: number }[] // length 3
-}
-
-export type ItemSetting = {
-  count: number
-}
-
-export enum ItemType {
-  Stone = 1,
-  Material = 2,
-  Chess = 3,
-}
-
-export type GlpkRow = {
-  item: string,
-  quests: {
-    quest: string,
-    appq: number,
-    appi: number
-  }[],
-}
 
 export async function putVersion(dataVer: string) {
-  await db.table('srcinfo').put({ dataversion: dataVer })
+  await db.table(TableNames.src_info).put({ dataversion: dataVer })
+}
+
+export function putServant(id: number, name: string, detail: ServantsFormat) {
+  if (typeof (id) == "string") {
+    id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
+  }
+  const row: TableServantsRow = { id, name, detail }
+  return db.table(TableNames.servants).put(row)
+}
+
+export function putItem(id: number, name: string, category: ItemType, detail: ItemsFormat) {
+  if (typeof (id) == "string") {
+    id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
+  }
+  if (typeof (category) == "string") {
+    category = parseInt(category, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
+  }
+  const row: TableItemsRow = { id, name, category, detail }
+  return db.table(TableNames.items).put(row)
+}
+
+// if id = -1 when putting items, it will be auto repeat
+export async function putSetting(id: number, name: string, settingType: UserSettingType, setting: ServantSetting | ItemSetting, calcCells?: Cell[]) {
+  if (typeof (id) == "string") {
+    id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
+  }
+  if (calcCells) {
+    // put servant setting
+    await db.transaction('rw', db.table(TableNames.user_setting), db.table(TableNames.calculator), async () => {
+      const row: TableUserSettingRow = { id, name, type: settingType, setting }
+      await db.table(TableNames.user_setting).put(row)
+      // Delete servant-related setting
+      await db.table(TableNames.calculator).where('[servantId+cellType+cellTargetLevel+itemName]').between(
+        [id, Dexie.minKey, Dexie.minKey, Dexie.minKey],
+        [id, Dexie.maxKey, Dexie.maxKey, Dexie.maxKey]
+      ).delete().then((deleteCount) => {
+        console.debug(`[db.ts] delete ${deleteCount} calc cells for servant ${id}`)
+      })
+      calcCells.forEach(async (c) => {
+        await db.table(TableNames.calculator).put(c)
+      })
+    }).catch((e: Error) => {
+      console.error('[db.ts]', e)
+      throw e
+    })
+  } else {
+    if (id === -1) {
+      const item = await db.table(TableNames.items).where('name').equals(name).toArray()
+      if (item.length !== 0) {
+        id = (item[0] as ItemInfo).id
+      } else {
+        throw new Error(`[db.ts] item ${name} not found`)
+      }
+    }
+    // put item setting
+    const row: TableUserSettingRow = { id, name, type: settingType, setting }
+    return db.table(TableNames.user_setting).put(row)
+  }
+}
+
+export function putGlpkObj(row: TableGlpkRow) {
+  return db.table(TableNames.glpk).put(row)
 }
 
 export async function getServantList(): Promise<Servant[]> {
-  const results = await db.table('servants').toArray()
+  const results = (await db.table(TableNames.servants).toArray()) as TableServantsRow[]
   return mapServantItems(results)
 }
 
@@ -99,7 +131,7 @@ export async function getServantBasic(id: number): Promise<ServantBasic> {
   if (typeof (id) == "string") {
     id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
   }
-  const s = await db.table('servants').get(id)
+  const s = (await db.table(TableNames.servants).get(id)) as TableServantsRow
   const detail = s.detail
   return {
     sId: s.id,
@@ -129,7 +161,7 @@ export async function getServantSetting(id: number): Promise<ServantSetting> {
   if (typeof (id) == "string") {
     id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
   }
-  const settings = await db.table('user_setting').where("id").equals(id).toArray()
+  const settings = await db.table(TableNames.user_setting).where("id").equals(id).toArray()
   return mapServantSetting(settings)
 }
 
@@ -137,34 +169,13 @@ export async function getServantDetail(id: number): Promise<ServantDetail> {
   if (typeof (id) == "string") {
     id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
   }
-  const s = await db.table('servants').where("id").equals(id).toArray()
-  const settings = await db.table('user_setting').where("id").equals(id).toArray()
+  const s = await db.table(TableNames.servants).where("id").equals(id).toArray()
+  const settings = await db.table(TableNames.user_setting).where("id").equals(id).toArray()
   return mapServantDetail(s, settings)
 }
 
-export function putServant(id: number, name: string, detail: object) {
-  if (typeof (id) == "string") {
-    id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
-  }
-  return db.table('servants').put({ id, name, detail })
-}
-
-export function putItem(id: number, name: string, category: ItemType, detail: object) {
-  if (typeof (id) == "string") {
-    id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
-  }
-  if (typeof (category) == "string") {
-    category = parseInt(category, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
-  }
-  return db.table('items').put({ id, name, category, detail })
-}
-
-export function putGlpkObj(obj: GlpkRow) {
-  return db.table('glpk').put({ ...obj })
-}
-
 export async function getItemList(category: ItemType): Promise<ItemInfo[]> {
-  const results = await db.table('items').where("category").equals(category).toArray()
+  const results = (await db.table(TableNames.items).where("category").equals(category).toArray()) as TableItemsRow[]
   return mapItemList(results)
 }
 
@@ -177,76 +188,28 @@ export async function getItemInfo(id?: number, name?: string): Promise<ItemInfo>
     id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
   }
   if (id && id !== -1) {
-    const item = (await db.table('items').where('id').equals(id).toArray())[0]
+    const item = (await db.table(TableNames.items).where('id').equals(id).toArray())[0]
     if (!item) {
       throw new Error('Unknow item ' + id + 'in database')
     }
-    const itemSetting = (await db.table('user_setting').where('id').equals(id).toArray())[0]
+    const itemSetting = (await db.table(TableNames.user_setting).where('id').equals(id).toArray())[0]
     return mapItemInfo(item, itemSetting)
   }
   if (name && name !== "") {
-    const item = (await db.table('items').where('name').equals(name).toArray())[0]
+    const item = (await db.table(TableNames.items).where('name').equals(name).toArray())[0]
     if (!item) {
       throw new Error('Unknow item ' + name + 'in database')
     }
-    const itemSetting = (await db.table('user_setting').where('name').equals(name).toArray())[0]
+    const itemSetting = (await db.table(TableNames.user_setting).where('name').equals(name).toArray())[0]
     return mapItemInfo(item, itemSetting)
   }
   throw new Error('No item key matched in database')
 }
 
-function mapItemInfo(item: any, itemSetting: any): ItemInfo {
-  return {
-    id: item.id,
-    name: item.name,
-    category: item.detail.category,
-    rarity: item.detail.rarity,
-    count: itemSetting ? (itemSetting.setting as ItemSetting).count : 0,
-    iconWithSuffix: `${item.name}.jpg`,
-  }
-}
-
-// if id = -1 when putting items, it will be auto repeat
-export async function putSetting(id: number, name: string, settingType: UserSettingType, setting: ServantSetting | ItemSetting, calcCells?: Cell[]) {
-  if (typeof (id) == "string") {
-    id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
-  }
-  if (calcCells) {
-    // put servant setting
-    await db.transaction('rw', db.table('user_setting'), db.table('calculator'), async () => {
-      await db.table('user_setting').put({ id, name, type: settingType, setting })
-      // Delete servant-related setting
-      await db.table('calculator').where('[servantId+cellType+cellTargetLevel+itemName]').between(
-        [id, Dexie.minKey, Dexie.minKey, Dexie.minKey],
-        [id, Dexie.maxKey, Dexie.maxKey, Dexie.maxKey]
-      ).delete().then((deleteCount) => {
-        console.debug(`[db.ts] delete ${deleteCount} calc cells for servant ${id}`)
-      })
-      calcCells.forEach(async (c) => {
-        await db.table('calculator').put(c)
-      })
-    }).catch((e: Error) => {
-      console.error('[db.ts]', e)
-      throw e
-    })
-  } else {
-    if (id === -1) {
-      const item = await db.table('items').where('name').equals(name).toArray()
-      if (item.length !== 0) {
-        id = (item[0] as ItemInfo).id
-      } else {
-        throw new Error(`[db.ts] item ${name} not found`)
-      }
-    }
-    // put item setting
-    return db.table('user_setting').put({ id, name, type: settingType, setting })
-  }
-}
-
 export async function getItemSetting(name: string): Promise<{ id: number, name: number, type: UserSettingType, setting: ItemSetting }> {
-  const result = await db.table('user_setting').get({ name })
+  const result = await db.table(TableNames.user_setting).get({ name })
   if (!result) {
-    const items = await db.table('items').where('name').equals(name).toArray()
+    const items = await db.table(TableNames.items).where('name').equals(name).toArray()
     if (items.length === 0) {
       throw new Error(`[db.ts] item${name} not in database`)
     }
@@ -260,20 +223,20 @@ export async function getItemSetting(name: string): Promise<{ id: number, name: 
   return result
 }
 
-export async function getItemSettings(): Promise<{ id: number, name: string, type: UserSettingType, setting: ItemSetting }[]> {
-  return await db.table('user_setting').where('type').equals(UserSettingType.Item).toArray()
+export function getItemSettings(): Promise<{ id: number, name: string, type: UserSettingType, setting: ItemSetting }[]> {
+  return db.table(TableNames.user_setting).where('type').equals(UserSettingType.Item).toArray()
 }
 
-export async function getCalcCells(): Promise<Cell[]> {
-  return await db.table('calculator').toArray()
+export function getCalcCells(): Promise<Cell[]> {
+  return db.table(TableNames.calculator).toArray()
 }
-async function mapServantItems(results: any[]): Promise<Servant[]> {
-  const queries = results.map(result => db.table('user_setting').where("id").equals(result.id).toArray())
+async function mapServantItems(results: TableServantsRow[]): Promise<Servant[]> {
+  const queries = results.map(result => db.table(TableNames.user_setting).where("id").equals(result.id).toArray())
   return Promise.all(queries).then((queries_res) => {
     return results.map((result, i) => {
       // queries_res[i] 为一个 query 查询完毕的结果，是个长度为 0 或 1 的数组，where stores the value corresponded to id in this query
       // 用 Promise.all 是为了合并结果为 Promise<Servant[]> 的形式
-      const setting = queries_res[i].length !== 0 ? queries_res[i][0].setting : undefined;
+      const setting = queries_res[i].length !== 0 ? (queries_res[i][0].setting) as ServantSetting : undefined;
       return {
         sNo: result.detail.no,
         sId: result.id,
@@ -291,7 +254,7 @@ async function mapServantItems(results: any[]): Promise<Servant[]> {
   })
 }
 
-function mapServantDetail(s: any[], settings: any[]): ServantDetail {
+function mapServantDetail(s: TableServantsRow[], settings: TableUserSettingRow[]): ServantDetail {
   if (s.length === 0) {
     throw new Error("[db.ts] No servant result")
   }
@@ -345,7 +308,7 @@ function mapServantDetail(s: any[], settings: any[]): ServantDetail {
   }
 }
 
-function mapServantSetting(results: any[]): ServantSetting {
+function mapServantSetting(results: TableUserSettingRow[]): ServantSetting {
   const setting = results.length !== 0 ? (results[0].setting as ServantSetting) : undefined;
   return {
     isFollow: setting ? setting.isFollow : false,
@@ -370,12 +333,12 @@ function mapServantSetting(results: any[]): ServantSetting {
   }
 }
 
-async function mapItemList(results: any[]): Promise<ItemInfo[]> {
+async function mapItemList(results: TableItemsRow[]): Promise<ItemInfo[]> {
   if (results.length === 0) {
     throw new Error("[db.ts] No item result")
   }
   // get user num settings
-  const queries = results.map(result => db.table('user_setting').where("id").equals(result.id).toArray())
+  const queries = results.map(result => db.table(TableNames.user_setting).where("id").equals(result.id).toArray())
   return Promise.all(queries).then((queries_res) => {
     return results.map((result, i) => {
       const setting = queries_res[i].length !== 0 ? queries_res[i][0].setting : undefined;
@@ -384,9 +347,20 @@ async function mapItemList(results: any[]): Promise<ItemInfo[]> {
         name: result.name,
         count: setting ? setting.count : 0,
         category: result.category,
-        rarity: result.rarity,
+        rarity: result.detail.rarity,
         iconWithSuffix: `${result.name}.jpg`,
       }
     })
   })
+}
+
+function mapItemInfo(item: TableItemsRow, itemSetting: TableUserSettingRow): ItemInfo {
+  return {
+    id: item.id,
+    name: item.name,
+    category: item.detail.category,
+    rarity: item.detail.rarity,
+    count: itemSetting ? (itemSetting.setting as ItemSetting).count : 0,
+    iconWithSuffix: `${item.name}.jpg`,
+  }
 }

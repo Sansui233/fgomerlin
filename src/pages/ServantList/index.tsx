@@ -4,7 +4,8 @@ import { HeartFilled, HeartOutlined, ReloadOutlined } from "@ant-design/icons";
 import { FixedSizeList } from 'react-window';
 import Search from 'antd/lib/input/Search';
 import ServantItem from './ServantItem';
-import { getServantList, getServantSetting, putSetting, UserSettingType } from '../../utils/db';
+import { getServantList, getServantSetting, putSetting } from '../../utils/db';
+import {UserSettingType} from '../../utils/db-type'
 import Emitter, { EvtArgTypes, EvtNames, EvtSources, ServantState } from '../../utils/events'
 import { Pages } from '../../App';
 

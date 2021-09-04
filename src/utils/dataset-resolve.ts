@@ -1,7 +1,8 @@
 import axios from "axios";
 import JSZip from "jszip"
 import { DataSetFormat, DATASET_TEXT, GlpkFormat } from "./dataset-conf";
-import { db, GlpkRow, putGlpkObj, putItem, putServant, putVersion } from "./db";
+import { db, putGlpkObj, putItem, putServant, putVersion } from "./db";
+import { TableGlpkRow } from "./db-type";
 
 
 async function fetchTextDataSet(): Promise<{ [key: string]: JSZip.JSZipObject; }> {
@@ -59,9 +60,9 @@ async function storeToDatabase(dataObject: DataSetFormat) {
 }
 
 function composeGlpkObj(glpk: GlpkFormat) {
-  const objs: GlpkRow[] = []
+  const objs: TableGlpkRow[] = []
   glpk.matrix.forEach((appi_arr, row) => {
-    const newRow: GlpkRow = {
+    const newRow: TableGlpkRow = {
       item: glpk.rowNames[row],
       quests: []
     }
