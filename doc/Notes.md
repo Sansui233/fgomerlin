@@ -47,7 +47,7 @@ Item：素材，包括了
 | user_setting | id: number                                                   | name: string  | type: UserSettingType | setting: ServantSetting \| ItemSetting \| number(QP) |                |
 | srcinfo      | dataversion: string                                          |               |                       |                                                      |                |
 | calculator   | servantId: number<br />cellType<br />cellTargetLevel:number<br />itemName: string |               |                       |                                                      | qpCost: number |
-| glpk         | item: string<br />                                           |               |                       | quest: string<br />appq: number<br />appi: number    |                |
+| glpk         | item: string<br />                                           |               |                       | quest: {<br />appq: number<br />appi: number}        |                |
 
 上表中的自定义类型均在 db.ts中定义为 type 或 enum。其中的`UserSettingType`除了有 Servant 和 Item，还有一个 QP，为纯数字。
 

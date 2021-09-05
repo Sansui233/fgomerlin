@@ -1,6 +1,10 @@
-export const DATASET_TEXT = "http://localhost:8080/dataset-text.zip"
-export const ICONBASE = "http://localhost:8080/icons"
+// export const DATASET_TEXT = "http://localhost:8080/dataset-text.zip"
+export const DATASET_TEXT = "https://assets.namichan.site/dataset-text.zip"
+// export const ICONBASE = "http://localhost:8080/icons"
+// export const ICONBASE = "http://assets.namichan.site/icons"
+export const ICONBASE = "https://pics.namichan.site/icons"
 
+// DON'T EDIT IT UNLESS YOU HAVE DIFFERENT VERSION OF DATASET
 // The json format of dataset-text
 export type DataSetFormat = {
   version: string,
@@ -108,6 +112,7 @@ export type ServantsFormat = {
     "skills": SkillDetailFormat[], // 强化前后
   }[], // length = 3
   "passiveSkills": {
+    "openCondition": string | null,
     "name": string,
     "nameEn": string | null,
     "rank": string,
@@ -119,19 +124,9 @@ export type ServantsFormat = {
       "lvData": string[] // length = 10
     }[]
   }[],
-  "passiveSkillsEn": {
-    "name": string,
-    "nameEn": string | null,
-    "rank": string,
-    "icon": string,
-    "effects": {
-      "description": string,
-      "descriptionJp": string | null,
-      "descriptionEn": string | null,
-      "lvData": string[] // length = 10
-    }[]
-  }[],
+  "passiveSkillsEn": SkillDetailFormat[],
   "appendSkills": SkillDetailFormat[],
+  "coinSummonNum": number,
   "itemCost": ItemCostFormat,
   "costumeNos": number[],
   "bondPoints": [],
@@ -166,11 +161,6 @@ export type ServantsFormat = {
   }[],
   "fandomIcons": { [key: string]: string },
   "fandomSprites": { [key: string]: string },
-
-
-
-
-
 }
 
 export type FreeQuestsFormat = {
@@ -224,6 +214,7 @@ type NoblePhantasmFormat = {
 
 export type SkillDetailFormat = {
   "state": string,
+  "openCondition": string | null,
   "name": string,
   "nameJp": string | null,
   "nameEn": string | null,

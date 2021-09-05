@@ -9,9 +9,9 @@ import { ItemType, TableGlpkRow, TableNames, TableServantsRow, TableUserSettingR
 import { ItemsFormat, ServantsFormat } from './dataset-conf';
 
 export var db: Dexie;
-export var version = 2021.0904;
+export var version = 2108.27
 
-// Define table key (indexing) see db-type.ts to fetch
+// Define table key property (indexed property). See db-type.ts for all properties
 const SERVANT_TABLE = "id, name"
 const ITEM_TABLE = "id, name, category"
 const USER_SETTING = "id, name, type"
@@ -28,9 +28,9 @@ export function initdb() {
     [TableNames.src_info]: SRCINFO_TABLE,
     [TableNames.calculator]: CALCULATOR_TABLE,
     [TableNames.glpk]: GLPK_TABLE
-  }).upgrade(trans => {
+  }).upgrade(async trans => {
     message.info("正在更新数据")
-    parseZipDataset().then(() => {
+    await parseZipDataset().then(() => {
       message.success(`数据版本已更新至${version}, 刷新生效`)
     }).catch((e) => {
       message.error("数据版本未更新，错误信息：" + e)
@@ -54,7 +54,6 @@ export function initdb() {
     })
   });
 }
-
 
 export async function putVersion(dataVer: string) {
   await db.table(TableNames.src_info).put({ dataversion: dataVer })
@@ -230,6 +229,7 @@ export function getItemSettings(): Promise<{ id: number, name: string, type: Use
 export function getCalcCells(): Promise<Cell[]> {
   return db.table(TableNames.calculator).toArray()
 }
+
 async function mapServantItems(results: TableServantsRow[]): Promise<Servant[]> {
   const queries = results.map(result => db.table(TableNames.user_setting).where("id").equals(result.id).toArray())
   return Promise.all(queries).then((queries_res) => {
