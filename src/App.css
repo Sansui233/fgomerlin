@@ -469,9 +469,6 @@ div.blank-item-placeholder {
   width: 3rem;
   text-align: right;
 }
-.content-scroll-container {
-  overflow-y: auto;
-}
 .statistic-content {
   max-width: 800px;
   color: var(--text-primary);

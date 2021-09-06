@@ -94,7 +94,6 @@ export default function Statistic() {
   }
 
   return (
-    <div className="content-scroll-container">
       <div className="statistic-content">
         <div className="statistic-toolbar">
           <div className="statistic-toolbar-content">
@@ -116,6 +115,5 @@ export default function Statistic() {
         <ItemStat title="职阶棋子" items={filter(3)} isInsufficientOnly={viewState.isInsufficientOnly} />
         <ItemStat title="其他素材" items={filter(2, 4)} isInsufficientOnly={viewState.isInsufficientOnly} />
       </div>
-    </div>
   )
 }
