@@ -174,8 +174,7 @@ button:hover svg {
   transform: translateY(3px);
 }
 .servant-list-container {
-  min-height: -webkit-fill-available;
-  min-height: fill-available;
+  min-height: 1440px;
   display: flex;
   flex-direction: column;
 }
