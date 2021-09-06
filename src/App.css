@@ -629,14 +629,9 @@ div.blank-item-placeholder {
     display: flex;
     height: 36px;
     flex-wrap: wrap;
+    background-color: unset;
   }
-  .item-category-container .currency-top {
-    order: 4;
-    height: unset;
-    margin: unset;
-    width: 100%;
-    display: none;
-  }
+
   .item-category-container > a {
     flex-grow: 1;
   }
