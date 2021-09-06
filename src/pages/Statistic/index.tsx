@@ -79,14 +79,14 @@ export default function Statistic() {
     })
   }
 
-  const  qpNeeded = () => {
+  const qpNeeded = () => {
     const qpItem = itemsNeeded.find(item => { return item.itemName === "QP" })
-    return qpItem?qpItem.itemNeeded : 0
+    return qpItem ? qpItem.itemNeeded : 0
   }
 
-  const  qpCount = () => {
+  const qpCount = () => {
     const qpItem = itemsCounts.find(item => { return item.itemName === "QP" })
-    return qpItem?qpItem.itemCount : 0
+    return qpItem ? qpItem.itemCount : 0
   }
 
   const qpLeft = () => {
@@ -97,14 +97,16 @@ export default function Statistic() {
     <div className="content-scroll-container">
       <div className="statistic-content">
         <div className="statistic-toolbar">
-          <Checkbox checked={viewState.isInsufficientOnly} onChange={handleSetView} /> 仅显示不足
+          <div className="statistic-toolbar-content">
+            <Checkbox checked={viewState.isInsufficientOnly} onChange={handleSetView} /> 仅显示不足
+          </div>
         </div>
         <div className="stats-qp">
           <img className="small" src={`${ICONBASE}/QP.png`} alt="qp" />
           <span>QP</span>
           <div style={{ textAlign: 'left' }}>
             <span>所需：{qpNeeded()}<br /></span>
-            <span>剩余：<span className={qpLeft() < 0? 'insufficient': ''}>{qpLeft()}</span></span>
+            <span>剩余：<span className={qpLeft() < 0 ? 'insufficient' : ''}>{qpLeft()}</span></span>
           </div>
         </div>
         <ItemStat title="铜素材" items={filter(2, 1)} isInsufficientOnly={viewState.isInsufficientOnly} />

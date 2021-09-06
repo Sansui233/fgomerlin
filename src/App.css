@@ -398,6 +398,7 @@ p.list-title {
   height: 100%;
   width: 200px;
   color: var(--text-primary);
+  background-color: var(--sider-bg);
 }
 .item-category-info {
   margin-left: 6px;
@@ -414,6 +415,10 @@ p.list-title {
   font-size: 16px;
   font-weight: 500;
   color: var(--text-bold);
+}
+
+.item-content {
+  margin-left: 200px;
 }
 .item-qp {
   text-align: center;
@@ -482,20 +487,27 @@ div.blank-item-placeholder {
   border-bottom: 1px solid var(--sider-bg);
 }
 .statistic-toolbar {
-  background-color: var(--toolbar-bg);
-  color: var(--text-gray);
-  padding: 2px 7px;
   width: 100%;
+  position: fixed;
+  top: 46;
+  left: 0px;
+  background-color: var(--toolbar-bg);
+}
+.statistic-toolbar-content {
   line-height: 22px;
   text-align: right;
   font-size: 0.9em;
-  position: sticky;
-  top: 0;
+  color: var(--text-gray);
+  padding: 2px 7px;
+  max-width: 800px;
+  margin: 0 auto;
 }
+
 .stats-qp {
   background-color: var(--item-bg);
   text-align: center;
-  padding: 6px 0;
+  padding-top: 33px;
+  padding-bottom: 6px; 
   display: flex;
   align-items: center;
   justify-content: center;
@@ -663,6 +675,7 @@ div.blank-item-placeholder {
   }
   .item-content {
     margin-top: 36px;
+    margin-left: 0;
   }
   .item-qp {
     justify-content: center;
