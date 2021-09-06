@@ -1,7 +1,7 @@
 {
-  "routes": [
-    { "src": "/servants.*", "dest": "/", "status": 200 },
-    { "src": "/items.*", "dest": "/", "status": 200 },
-    { "src": "/statistic.*", "dest": "/", "status": 200 }
+  "rewrites": [
+    { "source": "/servants/:id*{/}?", "destination": "/"},
+    { "source": "/items/:id*{/}?", "destination": "/"},
+    { "source": "/statistic/:id*{/}?", "destination": "/" }
   ]
 }

@@ -1,8 +1,8 @@
 // export const DATASET_TEXT = "http://localhost:8080/dataset-text.zip"
 export const DATASET_TEXT = "https://assets.namichan.site/dataset-text.zip"
 // export const ICONBASE = "http://localhost:8080/icons"
-// export const ICONBASE = "http://assets.namichan.site/icons"
-export const ICONBASE = "https://pics.namichan.site/icons"
+export const ICONBASE = "https://assets.namichan.site/icons"
+// export const ICONBASE = "https://pics.namichan.site/icons"
 
 // DON'T EDIT IT UNLESS YOU HAVE DIFFERENT VERSION OF DATASET
 // The json format of dataset-text

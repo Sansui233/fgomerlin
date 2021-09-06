@@ -1,9 +1,14 @@
-@media (prefers-color-scheme: dark) {
-  :root,
+body {
+  background-color: #f7f7f7;
+  font-size: 16px;
+}
+
+@media screen and (prefers-color-scheme: dark) {
   body {
-    background-color: #000;
+    background-color: rgb(41, 41, 41);
   }
 }
+
 .app.light {
   --theme--primary: #1890ff;
   --sider-bg: #f0f0f0;
@@ -41,10 +46,6 @@
   --toolbar-bg: #292929;
 }
 
-body {
-  background-color: #000;
-  color: var(--text-primary);
-}
 
 /** Framework *****************************************************************************************************************/
 /* Not for specific elements */
@@ -78,6 +79,30 @@ input.number:focus-visible {
   border-bottom: 1px solid var(--theme--primary);
 }
 
+input[type="color"],
+input[type="date"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="email"],
+input[type="month"],
+input[type="number"],
+input[type="password"],
+input[type="search"],
+input[type="tel"],
+input[type="text"],
+input[type="time"],
+input[type="url"],
+input[type="week"],
+select:focus,
+textarea {
+  font-size: 16px !important;
+}
+
+/* Fix search according to font-size*/
+.ant-input-search-button {
+  height: 35px;
+}
+
 .justify-center {
   margin-left: auto;
   margin-right: auto;
@@ -102,15 +127,19 @@ p.list-item-indentation {
 .app-menu {
   height: 46px;
   z-index: 99;
+  position: fixed;
+  width: 100%;
+  top: 0;
 }
 
 .app-content {
-  height: calc(100vh - 46px);
+  margin-top: 46px;
   overflow-y: hidden;
   background-color: var(--content-bg);
 }
 
 .sider {
+  position: fixed;
   flex: 0 0 394px !important;
   min-width: 394px !important;
   max-width: 394px !important;
@@ -150,10 +179,6 @@ button:hover svg {
 
 .like svg {
   color: var(--icon-pink);
-}
-
-body {
-  color: var(--text-primary);
 }
 
 .loading-placeholder {
@@ -213,6 +238,7 @@ body {
 ***********************************************************************/
 
 .servant-list-container {
+  min-height: 1080px;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -229,7 +255,7 @@ body {
 
 .search {
   flex-grow: 1;
-  padding: 0 3px;
+  padding: 0 3px 0px 8px;
 }
 
 .ant-input {
@@ -354,6 +380,7 @@ p.servant-item-info-other {
 }
 
 .servant-item-skills {
+  font-size: 14px;
   flex: 0 0 auto;
   max-width: 40px;
   color: var(--text-gray);
@@ -371,6 +398,9 @@ p.servant-item-info-other {
 /**********************************************************************
 ******************************* Servant Card *************************
 ***********************************************************************/
+.servant-card-container {
+  margin-left: 394px;
+}
 
 .servant-card {
   border-radius: 5px;
@@ -432,6 +462,7 @@ p.list-title {
 }
 
 .servant-card-setting-list-item-name {
+  font-size: 15px;
   flex-grow: 1;
   padding-left: 0.35em;
 }
@@ -462,14 +493,14 @@ p.list-title {
 ***********************************************************************/
 
 .currency-top {
-  height: 32px;
+  line-height: 1.2rem;
   display: flex;
-  align-items: center;
   text-align: center;
   margin: 7px;
 }
 
 .item-category-container {
+  position: fixed;
   height: 100%;
   color: var(--text-primary);
 }
@@ -614,13 +645,13 @@ div.blank-item-placeholder {
   color: var(--text-primary);
   flex-grow: 1;
   margin: 3px;
+  font-size: 15px;
 }
 .stats-item-container > p {
   margin-left: 4px;
   margin-bottom: 0;
   margin-right: auto;
   width: 6rem;
-  font-size: 15px;
 }
 
 .stats-item-container .stats-info {
@@ -663,11 +694,15 @@ div.blank-item-placeholder {
 
   .content {
     width: 100vw !important;
-    position: absolute;
+    position: fixed;
     left: 0;
     top: 0;
     padding-top: 60px;
     z-index: 1;
+  }
+
+  .servant-card-container {
+    margin-left: unset;
   }
 
   .item-sider {
@@ -678,10 +713,16 @@ div.blank-item-placeholder {
     max-width: 100% !important;
     min-width: 100% !important;
     width: 100% !important;
+    height: 65px;
   }
 
   .item-category-container {
+    position: fixed;
+    top: 46px;
+    height: 66px;
     display: flex;
+    width: 100%;
+    background: var(--sider-bg);
     flex-wrap: wrap;
   }
 
