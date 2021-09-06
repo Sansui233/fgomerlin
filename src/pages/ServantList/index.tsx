@@ -120,11 +120,12 @@ export default function ServantList(props: {removeCurrentOnSidebar: () => void})
         return false
       }
       if(query !== ""){
-        if(servant.sName.includes(query)) {
+        query = query.toLowerCase()
+        if(servant.sName.toLowerCase().includes(query)) {
           return true
         }
         if(servant.sNickNames.some((nickname) => {
-          return nickname.includes(query)
+          return nickname.toLowerCase().includes(query)
         })){
           return true
         }
