@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { getItemList, putSetting } from '../../utils/db'
+import { getItemList, getItemSetting, putSetting } from '../../utils/db'
 import {UserSettingType} from '../../utils/db-type'
 import { ItemType } from "../../utils/db-type";
 import {ICONBASE } from '../../utils/dataset-conf'
@@ -31,7 +31,13 @@ export default function ItemContents(props: any) {
   }
 
   const [itemstates, setstate] = useState(initstate)
+  const [qpstate, setqpstate] = useState(0)
 
+  useEffect(() => {
+    getItemSetting('QP').then((item) => {
+      setqpstate(item.setting.count)
+    })
+  }, [])
   // Component on mount
   useEffect(() => {
     getItemList(category).then((infos) => {
@@ -82,7 +88,32 @@ export default function ItemContents(props: any) {
     setstate(new_itemstates)
   }
 
+  // Only number is accepted
+  function handleQpOnChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target.value === "") {
+      setqpstate(0)
+      return
+    }
+    const num = parseInt(e.target.value)
+    if (isNaN(num)) {
+      return
+    }
+    setqpstate(num)
+  }
+
+  // submit data to database
+  function handleQPpOnBlur(e: React.FocusEvent<HTMLInputElement>) {
+    const num = parseInt(e.target.value)
+    putSetting(-1,'QP',UserSettingType.Item,{count: num})
+  }
+
   return (
+    <div className="item-content">
+      <div className="item-qp">
+        <img className="small" src={`${ICONBASE}/QP.png`} alt="qp" />
+        <span>QP</span>
+        <input type="text" className="number" name="qp" id="qp-input" onChange={handleQpOnChange} onBlur={handleQPpOnBlur} value={qpstate} />
+      </div>
     <div className="items-container">
       {itemstates.map((item, i) => {
         return (
@@ -97,6 +128,7 @@ export default function ItemContents(props: any) {
       <div className="items-item" style={{ visibility: "hidden", height: 0, marginTop: 0, marginBottom: 0 }}><img className="items-item-img" style={{ height: 0 }} src="" alt="" /><span style={{ height: 0 }} className="items-item-name"></span><span style={{ height: 0 }} className="items-item-count"></span></div>
       <div className="items-item" style={{ visibility: "hidden", height: 0, marginTop: 0, marginBottom: 0 }}><img className="items-item-img" style={{ height: 0 }} src="" alt="" /><span style={{ height: 0 }} className="items-item-name"></span><span style={{ height: 0 }} className="items-item-count"></span></div>
       <div className="items-item" style={{ visibility: "hidden", height: 0, marginTop: 0, marginBottom: 0 }}><img className="items-item-img" style={{ height: 0 }} src="" alt="" /><span style={{ height: 0 }} className="items-item-name"></span><span style={{ height: 0 }} className="items-item-count"></span></div>
+    </div>
     </div>
   )
 }

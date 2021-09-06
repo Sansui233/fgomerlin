@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { withRouter, Switch, Route, Redirect, Link } from "react-router-dom";
-import Layout, { Content } from 'antd/lib/layout/layout';
+import { Content } from 'antd/lib/layout/layout';
 import Sider from 'antd/lib/layout/Sider';
 import { message } from 'antd';
 import { Menu } from 'antd';
@@ -111,7 +111,7 @@ function App(props: any) {
   }
 
   return (
-    <Layout className={state.isDark ? "app dark" : "app light"}>
+    <div className={state.isDark ? "app dark" : "app light"}>
       <Menu className="app-menu" selectedKeys={[state.navCurrent]} mode="horizontal">
         <Menu.Item className="menu-item" key={Pages.servantList}>
           <Link to={handleSubNav(Pages.servantList)} onClick={addCurrentOnSidebar}>从者</Link>
@@ -129,20 +129,20 @@ function App(props: any) {
           <button className="clear-button" onClick={handleClickFetch}><CloudDownloadOutlined /></button>
         </Menu.Item>
       </Menu>
-      <Layout className="app-content">
+      <div className="app-content">
         <Switch>
           <Route path={`/${Pages.servantList}`}>
-            <Sider ref={servantSiderEl} className={state.pageCurrent === Pages.servantList ? "sider current-page" : "sider"}>
+            <aside ref={servantSiderEl} className={state.pageCurrent === Pages.servantList ? "sider current-page" : "sider"}>
               <ServantList removeCurrentOnSidebar={removeCurrentOnSidebar} />
-            </Sider>
+            </aside>
             <Content className={state.pageCurrent === Pages.servantContent ? "content current-page" : "content"}>
               <Route path={`/${Pages.servantList}/:id`} component={ServantCard} />
             </Content>
           </Route>
           <Route path={`/${Pages.itemList}`}>
-            <Sider ref={servantSiderEl} className={state.pageCurrent === Pages.itemList ? "item-sider current-page" : "item-sider"}>
+            <aside ref={servantSiderEl} className={state.pageCurrent === Pages.itemList ? "item-sider current-page" : "item-sider"}>
               <ItemCategory />
-            </Sider>
+            </aside>
             <Content className={state.pageCurrent === Pages.itemContent ? "content current-page" : "content"}>
               <Route path={`/${Pages.itemList}/:category`} component={ItemContents} />
             </Content>
@@ -152,8 +152,8 @@ function App(props: any) {
           </Route>
           <Redirect to={`/${Pages.servantList}`} />
         </Switch>
-      </Layout>
-    </Layout>
+      </div>
+    </div>
   );
 }
 
