@@ -1,6 +1,6 @@
 import { Checkbox } from 'antd'
 import { useState, useEffect } from 'react'
-import { Cell, countItemsNeeded, countServantInItem } from '../../utils/calculator'
+import { Cell, countItemsNeeded, countServantsInItem } from '../../utils/calculator'
 import { ICONBASE } from '../../utils/dataset-conf'
 import { getCalcCells, getItemSettings } from '../../utils/db'
 import { ItemInfo } from '../ItemContents'
@@ -49,7 +49,7 @@ export default function Statistic() {
   }, [])
 
   function showServants(itemName: string) {
-    countServantInItem(itemName, cellState).then(results => setServants(results))
+    countServantsInItem(itemName, cellState).then(results => setServants(results))
   }
 
   function handleSetView(e: any) {

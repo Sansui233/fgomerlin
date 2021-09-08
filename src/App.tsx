@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { withRouter, Switch, Route, Redirect, Link } from "react-router-dom";
 import { Content } from 'antd/lib/layout/layout';
-import Sider from 'antd/lib/layout/Sider';
 import { message } from 'antd';
 import { Menu } from 'antd';
 import { CloudDownloadOutlined, FormatPainterOutlined } from "@ant-design/icons";
@@ -38,38 +37,35 @@ function App(props: any) {
     isDark: cookies.getCookie('isdark') === "true" ? true : false,
   })
 
+  // pageOnChange
   useEffect(() => {
-    pageOnChange()
-  }, [props.location.pathname])
-
-  function pageOnChange() {
     const paths = window.location.pathname.split('/') // Format: ["", "servants", "100100"]
     if (paths.length === 2) {
-      setState({ ...state, navCurrent: paths[1], pageCurrent: paths[1] })
+      setState(s => { return { ...s, navCurrent: paths[1], pageCurrent: paths[1] } })
     }
     if (paths.length === 3) {
-      setState({ ...state, navCurrent: paths[1], pageCurrent: paths[1] })
+      setState(s => { return { ...s, navCurrent: paths[1], pageCurrent: paths[1] } })
       switch (paths[1]) {
         case Pages.servantList:
-          setState({ ...state, navCurrent: paths[1], pageCurrent: Pages.servantContent })
+          setState(s => { return { ...s, navCurrent: paths[1], pageCurrent: Pages.servantContent } })
           break;
         case Pages.itemList:
-          setState({ ...state, navCurrent: paths[1], pageCurrent: Pages.itemContent })
+          setState(s => { return { ...s, navCurrent: paths[1], pageCurrent: Pages.itemContent } })
           break;
         default:
           break;
       }
     }
-  }
+  }, [props.location.pathname])
 
   async function handleClickFetch() {
     message.info('正在获取并处理数据...');
     return parseZipDataset().then(() => {
       message.success('更新数据成功');
       console.log("[App.tsx] DONE database updated");
-      setTimeout(() => {
-        window.location.reload()
-      }, 500)
+      // setTimeout(() => {
+      //   window.location.reload()
+      // }, 500)
     }).catch((err) => {
       message.error('获取远程数据失败\n 错误信息：' + err)
     })
@@ -148,7 +144,7 @@ function App(props: any) {
             </Content>
           </Route>
           <Route path={`/${Pages.statistic}`}>
-            <Statistic/>
+            <Statistic />
           </Route>
           <Redirect to={`/${Pages.servantList}`} />
         </Switch>

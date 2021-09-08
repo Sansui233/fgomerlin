@@ -1,8 +1,8 @@
 import axios from "axios";
 import JSZip from "jszip"
 import { DataSetFormat, DATASET_TEXT, GlpkFormat } from "./dataset-conf";
-import { db, putGlpkObj, putItem, putServant, putVersion } from "./db";
-import { TableGlpkRow } from "./db-type";
+import { db, putFreeQuest, putGlpkObj, putItem, putServant, putVersion } from "./db";
+import { TableGlpkRow, TableNames } from "./db-type";
 
 
 async function fetchTextDataSet(): Promise<{ [key: string]: JSZip.JSZipObject; }> {
@@ -52,11 +52,20 @@ async function storeToDatabase(dataObject: DataSetFormat) {
   for (const obj of composeGlpkObj(dataObject.glpk)) {
     arr.push(() => putGlpkObj(obj))
   }
-  return db.transaction('rw', db.table('servants'), db.table('items'), db.table('glpk'), async () => {
-    for (const putPromise of arr) {
-      putPromise()
-    }
-  })
+  for (const [k, v] of Object.entries(dataObject.freeQuests)) {
+    arr.push(() => putFreeQuest({ questName: k, detail: v }))
+  }
+  return db.transaction(
+    'rw',
+    db.table(TableNames.servants), 
+    db.table(TableNames.items), 
+    db.table(TableNames.glpk),
+    db.table(TableNames.freequests),
+    async () => {
+      for (const putPromise of arr) {
+        putPromise()
+      }
+    })
 }
 
 function composeGlpkObj(glpk: GlpkFormat) {
@@ -68,7 +77,7 @@ function composeGlpkObj(glpk: GlpkFormat) {
     }
     appi_arr.forEach((appi, col) => {
       newRow.quests.push({
-        quest: glpk.colNames[col], 
+        quest: glpk.colNames[col],
         appq: glpk.costs[col],
         appi
       })

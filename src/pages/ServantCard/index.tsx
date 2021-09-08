@@ -82,13 +82,14 @@ export default function ServantCard(props: any) {
 
   // Subscribe event
   useEffect(() => {
+    // event handler
     function updateFollow(src: EvtSources, newState: EvtArgTypes) {
       if (src === EvtSources.ServatContent) {
         return // ignore events sent by self
       }
       const st = newState as ServantState;
       if (st.id !== state.basicInfo.sId) { return }
-      setstate({ ...state, userSettings: { ...state.userSettings, isFollow: st.isFollow !== undefined ? st.isFollow : state.userSettings.isFollow } })
+      setstate(s => { return { ...s, userSettings: { ...s.userSettings, isFollow: st.isFollow !== undefined ? st.isFollow : state.userSettings.isFollow } } })
     }
     Emitter.addDataListener(EvtNames.ModifyServant, updateFollow)
     return () => {

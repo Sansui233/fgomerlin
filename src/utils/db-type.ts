@@ -1,5 +1,5 @@
 import { CellType } from "./calculator";
-import { ItemsFormat, ServantsFormat } from "./dataset-conf";
+import { FreeQuestsFormat, ItemsFormat, ServantsFormat } from "./dataset-conf";
 
 export enum TableNames {
   servants = "servants",
@@ -7,7 +7,8 @@ export enum TableNames {
   user_setting = 'user_setting',
   src_info = 'srcinfo',
   calculator = 'calculator',
-  glpk = 'glpk'
+  glpk = 'glpk',
+  freequests = 'freequests'
 }
 
 export type TableServantsRow = { id: number, name: string, detail: ServantsFormat }
@@ -35,7 +36,9 @@ export type ItemSetting = {
 }
 
 export type TableSrcinfoRow = { dataversion: string }
+
 export type TableCalculatoreRow = { servantId: number, cellType: CellType, cellTargetLevel: number, itemName: string, qpCost: number }
+
 export type TableGlpkRow = {
   item: string,
   quests: {
@@ -43,4 +46,9 @@ export type TableGlpkRow = {
     appq: number,
     appi: number
   }[],
+}
+
+export type TableFreeQuestsRow = {
+  questName: string,
+  detail: FreeQuestsFormat
 }

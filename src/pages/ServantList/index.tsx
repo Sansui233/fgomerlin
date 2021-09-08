@@ -5,7 +5,7 @@ import { FixedSizeList } from 'react-window';
 import Search from 'antd/lib/input/Search';
 import ServantItem from './ServantItem';
 import { getServantList, getServantSetting, putSetting } from '../../utils/db';
-import {UserSettingType} from '../../utils/db-type'
+import { UserSettingType } from '../../utils/db-type'
 import Emitter, { EvtArgTypes, EvtNames, EvtSources, ServantState } from '../../utils/events'
 import { Pages } from '../../App';
 
@@ -23,27 +23,37 @@ export type Servant = {
   isFollow: boolean,
 }
 const initServants: Servant[] = []
-type FilterOption =  {
+type FilterOption = {
   needFollow: boolean,
   sClass: string
 }
-const initFilter:FilterOption = {
+const initFilter: FilterOption = {
   needFollow: false,
   sClass: ""
 }
 
-export default function ServantList(props: {removeCurrentOnSidebar: () => void}) {
+export default function ServantList(props: { removeCurrentOnSidebar: () => void }) {
   const [state, setState] = useState({
     servants: initServants,
     isLoaded: false,
     filter_str: "",
     filter_options: initFilter
   })
+  
+  const reloadFromDB = useCallback(
+    async () => {
+      setState(s => { return { servants: s.servants, isLoaded: false, filter_str: "", filter_options: s.filter_options } })
+      const servants = await getServantList()
+      console.log(`[ServantList] reload from db successfully. Total ${servants.length} items`)
+      setState(s => { return { servants, isLoaded: true, filter_str: "", filter_options: s.filter_options } })
+    },
+    [],
+  )
 
   // Load when mounted
   useEffect(() => {
     reloadFromDB().then()
-  }, [])
+  }, [reloadFromDB])
 
   // Subscribe event
   useEffect(() => {
@@ -66,7 +76,7 @@ export default function ServantList(props: {removeCurrentOnSidebar: () => void})
         skill2: st.skills ? st.skills[1] : s.skill2,
         skill3: st.skills ? st.skills[2] : s.skill3,
       }
-      setState({ ...state, servants: newServants })
+      setState(s => { return { ...s, servants: newServants } })
     }
     Emitter.addDataListener(EvtNames.ModifyServant, updateState)
     return () => {
@@ -74,40 +84,33 @@ export default function ServantList(props: {removeCurrentOnSidebar: () => void})
     }
   }, [state.servants]) // Unless state will always be 0
 
-  async function reloadFromDB() {
-    setState({ servants: state.servants, isLoaded: false, filter_str: "", filter_options: state.filter_options})
-    const servants = await getServantList()
-    console.log(`[ServantList] reload from db successfully. Total ${servants.length} items`)
-    setState({ servants, isLoaded: true, filter_str: "", filter_options: state.filter_options})
-  }
-
   function searchOnChange(e: any) {
     const { value } = e.target;
     setState({ ...state, filter_str: value })
   }
 
   function changeFollow(sId: number) {
-      const i = state.servants.findIndex((s:Servant) => {
-        return sId === s.sId
-      })
-      const s = state.servants[i]
-      const newServants = [...state.servants]
-      newServants[i] = { ...s, isFollow: !s.isFollow}
-      getServantSetting(sId).then((setting) => {
-        putSetting(sId, s.sName, UserSettingType.Servant ,{ ...setting, isFollow: !s.isFollow }).then(() => {
-          setState({ ...state, servants: newServants })
-          Emitter.dataEmit(EvtNames.ModifyServant, EvtSources.ServantSidebar, {
-            id: sId,
-            isFollow: !s.isFollow
-          })
+    const i = state.servants.findIndex((s: Servant) => {
+      return sId === s.sId
+    })
+    const s = state.servants[i]
+    const newServants = [...state.servants]
+    newServants[i] = { ...s, isFollow: !s.isFollow }
+    getServantSetting(sId).then((setting) => {
+      putSetting(sId, s.sName, UserSettingType.Servant, { ...setting, isFollow: !s.isFollow }).then(() => {
+        setState({ ...state, servants: newServants })
+        Emitter.dataEmit(EvtNames.ModifyServant, EvtSources.ServantSidebar, {
+          id: sId,
+          isFollow: !s.isFollow
         })
-      }).catch((e: Error) => {
-        console.error('error when update', e, e.stack)
       })
+    }).catch((e: Error) => {
+      console.error('error when update', e, e.stack)
+    })
   }
 
-  function changeFilterFollow (){
-    setState({...state, filter_options: {...state.filter_options, needFollow: !state.filter_options.needFollow}})
+  function changeFilterFollow() {
+    setState({ ...state, filter_options: { ...state.filter_options, needFollow: !state.filter_options.needFollow } })
   }
 
   // 纯函数，不要在里面依赖 state
@@ -119,14 +122,14 @@ export default function ServantList(props: {removeCurrentOnSidebar: () => void})
       if (options.sClass !== "" && servant.sClass !== options.sClass) {
         return false
       }
-      if(query !== ""){
+      if (query !== "") {
         query = query.toLowerCase()
-        if(servant.sName.toLowerCase().includes(query)) {
+        if (servant.sName.toLowerCase().includes(query)) {
           return true
         }
-        if(servant.sNickNames.some((nickname) => {
+        if (servant.sNickNames.some((nickname) => {
           return nickname.toLowerCase().includes(query)
-        })){
+        })) {
           return true
         }
         return false
@@ -151,9 +154,9 @@ export default function ServantList(props: {removeCurrentOnSidebar: () => void})
       <div className="toolbar">
         <Search className="search" onChange={searchOnChange} />
         <button className="clear-button filter-like-button" onClick={changeFilterFollow}>
-          {state.filter_options.needFollow? <HeartFilled className="like"/>:<HeartOutlined/>}
+          {state.filter_options.needFollow ? <HeartFilled className="like" /> : <HeartOutlined />}
         </button>
-        <button className="clear-button reload-button" onClick={reloadFromDB}><ReloadOutlined/></button>
+        <button className="clear-button reload-button" onClick={reloadFromDB}><ReloadOutlined /></button>
       </div>
       {state.isLoaded ?
         <FixedSizeList

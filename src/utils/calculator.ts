@@ -194,7 +194,7 @@ export async function countItemsNeeded(cells: Cell[]){
   return items
 }
 
-export async function countServantInItem(itemName: string, cells: Cell[]){
+export async function countServantsInItem(itemName: string, cells: Cell[]){
   const servants: {
     servantInfo: ServantBasic,
     itemNeeded: number

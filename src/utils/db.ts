@@ -5,11 +5,11 @@ import { ServantBasic, ServantDetail } from '../pages/ServantCard';
 import { Servant } from '../pages/ServantList'
 import { parseZipDataset } from './dataset-resolve';
 import { Cell } from './calculator';
-import { ItemType, TableGlpkRow, TableNames, TableServantsRow, TableUserSettingRow, UserSettingType, ServantSetting, ItemSetting, TableItemsRow } from "./db-type";
+import { ItemType, TableGlpkRow, TableNames, TableServantsRow, TableUserSettingRow, UserSettingType, ServantSetting, ItemSetting, TableItemsRow, TableFreeQuestsRow } from "./db-type";
 import { ItemsFormat, ServantsFormat } from './dataset-conf';
 
 export var db: Dexie;
-export var version = 2108.27
+export var version = 2109.02
 
 // Define table key property (indexed property). See db-type.ts for all properties
 const SERVANT_TABLE = "id, name"
@@ -18,6 +18,8 @@ const USER_SETTING = "id, name, type"
 const SRCINFO_TABLE = "dataversion"
 const CALCULATOR_TABLE = "[servantId+cellType+cellTargetLevel+itemName]" // See doc for details
 const GLPK_TABLE = "item" // See dataset-conf
+const FREEQUESTS_TABLE = "questName" // See dataset-conf
+
 
 export function initdb() {
   db = new Dexie("FGOTEST")
@@ -27,7 +29,8 @@ export function initdb() {
     [TableNames.user_setting]: USER_SETTING,
     [TableNames.src_info]: SRCINFO_TABLE,
     [TableNames.calculator]: CALCULATOR_TABLE,
-    [TableNames.glpk]: GLPK_TABLE
+    [TableNames.glpk]: GLPK_TABLE,
+    [TableNames.freequests]: FREEQUESTS_TABLE
   }).upgrade(async trans => {
     message.info("正在更新数据")
     await parseZipDataset().then(() => {
@@ -76,6 +79,10 @@ export function putItem(id: number, name: string, category: ItemType, detail: It
   }
   const row: TableItemsRow = { id, name, category, detail }
   return db.table(TableNames.items).put(row)
+}
+
+export function putFreeQuest(freequest: TableFreeQuestsRow){
+  return db.table(TableNames.freequests).put(freequest)
 }
 
 // if id = -1 when putting items, it will be auto repeat
@@ -228,6 +235,22 @@ export function getItemSettings(): Promise<{ id: number, name: string, type: Use
 
 export function getCalcCells(): Promise<Cell[]> {
   return db.table(TableNames.calculator).toArray()
+}
+
+export async function getGlpkObj(itemName: string):Promise<TableGlpkRow> {
+ const result = await db.table(TableNames.glpk).where('item').equals(itemName).toArray()
+ if (result.length === 0) {
+   throw new Error(`[db.ts] Item "${itemName}" not found`)
+ }
+ return result[0]
+}
+
+export async function getFreeQuest(questName:string):Promise<TableFreeQuestsRow> {
+  const result = await db.table(TableNames.freequests).where('questName').equals(questName).toArray()
+ if (result.length === 0) {
+   throw new Error(`[db.ts] Free quest "${questName}" not found`)
+ }
+ return result[0]
 }
 
 async function mapServantItems(results: TableServantsRow[]): Promise<Servant[]> {

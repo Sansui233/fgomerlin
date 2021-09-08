@@ -1,10 +1,7 @@
-import React, { useEffect, useState } from 'react'
 import SidebarItem from '../../components/SidebarItemContainer'
 import { Link } from 'react-router-dom'
 import { ICONBASE } from '../../utils/dataset-conf'
 import { Pages } from '../../App'
-import { getItemSetting, putSetting} from '../../utils/db'
-import {UserSettingType} from '../../utils/db-type'
 
 
 export default function ItemCategory() {
