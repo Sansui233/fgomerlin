@@ -32,10 +32,7 @@ const ItemDrawer: React.FC<Props> = ({ item, onClose, visible }: Props) => {
       const quests = row.quests.filter(q => q.appi !== 0)
       // Get some detail for each quest
       Promise.all(quests.map(async q => {
-          return await getFreeQuest(q.quest).catch(e => {
-            console.warn(e);
-            return undefined;
-          });
+          return await getFreeQuest(q.quest).catch(() => undefined);
         })
       ).then(results => {
         setQuests(quests.flatMap((q, i) => {
@@ -89,14 +86,14 @@ const ItemDrawer: React.FC<Props> = ({ item, onClose, visible }: Props) => {
           itemQuests.length === 0 ? "暂无数据"
             : sortBy === SortOpt.appi ?
               filterByApPerItem(itemQuests, 10).map(q => (
-                <li>
-                  <div className="title">{q.quest} {q.appi}AP</div>
+                <li className="quest">
+                  <div className="title">{q.quest} <span className="ap">{q.appi} AP/个</span></div>
                   <div className="detail">{q.chapter + q.name}</div>
                 </li>
               ))
               : filterByApPerQuest(itemQuests, 10).map(q => (
                 <li>
-                  <div className="title">{q.quest} {q.appq}AP</div>
+                  <div className="title">{q.quest} <span className="ap">{q.appq} AP/次</span></div>
                   <div className="detail">{q.chapter + q.name}</div>
                 </li>
               ))

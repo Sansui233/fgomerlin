@@ -122,8 +122,10 @@ export default function ItemContents(props: any) {
   const placeHolder = () => (
     <div className="items-item" style={{ visibility: "hidden", height: 0, marginTop: 0, marginBottom: 0 }}>
       <img className="items-item-img" style={{ height: 0 }} src="" alt="" />
-      <span style={{ height: 0 }} className="items-item-name"></span>
-      <span style={{ height: 0 }} className="items-item-count"></span>
+      <span style={{ height: 0 }} className="items-item-name">占位占位</span>
+      <span style={{ height: 0 }} className="items-item-count">
+        <input type="text" className="number" value={0} />
+      </span>
     </div>)
 
   return (

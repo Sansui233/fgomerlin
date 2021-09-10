@@ -34,7 +34,7 @@ export function initdb() {
   }).upgrade(async trans => {
     message.info("正在更新数据")
     await parseZipDataset().then(() => {
-      message.success(`数据版本已更新至${version}, 刷新生效`)
+      message.success(`数据版本已更新至${version}, 刷新后生效`)
     }).catch((e) => {
       message.error("数据版本未更新，错误信息：" + e)
     })

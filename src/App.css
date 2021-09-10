@@ -503,13 +503,28 @@ div.blank-item-placeholder {
 .item-drawer .close-button:hover svg {
   color: var(--theme--primary);
 }
-
 .item-drawer p.list-title {
-  margin-bottom: 0.5em;
+  margin-bottom: unset;
   padding-left: 18px;
   background-color: var(--content-bg);
   border-bottom: 1px solid var(--sider-bg);
 }
+li.quest {
+  display: block;
+  padding: 5px 18px;
+  border-bottom: 1px solid var(--sider-bg);
+}
+li.quest .title .ap{
+  float: right;
+}
+li.quest .detail {
+  color: var(--text-gray);
+  font-size: 0.85em;
+}
+
+
+
+
 .statistic-content {
   max-width: 800px;
   color: var(--text-primary);

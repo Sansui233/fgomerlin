@@ -11,7 +11,8 @@ import { clientsClaim } from 'workbox-core';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
-import { StaleWhileRevalidate } from 'workbox-strategies';
+import { CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
+import { ICONBASE } from './utils/dataset-conf';
 
 clientsClaim();
 
@@ -60,6 +61,13 @@ registerRoute(
     ],
   })
 );
+
+registerRoute(
+  new RegExp(ICONBASE),
+  new CacheFirst({
+    cacheName: 'extimages'
+  })
+)
 
 // This allows the web app to trigger skipWaiting via
 // registration.waiting.postMessage({type: 'SKIP_WAITING'})

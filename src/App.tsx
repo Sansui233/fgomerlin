@@ -63,9 +63,9 @@ function App(props: any) {
     return parseZipDataset().then(() => {
       message.success('更新数据成功');
       console.log("[App.tsx] DONE database updated");
-      // setTimeout(() => {
-      //   window.location.reload()
-      // }, 500)
+      setTimeout(() => {
+        window.location.reload()
+      }, 500)
     }).catch((err) => {
       message.error('获取远程数据失败\n 错误信息：' + err)
     })
