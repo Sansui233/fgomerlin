@@ -7,10 +7,10 @@ export default function ItemStat(props: {
     itemIconWithSuffix: string,
     itemNeeded: number,
     itemCount: number,
-  }[]
+  }[], showDrawer: (name: string) => any
 }) {
 
-  const filteritems = (isInsufficientOnly: boolean, items:{
+  const filteritems = (isInsufficientOnly: boolean, items: {
     itemName: string,
     itemIconWithSuffix: string,
     itemNeeded: number,
@@ -18,7 +18,7 @@ export default function ItemStat(props: {
   }[]) => {
     return items.filter((item) => {
       const left = item.itemCount - item.itemNeeded
-      if(props.isInsufficientOnly && left > 0){
+      if (props.isInsufficientOnly && left > 0) {
         return false
       }
       return true
@@ -28,7 +28,7 @@ export default function ItemStat(props: {
   const itemRenderer = (itemName: string, itemIconWithSuffix: string, itemNeeded: number, itemCount: number) => {
     const left = itemCount - itemNeeded
     return (
-      <div className="stats-item-container">
+      <div className="stats-item-container" onClick={()=>{props.showDrawer(itemName)}}>
         <img src={`${ICONBASE}/${itemIconWithSuffix}`} alt="" className="items-item-img" />
         <p>{itemName}</p>
         <div className="stats-info">
@@ -42,7 +42,7 @@ export default function ItemStat(props: {
 
   const placeHolderRender = () => {
     return (
-      <div className="stats-item-container" style={{height:0, margin:0, padding:0,visibility:'hidden'}}>
+      <div className="stats-item-container" style={{ height: 0, margin: 0, padding: 0, visibility: 'hidden' }}>
         <img src={`${ICONBASE}/`} alt="" className="items-item-img" />
         <p>占位占位</p>
         <div className="stats-info">
@@ -56,14 +56,14 @@ export default function ItemStat(props: {
   }
 
   // If null
-  if(filteritems(props.isInsufficientOnly,props.items).length === 0) {
+  if (filteritems(props.isInsufficientOnly, props.items).length === 0) {
     return <div></div>
-  }else{
+  } else {
     return (
       <section>
         <p className="list-title">{props.title}</p>
         <div className="stat-items-container">
-          {filteritems(props.isInsufficientOnly,props.items).map((item) => {
+          {filteritems(props.isInsufficientOnly, props.items).map((item) => {
             return itemRenderer(item.itemName, item.itemIconWithSuffix, item.itemNeeded, item.itemCount)
           })}
           {placeHolderRender()}

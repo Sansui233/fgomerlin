@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { ICONBASE } from '../../utils/dataset-conf';
 import { getFreeQuest, getGlpkObj } from '../../utils/db';
 import './index.css'
+import { ReactComponent as SortIcon} from '../../assets/icons/sort-amount-down-alt-solid.svg'
 
 type Props = {
   item: {
@@ -27,13 +28,13 @@ const ItemDrawer: React.FC<Props> = ({ item, onClose, visible }: Props) => {
   }, [visible])
 
   useEffect(() => {
-    if(item.name === '') {return}
+    if (item.name === '') { return }
     getGlpkObj(item.name).then((row) => {
       const quests = row.quests.filter(q => q.appi !== 0)
       // Get some detail for each quest
       Promise.all(quests.map(async q => {
-          return await getFreeQuest(q.quest).catch(() => undefined);
-        })
+        return await getFreeQuest(q.quest).catch(() => undefined);
+      })
       ).then(results => {
         setQuests(quests.flatMap((q, i) => {
           const r = results[i]
@@ -62,12 +63,16 @@ const ItemDrawer: React.FC<Props> = ({ item, onClose, visible }: Props) => {
     }).slice(0, 10)
   }
 
-  function filterByApPerQuest(quests: Quest[], num: number): Quest[] {
+  function filterByPercentage(quests: Quest[], num: number): Quest[] {
     return quests.filter(q => {
       return q.appq !== 0
     }).sort((first, second) => {
-      return first.appq - second.appq // asc
+      return second.appq / second.appi - first.appq / first.appi // des
     }).slice(0, 10)
+  }
+
+  function switchFilter() {
+    setSortBy(s => s === SortOpt.appi ? SortOpt.appq : SortOpt.appi)
   }
 
   return (
@@ -81,9 +86,14 @@ const ItemDrawer: React.FC<Props> = ({ item, onClose, visible }: Props) => {
             <CloseOutlined />
           </div>
         </div>
-        <p className="list-title">关卡效率</p>
+        <p className="list-title" onClick={switchFilter}>关卡效率
+          <span>
+            <SortIcon fill="currentColor"/>
+            {sortBy === SortOpt.appi ? "AP效率" : "掉率"}
+          </span>
+        </p>
         {
-          itemQuests.length === 0 ? "暂无数据"
+          itemQuests.length === 0 ? "  暂无数据"
             : sortBy === SortOpt.appi ?
               filterByApPerItem(itemQuests, 10).map(q => (
                 <li className="quest">
@@ -91,9 +101,9 @@ const ItemDrawer: React.FC<Props> = ({ item, onClose, visible }: Props) => {
                   <div className="detail">{q.chapter + q.name}</div>
                 </li>
               ))
-              : filterByApPerQuest(itemQuests, 10).map(q => (
-                <li>
-                  <div className="title">{q.quest} <span className="ap">{q.appq} AP/次</span></div>
+              : filterByPercentage(itemQuests, 10).map(q => (
+                <li className="quest">
+                  <div className="title">{q.quest} <span className="ap">{(q.appq/q.appi).toFixed(3)} 个/次</span></div>
                   <div className="detail">{q.chapter + q.name}</div>
                 </li>
               ))

@@ -1,20 +1,6 @@
-# DOC
-
-## 数据类型
-
-渲染用从者列表条目，用于
-
-- ServantList state
-- ServantDetail
-
-```
-{
-  sId: string, 
-  sName: string, 
-  sClass: string,
-  sImg: string, // The name of img, without prefix '/'
-}
-```
+## Thanks
+- Chaldea
+- fontawesome.com [License](https://fontawesome.com/license)
 
 # Getting Started with Create React App
 

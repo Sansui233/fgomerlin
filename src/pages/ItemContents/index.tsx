@@ -111,7 +111,6 @@ export default function ItemContents(props: any) {
   }
 
   function showDrawer(itemName: string) {
-    console.debug(`showDrawer${itemName}`)
     setShowDrawer(true);
     setCurrentItem(itemName)
   };

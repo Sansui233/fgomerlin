@@ -508,22 +508,36 @@ div.blank-item-placeholder {
   padding-left: 18px;
   background-color: var(--content-bg);
   border-bottom: 1px solid var(--sider-bg);
+  cursor: pointer;
 }
+.item-drawer p.list-title > span {
+  float: right;
+  margin-right: 18px;
+}
+
+.item-drawer p.list-title:hover > span,
+.item-drawer p.list-title:hover svg {
+  color: var(--theme--primary);
+}
+
+.item-drawer p.list-title svg {
+  height: 1em;
+  vertical-align: text-bottom;
+  margin: 0 5px;
+}
+
 li.quest {
   display: block;
   padding: 5px 18px;
   border-bottom: 1px solid var(--sider-bg);
 }
-li.quest .title .ap{
+li.quest .title .ap {
   float: right;
 }
 li.quest .detail {
   color: var(--text-gray);
   font-size: 0.85em;
 }
-
-
-
 
 .statistic-content {
   max-width: 800px;
@@ -589,6 +603,7 @@ li.quest .detail {
   flex-grow: 1;
   margin: 3px;
   font-size: 15px;
+  cursor: pointer;
 }
 .stats-item-container > p {
   margin-left: 4px;
