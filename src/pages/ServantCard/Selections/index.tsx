@@ -38,7 +38,7 @@ export default function Selections(props: { mode: "skill" | "appendedskill" | "l
     case "skill":
       numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
       return (
-        <div>
+        <div onClick={e=>{e.stopPropagation()}}>
           <Select className="skill-select" value={state.current.toString()} onChange={handleSelectionChange(Node.current)}>
             {numbers.map((i) => {
               return <Option key={i} value={i}>{i}</Option>
@@ -55,7 +55,7 @@ export default function Selections(props: { mode: "skill" | "appendedskill" | "l
     case "appendedskill":
       numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
       return (
-        <div>
+        <div onClick={e=>{e.stopPropagation()}}>
           <Select className="skill-select" value={state.current.toString()} onChange={handleSelectionChange(Node.current)}>
             {numbers.map((i) => {
               return <Option key={i} value={i}>{i}</Option>
@@ -72,7 +72,7 @@ export default function Selections(props: { mode: "skill" | "appendedskill" | "l
     case "level":
       numbers = [0, 1, 2, 3, 4];
       return (
-        <div>
+        <div onClick={e=>{e.stopPropagation()}}>
           <Select className="skill-select" value={state.current.toString()} onChange={handleSelectionChange(Node.current)}>
             {numbers.map((i) => {
               return <Option key={i} value={i}>{i}</Option>
@@ -115,7 +115,7 @@ export default function Selections(props: { mode: "skill" | "appendedskill" | "l
         setstate({ ...state, target: numbers[0] })
       }
       return (
-        <div>
+        <div onClick={e=>{e.stopPropagation()}}>
           <Select className="skill-select" value={state.current.toString()} onChange={handleSelectionChange(Node.current)}>
             {numbers.map((i) => {
               return <Option key={`flc${i}`} value={i}>{i}</Option>

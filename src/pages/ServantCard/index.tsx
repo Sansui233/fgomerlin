@@ -7,6 +7,7 @@ import { ICONBASE, ItemCostFormat, SkillDetailFormat } from '../../utils/dataset
 import ArrowUp from '../../assets/icons/arrow-up.svg';
 import Emitter, { EvtSources, EvtNames, EvtArgTypes, ServantState } from '../../utils/events';
 import { composeCalcCells } from '../../utils/calculator';
+import SkillDrawer from '../../components/SkillDrawer';
 
 export type ServantBasic = {
   sId: number,
@@ -18,8 +19,11 @@ export type ServantBasic = {
   sRarity: number,
   sObtain: string,
   mcLink: string
-  skills: SkillDetailFormat[];
-  appendedskill: SkillDetailFormat[];
+  activeSkills: {
+    "cnState": number,
+    "skills": SkillDetailFormat[], // 强化前后
+  }[];
+  appendedSkills: SkillDetailFormat[];
   itemCost: ItemCostFormat
 }
 
@@ -39,8 +43,8 @@ const initDetail: ServantDetail = {
     sRarity: 3,
     sObtain: "",
     mcLink: "",
-    skills: [],
-    appendedskill: [],
+    activeSkills: [],
+    appendedSkills: [],
     itemCost: {
       ascension: [],
       skill: [],
@@ -67,6 +71,19 @@ const initDetail: ServantDetail = {
 export default function ServantCard(props: any) {
   const { id } = props.match.params
   const [state, setstate] = useState(initDetail)
+  const [drawer, setdrawer] = useState({
+    visible: false,
+    targetSkill: '',
+    isApeendSkill: false
+  })
+
+  const closeDrawer = () => {
+    setdrawer(s => { return { ...s, visible: false } })
+  }
+
+  const showDrawer = (skillName: string, isApeendSkill: boolean) => {
+    setdrawer(s => { return { ...s, targetSkill: skillName, visible: true, isApeendSkill } })
+  }
 
   // ComponentDidMount or when id changed
   useEffect(() => {
@@ -110,7 +127,6 @@ export default function ServantCard(props: any) {
     })
   }
 
-  // TODO
   function changeLevel(current: number, target: number) {
     const userSettings: ServantSetting = { ...state.userSettings, ascension: { current, target } };
     putSetting(state.basicInfo.sId, state.basicInfo.sName, UserSettingType.Servant, userSettings, composeCalcCells({ ...state, userSettings })).then(() => {
@@ -162,6 +178,24 @@ export default function ServantCard(props: any) {
     }
   }
 
+  function composeItemCost(): { currentLevel: number, targetLevel: number, items: { [itemName: string]: number } }[] {
+    if (drawer.isApeendSkill) {
+      const ic = state.basicInfo.itemCost.appendSkill.map((lv, i) => {
+        return { currentLevel: i + 1, targetLevel: i + 2, items: lv }
+      })
+      ic.unshift({
+        currentLevel: 0,
+        targetLevel: 1,
+        items: { "从者硬币": 120 }
+      })
+      return ic
+    } else {
+      return state.basicInfo.itemCost.skill.map((lv, i) => {
+        return { currentLevel: i + 1, targetLevel: i + 2, items: lv }
+      })
+    }
+  }
+
   return (
     <div className="servant-card-container">
       <div className="servant-card">
@@ -197,13 +231,14 @@ export default function ServantCard(props: any) {
                 <Selections mode="finalLevel" {...state.userSettings.finalLevel} rarity={state.basicInfo.sRarity} changeSelection={changeFinalLevel} />
               </div>
             </section>
-
-
             <section className="servant-card-setting-list">
               <p className="list-item-indentation list-title">技能强化</p>
-              {state.basicInfo.skills.map((skill, index) => {
+              {state.basicInfo.activeSkills.map((as, index) => {
+                const skill = as.skills[as.skills.length - 1]
                 return (
-                  <div className="servant-card-setting-list-item list-item-indentation" key={index}>
+                  <div className="servant-card-setting-list-item list-item-indentation" key={index}
+                    onClick={() => { showDrawer(skill.name, false) }}
+                  >
                     <img src={ICONBASE + "/" + skill.icon} alt="skill1" className="servant-card-icon" />
                     <span className="servant-card-setting-list-item-name">{skill.name}</span>
                     <Selections mode="skill" {...state.userSettings.skills[index]} changeSelection={changeSkill(index)} />
@@ -214,9 +249,11 @@ export default function ServantCard(props: any) {
 
             <section className="servant-card-setting-list">
               <p className="list-item-indentation list-title">附加技能</p>
-              {state.basicInfo.appendedskill.map((skill, index) => {
+              {state.basicInfo.appendedSkills.map((skill, index) => {
                 return (
-                  <div className="servant-card-setting-list-item list-item-indentation" key={index}>
+                  <div className="servant-card-setting-list-item list-item-indentation" key={index}
+                    onClick={() => { showDrawer(skill.name, true) }}
+                  >
                     <img src={ICONBASE + "/" + skill.icon + '.png'} alt="skill1" className="servant-card-icon" />
                     <span className="servant-card-setting-list-item-name">{skill.name}</span>
                     <Selections mode="skill" {...state.userSettings.appendedSkills[index]} changeSelection={changeAppendedSkill(index)} />
@@ -227,6 +264,19 @@ export default function ServantCard(props: any) {
 
           </React.Fragment>)
         }
+        <SkillDrawer
+          skills={
+            drawer.isApeendSkill ?
+              state.basicInfo.appendedSkills.map(sk => {
+                return [{ ...sk, icon: sk.icon + '.png' }]
+              })
+              :
+              state.basicInfo.activeSkills.map(as => as.skills)
+          }
+          targetSkillName={drawer.targetSkill}
+          onClose={closeDrawer}
+          itemCost={composeItemCost()}
+          visible={drawer.visible} />
       </div>
     </div>
   )

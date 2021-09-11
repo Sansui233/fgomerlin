@@ -44,7 +44,7 @@ export async function parseZipDataset() {
   }
 }
 
-function storeToDatabase(dataObject: DataSetFormat) {
+async function storeToDatabase(dataObject: DataSetFormat) {
   console.debug('[dataset-resolve] storeToDatabase...')
   const arr: (() => Promise<any>)[] = []
   for (const value of Object.values(dataObject.servants)) {
@@ -59,7 +59,7 @@ function storeToDatabase(dataObject: DataSetFormat) {
   for (const [k, v] of Object.entries(dataObject.freeQuests)) {
     arr.push(() => putFreeQuest({ questName: k, detail: v }))
   }
-  return db.transaction(
+  return await db.transaction(
     'rw',
     db.table(TableNames.servants), 
     db.table(TableNames.items), 

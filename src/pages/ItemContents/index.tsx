@@ -74,7 +74,7 @@ export default function ItemContents(props: any) {
 
   // focus on next item when press enter
   function handleOnKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Enter" || e.key === "Tab") {
+    if (e.key === "Enter") { //TODO Tab的逻辑不太对
       const activeEl = document.activeElement ? document.activeElement as HTMLInputElement : null
       if (!activeEl) { return }
       const currentIndex = activeEl.dataset.index !== undefined ? parseInt(activeEl.dataset.index) : undefined

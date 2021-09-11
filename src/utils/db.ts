@@ -32,13 +32,15 @@ export function initdb() {
     [TableNames.glpk]: GLPK_TABLE,
     [TableNames.freequests]: FREEQUESTS_TABLE
   }).upgrade(async trans => {
-    message.info("正在更新数据")
-    return await parseZipDataset().then(() => {
-      message.success(`数据版本已更新至${version}, 刷新后生效`)
-      console.log('[db.ts] database upgraded to ' + version)
-    }).catch((e) => {
-      message.error("数据版本未更新，错误信息：" + e)
-      throw e
+    Dexie.ignoreTransaction(()=> {
+      message.info("正在更新数据")
+      parseZipDataset().then(() => {
+        message.success(`数据版本已更新至${version}, 刷新内容生效`)
+        console.log('[db.ts] database upgraded to ' + version)
+      }).catch((e) => {
+        message.error("数据版本未更新，错误信息：" + e +".请尝试点击右上角更新", 3000)
+        throw e
+      })
     })
   });
 
@@ -155,16 +157,8 @@ export async function getServantBasic(id: number): Promise<ServantBasic> {
     sRarity: detail.info.rarity2 ? detail.info.rarity2 : detail.info.rarity,
     sObtain: detail.info.obtain,
     mcLink: detail.mcLink,
-    skills: [
-      detail.activeSkills[0].skills.slice(-1)[0],
-      detail.activeSkills[1].skills.slice(-1)[0],
-      detail.activeSkills[2].skills.slice(-1)[0],
-    ],
-    appendedskill: [
-      detail.appendSkills[0],
-      detail.appendSkills[1],
-      detail.appendSkills[2],
-    ],
+    activeSkills: detail.activeSkills,
+    appendedSkills: detail.appendSkills,
     itemCost: detail.itemCost,
   }
 }
@@ -300,17 +294,8 @@ function mapServantDetail(s: TableServantsRow[], settings: TableUserSettingRow[]
       sRarity: detail.info.rarity2 ? detail.info.rarity2 : detail.info.rarity,
       sObtain: detail.info.obtain,
       mcLink: detail.mcLink,
-      skills: [
-        detail.activeSkills[0].skills.slice(-1)[0],
-        detail.activeSkills[1].skills.slice(-1)[0],
-        detail.activeSkills[2].skills.slice(-1)[0],
-
-      ],
-      appendedskill: [
-        detail.appendSkills[0],
-        detail.appendSkills[1],
-        detail.appendSkills[2],
-      ],
+      activeSkills: detail.activeSkills,
+      appendedSkills: detail.appendSkills,
       itemCost: detail.itemCost,
     },
     userSettings: {

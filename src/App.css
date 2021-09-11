@@ -29,7 +29,7 @@ body::-webkit-scrollbar {
 }
 .app.dark,
 .app.light {
-  --theme--primary: #1890ff;
+  --theme-primary: #1890ff;
   --icon-gray: #8d8d8d;
   --icon-pink: #ff5757;
   --box-shadow: rgba(0, 0, 0, 0.07058823529411765);
@@ -85,7 +85,7 @@ input.number:focus-visible {
   outline: unset;
   background-color: var(--item-bg);
   color: var(--text-primary);
-  border-bottom: 1px solid var(--theme--primary);
+  border-bottom: 1px solid var(--theme-primary);
 }
 .justify-center {
   margin-left: auto;
@@ -105,7 +105,7 @@ p.list-item-indentation {
   top: 0;
 }
 .app-content {
-  margin-top: 46px;
+  padding-top: 46px;
   overflow-y: hidden;
   background-color: var(--content-bg);
 }
@@ -134,7 +134,7 @@ svg {
   color: var(--icon-gray);
 }
 button:hover svg {
-  color: var(--theme--primary);
+  color: var(--theme-primary);
 }
 .like svg {
   color: var(--icon-pink);
@@ -164,7 +164,7 @@ button:hover svg {
   color: var(--text-primary);
 }
 .ant-menu-horizontal > .ant-menu-item-selected a {
-  color: var(--theme--primary);
+  color: var(--theme-primary);
 }
 .menu-item {
   flex-grow: 0;
@@ -206,7 +206,7 @@ button:hover svg {
 padding-right: 1em;
 }
 .servant-list-container .toolbar > button:hover svg{
-  color: var(--theme--primary);
+  color: var(--theme-primary);
 }
 .servant-list-container .toolbar button.filter-like-button:hover svg {
   color: var(--icon-pink);
@@ -254,7 +254,7 @@ padding-right: 1em;
   justify-content: space-between;
 }
 .sidebar-item-hover-layer:hover {
-  box-shadow: 0 0 2px 1px var(--theme--primary);
+  box-shadow: 0 0 2px 1px var(--theme-primary);
   background-color: var(--button-bg-hover);
 }
 .sidebar-item-img-container {
@@ -362,7 +362,9 @@ p.list-title {
   justify-content: space-between;
   background-color: var(--item-bg);
   height: 45px;
+  cursor: pointer;
 }
+
 .servant-card-icon {
   width: 28px;
   height: 28px;
@@ -390,12 +392,65 @@ p.list-title {
 .skill-select .ant-select-selection-search {
   border-bottom: 1px solid var(--underline);
 }
-.currency-top {
-  line-height: 1.2rem;
-  display: flex;
-  text-align: center;
-  margin: 7px;
+
+.svt-drawer .drawer-content {
+  top: 46px;
+  height: calc( 100% - 46px );
+  background-color: var(--content-bg);
+  color: var(--text-primary);
 }
+
+.drawer-content .skill-container {
+  margin: 20px 18px;
+  border: 1px solid var(--sider-bg-darker);
+  box-shadow: 0 4px 4px 0 var(--box-shadow);
+  background-color: var(--item-bg);
+}
+
+.drawer-content .tab-container {
+  margin: 20px 18px -20px 18px;
+  color: var(--text-gray);
+}
+.drawer-content .tab-container > div {
+  border:1px solid var(--sider-bg-darker);
+  border-bottom: unset;
+  font-size: 0.85rem;
+  padding: 2px 5px;
+}
+
+.drawer-content .skill-container > .skill-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  padding: 10px 10px;
+  display: flex;
+  align-items: center;
+}
+
+.drawer-content .skill-container > .skill-description {
+  font-size: 0.9rem;
+  padding: 4px 10px;
+  background-color: var(--content-bg);
+  border-top: 1px solid var(--sider-bg-darker);
+  border-bottom: 1px solid var(--sider-bg-darker);
+  text-align: center;
+}
+
+.drawer-content .skill-container > .skill-title > span {
+  padding-left: 5px;
+}
+
+.drawer-content .skill-container > .skill-title > span.cold {
+  margin-left: auto;
+  font-size: 1rem;
+  font-weight: normal;
+}
+
+
+.tab-container > div.current {
+  background-color: var(--theme-primary);
+  color: white;
+}
+
 .item-category-container {
   position: fixed;
   height: 100%;
@@ -499,7 +554,7 @@ div.blank-item-placeholder {
   cursor: pointer;
 }
 .item-drawer .close-button:hover svg {
-  color: var(--theme--primary);
+  color: var(--theme-primary);
 }
 .item-drawer p.list-title {
   margin-bottom: unset;
@@ -515,7 +570,7 @@ div.blank-item-placeholder {
 
 .item-drawer p.list-title:hover > span,
 .item-drawer p.list-title:hover svg {
-  color: var(--theme--primary);
+  color: var(--theme-primary);
 }
 
 .item-drawer p.list-title svg {
@@ -720,10 +775,10 @@ li.quest .detail {
     cursor: pointer;
   }
   .item-category-container .sidebar-item-container:hover .item-category-info .item-name {
-    color: var(--theme--primary);
+    color: var(--theme-primary);
   }
   .item-category-container .sidebar-item-hover-layer:hover {
-    box-shadow: 0 2px 0 0 var(--theme--primary);
+    box-shadow: 0 2px 0 0 var(--theme-primary);
     background-color: unset;
   }
   .item-category-container .item-category-info {

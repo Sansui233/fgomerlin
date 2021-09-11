@@ -1,0 +1,100 @@
+.svt-drawer {
+  position: fixed;
+  top: 0;
+  min-height: 100%;
+  width: 100%;
+  visibility: hidden;
+  transition: visibility .3s 0s;
+}
+
+.svt-drawer.open {
+  visibility: visible;
+  transition: visibility .3s 0s;
+}
+
+.svt-drawer .drawer-mask {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  -webkit-transition: opacity 0.3s;
+  -moz-transition: opacity 0.3s;
+  -o-transition: opacity 0.3s;
+  transition: opacity 0.3s;
+  background-color: rgb(0, 0, 0);
+}
+
+.svt-drawer.open .drawer-mask {
+  opacity: 0.25;
+}
+
+.svt-drawer .drawer-content {
+  position: fixed;
+  right: 0;
+  width: 40%;
+  animation: drawerFadeOut 0.3s cubic-bezier(.25, .1, .25, 1);
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.svt-drawer.open .drawer-content {
+  animation: drawerFadeIn 0.3s cubic-bezier(0.7, 0.3, 0.1, 1);
+}
+
+
+@media screen and (max-width: 720px) {
+  .svt-drawer.open .drawer-content {
+    width: 80%;
+  }
+}
+
+@keyframes delay {
+  0% {
+    visibility: hidden;
+  }
+  1% {
+    visibility: show;
+  }
+}
+
+@keyframes drawerFadeIn {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+@keyframes drawerFadeOut {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/*********** Tabs ********/
+.tab-container {
+  display: flex;
+}
+.tab-container > div {
+  display: inline-block;
+  cursor: pointer;
+}
+
+
+.skill-container {
+  scroll-behavior: smooth;
+}
+
+.skill-lvdata {
+  text-align: center;
+}
+
+.skill-lvdata > span{
+  display: inline-block;
+  width: 20%;
+  padding: 2px 5px;
+}
