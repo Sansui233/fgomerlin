@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { Link } from "react-router-dom";
-import { HeartFilled, HeartOutlined, ReloadOutlined } from "@ant-design/icons";
+import { FilterOutlined, HeartFilled, HeartOutlined, ReloadOutlined, SortAscendingOutlined } from "@ant-design/icons";
 import { FixedSizeList } from 'react-window';
 import Search from 'antd/lib/input/Search';
 import ServantItem from './ServantItem';
@@ -39,7 +39,7 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
     filter_str: "",
     filter_options: initFilter
   })
-  
+
   const reloadFromDB = useCallback(
     async () => {
       setState(s => { return { servants: s.servants, isLoaded: false, filter_str: "", filter_options: s.filter_options } })
@@ -153,10 +153,16 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
     <div className="servant-list-container">
       <div className="toolbar">
         <Search className="search" onChange={searchOnChange} />
+        <button className="clear-button">
+          <FilterOutlined />
+        </button>
+        <button className="clear-button">
+          <SortAscendingOutlined />
+        </button>
         <button className="clear-button filter-like-button" onClick={changeFilterFollow}>
           {state.filter_options.needFollow ? <HeartFilled className="like" /> : <HeartOutlined />}
         </button>
-        <button className="clear-button reload-button" onClick={reloadFromDB}><ReloadOutlined /></button>
+        <button className="clear-button" onClick={reloadFromDB}><ReloadOutlined /></button>
       </div>
       {state.isLoaded ?
         <FixedSizeList

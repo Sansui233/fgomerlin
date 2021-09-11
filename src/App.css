@@ -184,7 +184,7 @@ button:hover svg {
   display: flex;
   flex-direction: column;
 }
-.toolbar {
+.servant-list-container .toolbar {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
@@ -195,6 +195,22 @@ button:hover svg {
 .search {
   flex-grow: 1;
   padding: 0 3px 0 8px;
+}
+.servant-list-container .toolbar > button {
+  padding: unset;
+  padding-left: 0.5em;
+  flex-grow: 0;
+  color: var(--text-gray);
+  cursor: pointer;
+}
+.servant-list-container .toolbar > button:last-of-type {
+padding-right: 1em;
+}
+.servant-list-container .toolbar > button:hover svg{
+  color: var(--theme--primary);
+}
+.servant-list-container .toolbar button.filter-like-button:hover svg {
+  color: var(--icon-pink);
 }
 .ant-input {
   color: var(--text-primary);
@@ -211,28 +227,6 @@ button:hover svg {
 .ant-btn:focus,
 .ant-btn:hover {
   background-color: var(--button-bg-hover);
-}
-.filter-like-button {
-  padding: unset;
-  padding-left: 0.5em;
-  padding-right: 0.4em;
-  flex-grow: 0;
-  color: var(--text-gray);
-  cursor: pointer;
-}
-.filter-like-button:hover svg {
-  color: var(--icon-pink);
-}
-.reload-button {
-  padding: unset;
-  padding-left: 0.4em;
-  padding-right: 0.8em;
-  flex-grow: 0;
-  color: var(--text-gray);
-  cursor: pointer;
-}
-.reload-button:hover svg {
-  color: var(--theme--primary);
 }
 .servant-list-content {
   height: calc(100vh - 90px) !important;
@@ -352,6 +346,11 @@ p.servant-item-info-other {
   cursor: pointer;
   font-size: 1.25rem;
 }
+
+.servant-card-like:hover svg{
+  color: var(--icon-pink);
+}
+
 .servant-card-setting-list {
   margin: 33px 0;
 }
@@ -745,7 +744,7 @@ li.quest .detail {
   .item-qp {
     justify-content: center;
   }
-  .item-drawer .drawer-content {
+  .item-content .item-drawer .drawer-content {
     padding-top: 76px;
   }
 }

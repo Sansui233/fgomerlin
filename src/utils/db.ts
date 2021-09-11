@@ -9,7 +9,7 @@ import { ItemType, TableGlpkRow, TableNames, TableServantsRow, TableUserSettingR
 import { ItemsFormat, ServantsFormat } from './dataset-conf';
 
 export var db: Dexie;
-export var version = 2109.02
+export var version = 2109.1
 
 // Define table key property (indexed property). See db-type.ts for all properties
 const SERVANT_TABLE = "id, name"
@@ -33,10 +33,12 @@ export function initdb() {
     [TableNames.freequests]: FREEQUESTS_TABLE
   }).upgrade(async trans => {
     message.info("正在更新数据")
-    await parseZipDataset().then(() => {
+    return await parseZipDataset().then(() => {
       message.success(`数据版本已更新至${version}, 刷新后生效`)
+      console.log('[db.ts] database upgraded to ' + version)
     }).catch((e) => {
       message.error("数据版本未更新，错误信息：" + e)
+      throw e
     })
   });
 
@@ -63,6 +65,7 @@ export async function putVersion(dataVer: string) {
 }
 
 export function putServant(id: number, name: string, detail: ServantsFormat) {
+  // console.debug('[db.ts] putServant')
   if (typeof (id) == "string") {
     id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
   }
@@ -71,6 +74,7 @@ export function putServant(id: number, name: string, detail: ServantsFormat) {
 }
 
 export function putItem(id: number, name: string, category: ItemType, detail: ItemsFormat) {
+  // console.debug('[db.ts] putItem')
   if (typeof (id) == "string") {
     id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
   }
@@ -81,7 +85,8 @@ export function putItem(id: number, name: string, category: ItemType, detail: It
   return db.table(TableNames.items).put(row)
 }
 
-export function putFreeQuest(freequest: TableFreeQuestsRow){
+export function putFreeQuest(freequest: TableFreeQuestsRow) {
+  // console.debug('[db.ts] putFreequest')
   return db.table(TableNames.freequests).put(freequest)
 }
 
@@ -100,7 +105,7 @@ export async function putSetting(id: number, name: string, settingType: UserSett
         [id, Dexie.minKey, Dexie.minKey, Dexie.minKey],
         [id, Dexie.maxKey, Dexie.maxKey, Dexie.maxKey]
       ).delete().then((deleteCount) => {
-        console.debug(`[db.ts] delete ${deleteCount} calc cells for servant ${id}`)
+        // console.debug(`[db.ts] delete ${deleteCount} calc cells for servant ${id}`)
       })
       calcCells.forEach(async (c) => {
         await db.table(TableNames.calculator).put(c)
@@ -125,6 +130,7 @@ export async function putSetting(id: number, name: string, settingType: UserSett
 }
 
 export function putGlpkObj(row: TableGlpkRow) {
+  // console.debug('[db.ts] putGlpk')
   return db.table(TableNames.glpk).put(row)
 }
 
@@ -237,20 +243,20 @@ export function getCalcCells(): Promise<Cell[]> {
   return db.table(TableNames.calculator).toArray()
 }
 
-export async function getGlpkObj(itemName: string):Promise<TableGlpkRow> {
- const result = await db.table(TableNames.glpk).where('item').equals(itemName).toArray()
- if (result.length === 0) {
-   throw new Error(`[db.ts] Item "${itemName}" not found`)
- }
- return result[0]
+export async function getGlpkObj(itemName: string): Promise<TableGlpkRow> {
+  const result = await db.table(TableNames.glpk).where('item').equals(itemName).toArray()
+  if (result.length === 0) {
+    throw new Error(`[db.ts] Item "${itemName}" not found`)
+  }
+  return result[0]
 }
 
-export async function getFreeQuest(questName:string):Promise<TableFreeQuestsRow> {
+export async function getFreeQuest(questName: string): Promise<TableFreeQuestsRow> {
   const result = await db.table(TableNames.freequests).where('questName').equals(questName).toArray()
- if (result.length === 0) {
-   throw new Error(`[db.ts] Free quest "${questName}" not found`)
- }
- return result[0]
+  if (result.length === 0) {
+    throw new Error(`[db.ts] Free quest "${questName}" not found`)
+  }
+  return result[0]
 }
 
 async function mapServantItems(results: TableServantsRow[]): Promise<Servant[]> {

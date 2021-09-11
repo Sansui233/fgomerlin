@@ -6,7 +6,7 @@ import { TableGlpkRow, TableNames } from "./db-type";
 
 
 async function fetchTextDataSet(): Promise<{ [key: string]: JSZip.JSZipObject; }> {
-  console.log("[dataset-resolve] Getting text pack...")
+  console.log("[dataset-resolve] getting text pack...")
   const response = await axios({
     method: 'get',
     url: DATASET_TEXT,
@@ -19,29 +19,33 @@ async function fetchTextDataSet(): Promise<{ [key: string]: JSZip.JSZipObject; }
 
 export async function parseZipDataset() {
   const files = await fetchTextDataSet()
-  console.debug('[dataset-resolve] Parsing files')
+  console.debug('[dataset-resolve] parsing files...')
   for (const filename of Object.keys(files)) {
-    console.debug('[dataset-resolve] Parsing', filename)
+    console.debug('[dataset-resolve] parsing', filename)
     const file = files[filename]
     switch (filename) {
       case "VERSION":
       case "dataset-text/VERSION":
         // Print Version
         const version = await file.async("string")
-        console.log("[dataset-resolve] Current Data Version: ", version)
+        console.log("[dataset-resolve] current dataset version: ", version)
         await putVersion(version)
+        console.debug('[dataset-resolve] version put complete')
         break;
       case "dataset.json":
       case "dataset-text/dataset.json":
         const result = await file.async("string")
-        return storeToDatabase(JSON.parse(result))
+        await storeToDatabase(JSON.parse(result))
+        console.debug('[dataset-resolve] storing transaction completed')
+        break;
       default:
         break;
     }
   }
 }
 
-async function storeToDatabase(dataObject: DataSetFormat) {
+function storeToDatabase(dataObject: DataSetFormat) {
+  console.debug('[dataset-resolve] storeToDatabase...')
   const arr: (() => Promise<any>)[] = []
   for (const value of Object.values(dataObject.servants)) {
     arr.push(() => putServant(value.svtId, value.info.name, value))
