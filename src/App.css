@@ -126,7 +126,6 @@ p.list-item-indentation {
 }
 .content {
   height: 100%;
-  overflow-y: auto;
 }
 button {
   background-color: var(--item-bg);
@@ -620,6 +619,13 @@ li.quest .detail {
 }
 .insufficient {
   color: var(--icon-pink);
+}
+.stat-svt-container {
+  padding: 5px 17px;
+  margin-bottom: 3px;
+}
+.stat-svt-container > div {
+  margin: 1px;
 }
 
 /******************************************* Mobile *******************************************/

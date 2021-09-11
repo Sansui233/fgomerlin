@@ -1,9 +1,10 @@
 import { CloseOutlined } from '@ant-design/icons';
 import React, { useEffect, useRef, useState } from 'react'
 import { ICONBASE } from '../../utils/dataset-conf';
-import { getFreeQuest, getGlpkObj } from '../../utils/db';
+import { getCalcCells, getFreeQuest, getGlpkObj, getServantBasic } from '../../utils/db';
 import './index.css'
-import { ReactComponent as SortIcon} from '../../assets/icons/sort-amount-down-alt-solid.svg'
+import { ReactComponent as SortIcon } from '../../assets/icons/sort-amount-down-alt-solid.svg'
+import AvatarWithNumber from '../AvatarWithNumber'
 
 type Props = {
   item: {
@@ -17,11 +18,14 @@ enum SortOpt { appi, appq }
 const initSort = SortOpt.appi
 type Quest = { quest: string, appq: number, appi: number, chapter: string, name: string }
 const initQuests: Quest[] = []
+type SvtNeed = { id: number, name: string, iconWithSuffix: string, itemNum: number }
+const initSvtNeed: SvtNeed[] = []
 
 const ItemDrawer: React.FC<Props> = ({ item, onClose, visible }: Props) => {
   const [visibility, setVisibility] = useState(false)
   const [itemQuests, setQuests] = useState(initQuests)
   const [sortBy, setSortBy] = useState(initSort)
+  const [svtNeed, setSvtNeed] = useState(initSvtNeed)
 
   useEffect(() => {
     setVisibility(visible)
@@ -49,6 +53,41 @@ const ItemDrawer: React.FC<Props> = ({ item, onClose, visible }: Props) => {
     }).catch(e => {
       console.error(e, '\n')
       setQuests([])
+    })
+  }, [item.name])
+
+  useEffect(() => {
+    getCalcCells().then(cells => {
+      const svts: SvtNeed[] = []
+      // Count targetsvts in calculator
+      cells.forEach((c) => {
+        if (c.itemName === item.name) {
+          const i = svts.findIndex((s) => {
+            return s.id === c.servantId
+          })
+          if (i !== -1) {
+            svts[i].itemNum += c.itemNum
+          } else {
+            svts.push({
+              id: c.servantId,
+              name: '',
+              iconWithSuffix: '',
+              itemNum: c.itemNum,
+            })
+          }
+        }
+      })
+      // fill svt info
+      Promise.all(svts.map((s) => {
+        return getServantBasic(s.id)
+      })).then(results => {
+        results.forEach((r, i) => {
+          svts[i].id = r.sId
+          svts[i].iconWithSuffix = r.sImg
+        })
+      }).then(() => {
+        setSvtNeed(svts)
+      })
     })
   }, [item.name])
 
@@ -88,12 +127,12 @@ const ItemDrawer: React.FC<Props> = ({ item, onClose, visible }: Props) => {
         </div>
         <p className="list-title" onClick={switchFilter}>关卡效率
           <span>
-            <SortIcon fill="currentColor"/>
+            <SortIcon fill="currentColor" />
             {sortBy === SortOpt.appi ? "AP效率" : "掉率"}
           </span>
         </p>
         {
-          itemQuests.length === 0 ? "  暂无数据"
+          itemQuests.length === 0 ? <span style={{ paddingLeft: '18px' }}>暂无数据</span>
             : sortBy === SortOpt.appi ?
               filterByApPerItem(itemQuests, 10).map(q => (
                 <li className="quest">
@@ -103,12 +142,19 @@ const ItemDrawer: React.FC<Props> = ({ item, onClose, visible }: Props) => {
               ))
               : filterByPercentage(itemQuests, 10).map(q => (
                 <li className="quest">
-                  <div className="title">{q.quest} <span className="ap">{(q.appq/q.appi).toFixed(3)} 个/次</span></div>
+                  <div className="title">{q.quest} <span className="ap">{(q.appq / q.appi).toFixed(3)} 个/次</span></div>
                   <div className="detail">{q.chapter + q.name}</div>
                 </li>
               ))
         }
         <p className="list-title">从者需求</p>
+        <div className="stat-svt-container">
+          {svtNeed.length === 0 ? <span>无从者规划需要此材料</span> :
+            svtNeed.map((s) => (
+              <AvatarWithNumber id={s.id} name={s.name} src={s.iconWithSuffix} num={s.itemNum} />
+            ))
+          }
+        </div>
       </div>
     </aside>
   )

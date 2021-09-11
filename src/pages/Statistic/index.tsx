@@ -1,14 +1,12 @@
 import { Checkbox } from 'antd'
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import ItemDrawer from '../../components/ItemDrawer'
-import { Cell, countItemsNeeded, countServantsInItem } from '../../utils/calculator'
+import { countItemsNeeded } from '../../utils/calculator'
 import { ICONBASE } from '../../utils/dataset-conf'
 import { getCalcCells, getItemSettings } from '../../utils/db'
 import { ItemInfo } from '../ItemContents'
-import { ServantBasic } from '../ServantCard'
 import ItemStat from './ItemStat/ index'
 
-const initState: Cell[] = []
 const initItems: {
   itemName: string;
   itemInfo: ItemInfo;
@@ -18,16 +16,10 @@ const initItemCount: {
   itemName: string,
   itemCount: number
 }[] = []
-const initServants: {
-  servantInfo: ServantBasic,
-  itemNeeded: number
-}[] = []
 
 export default function Statistic() {
-  const [cellState, setState] = useState(initState)
   const [itemsNeeded, setItemsNeed] = useState(initItems)
   const [itemsCounts, setItemsCount] = useState(initItemCount)
-  const [servantsInItem, setServants] = useState(initServants)
   const [viewState, setView] = useState({
     isInsufficientOnly: false
   })
@@ -36,7 +28,6 @@ export default function Statistic() {
 
   useEffect(() => {
     getCalcCells().then((cells) => {
-      setState(cells)
       countItemsNeeded(cells).then(results => setItemsNeed(results))
       getItemSettings().then(results => {
         const items = results.map(item => {
@@ -50,10 +41,6 @@ export default function Statistic() {
       getItemSettings()
     })
   }, [])
-
-  function showServants(itemName: string) {
-    countServantsInItem(itemName, cellState).then(results => setServants(results))
-  }
 
   function handleSetView(e: any) {
     setView({ ...viewState, isInsufficientOnly: e.target.checked })
@@ -105,6 +92,7 @@ export default function Statistic() {
   }
 
   return (
+    <React.Fragment>
       <div className="statistic-content">
         <div className="statistic-toolbar">
           <div className="statistic-toolbar-content">
@@ -125,7 +113,8 @@ export default function Statistic() {
         <ItemStat showDrawer={showDrawer} title="技能石" items={filter(1)} isInsufficientOnly={viewState.isInsufficientOnly} />
         <ItemStat showDrawer={showDrawer} title="职阶棋子" items={filter(3)} isInsufficientOnly={viewState.isInsufficientOnly} />
         <ItemStat showDrawer={showDrawer} title="其他素材" items={filter(2, 4)} isInsufficientOnly={viewState.isInsufficientOnly} />
-        <ItemDrawer item={{name: currentItem,iconWithSuffix: `${currentItem}.jpg`}} onClose={hideDrawer} visible={isShowDrawer}/>
       </div>
+      <ItemDrawer item={{ name: currentItem, iconWithSuffix: `${currentItem}.jpg` }} onClose={hideDrawer} visible={isShowDrawer} />
+    </React.Fragment>
   )
 }
