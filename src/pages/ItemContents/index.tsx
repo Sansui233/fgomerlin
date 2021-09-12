@@ -31,7 +31,7 @@ export default function ItemContents(props: any) {
       break;
   }
 
-  const [itemstates, setstate] = useState(initstate)
+  const [itemstates, setitemstate] = useState(initstate)
   const [qpstate, setqpstate] = useState(0)
   const [isShowDrawer, setShowDrawer] = useState(false)
   const [currentItem, setCurrentItem] = useState("")
@@ -41,12 +41,21 @@ export default function ItemContents(props: any) {
       setqpstate(item.setting.count)
     })
   }, [])
+
   // Component on mount
   useEffect(() => {
     getItemList(category).then((infos) => {
-      setstate(infos)
+      setitemstate(infos)
+    }).then(() => {
+      const hash = decodeURI(props.location.hash).slice(1)
+      const e = document.getElementById(hash)
+      if(e){
+        e?.scrollIntoView({behavior: "smooth", block: "center"})
+        setCurrentItem(hash)
+        setShowDrawer(true)
+      }
     })
-  }, [category])
+  }, [category, props.location.hash])
 
   // Only number is accepted
   function handleInputOnChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -88,7 +97,7 @@ export default function ItemContents(props: any) {
   function changeItemState(index: number, count: number) {
     const new_itemstates = [...itemstates]
     new_itemstates[index].count = count
-    setstate(new_itemstates)
+    setitemstate(new_itemstates)
   }
 
   // Only number is accepted
@@ -137,7 +146,7 @@ export default function ItemContents(props: any) {
       <div className="items-container">
         {itemstates.map((item, i) => {
           return (
-            <div className="items-item" onClick={() => { showDrawer(item.name) }} key={item.id}>
+            <div className="items-item" onClick={() => { showDrawer(item.name) }} key={item.id} id={item.name}>
               <img className="medium" src={`${ICONBASE}/${item.iconWithSuffix}`} alt={item.name} />
               <span className="items-item-name">{item.name}</span>
               <div className="items-item-count">

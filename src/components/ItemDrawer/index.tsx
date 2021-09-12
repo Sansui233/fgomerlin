@@ -135,13 +135,13 @@ const ItemDrawer: React.FC<Props> = ({ item, onClose, visible }: Props) => {
           itemQuests.length === 0 ? <span style={{ paddingLeft: '18px' }}>暂无数据</span>
             : sortBy === SortOpt.appi ?
               filterByApPerItem(itemQuests, 10).map(q => (
-                <li className="quest">
+                <li key={q.quest} className="quest">
                   <div className="title">{q.quest} <span className="ap">{q.appi} AP/个</span></div>
                   <div className="detail">{q.chapter + q.name}</div>
                 </li>
               ))
               : filterByPercentage(itemQuests, 10).map(q => (
-                <li className="quest">
+                <li key={q.quest} className="quest">
                   <div className="title">{q.quest} <span className="ap">{(q.appq / q.appi).toFixed(3)} 个/次</span></div>
                   <div className="detail">{q.chapter + q.name}</div>
                 </li>
@@ -151,7 +151,7 @@ const ItemDrawer: React.FC<Props> = ({ item, onClose, visible }: Props) => {
         <div className="stat-svt-container">
           {svtNeed.length === 0 ? <span>无从者规划需要此材料</span> :
             svtNeed.map((s) => (
-              <AvatarWithNumber id={s.id} name={s.name} iconWithSuffix={s.iconWithSuffix} num={s.itemNum} />
+              <AvatarWithNumber key={s.id} id={s.id} name={s.name} iconWithSuffix={s.iconWithSuffix} num={s.itemNum} />
             ))
           }
         </div>

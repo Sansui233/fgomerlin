@@ -25,7 +25,6 @@ const cookies = {
         updatedCookie += "=" + optionValue;
       }
     }
-  
     document.cookie = updatedCookie;
   }
 }

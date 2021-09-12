@@ -33,12 +33,12 @@ export function initdb() {
     [TableNames.freequests]: FREEQUESTS_TABLE
   }).upgrade(async trans => {
     Dexie.ignoreTransaction(()=> {
-      message.info("正在更新数据",3000)
+      message.info("正在更新数据",5)
       parseZipDataset().then(() => {
         message.success(`数据版本已更新至${version}, 刷新内容生效`)
         console.log('[db.ts] database upgraded to ' + version)
       }).catch((e) => {
-        message.error("数据版本未更新，错误信息：" + e +".请尝试点击右上角更新", 3000)
+        message.error("数据版本未更新，错误信息：" + e +".请尝试点击右上角更新", 5)
         throw e
       })
     })

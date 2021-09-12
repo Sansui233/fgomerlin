@@ -36,9 +36,9 @@ export default function SkillDrawer({ skills, targetSkillName, onClose, itemCost
   }, [visible, targetSkillName])
 
   const handleNav = (status: number) => {
-    if(status === 0){
+    if (status === 0) {
       document.getElementById('nav-skill')?.scrollIntoView(true)
-    }else if(status === 1){
+    } else if (status === 1) {
       document.getElementById('nav-itemcost')?.scrollIntoView(true)
     }
     setnavstatus(status)
@@ -134,10 +134,10 @@ function ItemRenderer(props: {
     <section className="itemcost" id="nav-itemcost">
       <h2>升级材料</h2>
       {props.itemCost.map((lv) => (
-        <li key={lv.currentLevel}>
+        <li key={'lv'+lv.currentLevel}>
           <div>Lv.{lv.currentLevel}&nbsp;→&nbsp;{lv.targetLevel}</div>
           <div>{Object.entries(lv.items).map(([name, num], i) => {
-            return <AvatarWithNumber id={name} name={name} iconWithSuffix={`${name}.jpg`} num={num} />
+            return <AvatarWithNumber key={name} id={name} name={name} iconWithSuffix={`${name}.jpg`} num={num} />
           })}</div>
         </li>
       ))}

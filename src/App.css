@@ -366,7 +366,7 @@ p.servant-item-info-other {
   box-shadow: 0 6px 4px 0 var(--box-shadow);
   transition: margin-left 0.3s;
 }
-@media screen and (max-width: 1074px) {
+@media screen and (max-width: 974px) {
   .servant-card {
     margin-left: auto;
   }
@@ -708,7 +708,8 @@ li.quest .detail {
 .statistic-toolbar {
   width: 100%;
   position: fixed;
-  top: 46;
+  z-index: 2; /* overlay relative img*/
+  top: 46px;
   left: 0px;
   background-color: var(--toolbar-bg);
   /* transition: background-color .3s;*/

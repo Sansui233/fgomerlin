@@ -73,7 +73,7 @@ function App(props: any) {
 
 
   function switchTheme() {
-    document.cookie = "isdark=" + !state.isDark;
+    cookies.setCookie("isdark", (!state.isDark).toString())
     setState({ ...state, isDark: !state.isDark })
   }
 

@@ -28,8 +28,8 @@ export default function ItemStat(props: {
   const itemRenderer = (itemName: string, itemIconWithSuffix: string, itemNeeded: number, itemCount: number) => {
     const left = itemCount - itemNeeded
     return (
-      <div className="stats-item-container" onClick={()=>{props.showDrawer(itemName)}}>
-        <img src={`${ICONBASE}/${itemIconWithSuffix}`} alt="" className="medium" />
+      <div className="stats-item-container" key={itemName} onClick={()=>{props.showDrawer(itemName)}}>
+        <img src={`${ICONBASE}/${itemIconWithSuffix}`} alt={itemName} className="medium" />
         <p>{itemName}</p>
         <div className="stats-info">
           <span>所需：</span>

@@ -18,7 +18,7 @@ export default function AvatarWithNumber(props: { id: number | string, name: str
   // TODO add router for each item detail
   else {
     return (
-      <Link className="avatar-container" to={`/${Pages.itemList}/materials`}>
+      <Link className="avatar-container" to={`/${Pages.itemList}/materials/#${props.name}`}>
         <img className="medium" src={ICONBASE + '/' + props.iconWithSuffix} alt={props.name} />
         <span className="item">{props.num}</span>
       </Link>
