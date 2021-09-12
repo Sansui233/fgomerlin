@@ -198,7 +198,7 @@ export default function ServantCard(props: any) {
 
   return (
     <div className="servant-card-container">
-      <div className="servant-card">
+      <div className={drawer.visible?"servant-card masked":"servant-card"}>
         <section className="servant-card-head list-item-indentation">
           <div className="servant-card-img-container">
             <img src={ICONBASE + "/" + state.basicInfo.sImg} alt="avatar" />
@@ -264,6 +264,7 @@ export default function ServantCard(props: any) {
 
           </React.Fragment>)
         }
+      </div>
         <SkillDrawer
           skills={
             drawer.isApeendSkill ?
@@ -277,7 +278,6 @@ export default function ServantCard(props: any) {
           onClose={closeDrawer}
           itemCost={composeItemCost()}
           visible={drawer.visible} />
-      </div>
     </div>
   )
 }

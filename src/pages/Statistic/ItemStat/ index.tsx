@@ -29,7 +29,7 @@ export default function ItemStat(props: {
     const left = itemCount - itemNeeded
     return (
       <div className="stats-item-container" onClick={()=>{props.showDrawer(itemName)}}>
-        <img src={`${ICONBASE}/${itemIconWithSuffix}`} alt="" className="items-item-img" />
+        <img src={`${ICONBASE}/${itemIconWithSuffix}`} alt="" className="medium" />
         <p>{itemName}</p>
         <div className="stats-info">
           <span>所需：</span>
@@ -43,7 +43,7 @@ export default function ItemStat(props: {
   const placeHolderRender = () => {
     return (
       <div className="stats-item-container" style={{ height: 0, margin: 0, padding: 0, visibility: 'hidden' }}>
-        <img src={`${ICONBASE}/`} alt="" className="items-item-img" />
+        <img src={`${ICONBASE}/`} alt="" className="medium" />
         <p>占位占位</p>
         <div className="stats-info">
           <span>占位：</span>

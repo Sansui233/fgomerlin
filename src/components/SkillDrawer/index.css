@@ -98,3 +98,17 @@
   width: 20%;
   padding: 2px 5px;
 }
+
+.drawer-content nav {
+  position: fixed;
+  top: 46px;
+  right: 0px;
+  font-size: 0.9rem;
+}
+
+.drawer-content nav > li {
+  display: inline-block;
+  margin: unset;
+  padding: 3px 13px;
+  cursor: pointer;
+}

@@ -120,7 +120,7 @@ export default function ItemContents(props: any) {
 
   const placeHolder = () => (
     <div className="items-item" style={{ visibility: "hidden", height: 0, marginTop: 0, marginBottom: 0 }}>
-      <img className="items-item-img" style={{ height: 0 }} src="" alt="" />
+      <img className="medium" style={{ height: 0 }} src="" alt="" />
       <span style={{ height: 0 }} className="items-item-name">占位占位</span>
       <span style={{ height: 0 }} className="items-item-count">
         <input type="text" className="number" defaultValue={0} />
@@ -138,7 +138,7 @@ export default function ItemContents(props: any) {
         {itemstates.map((item, i) => {
           return (
             <div className="items-item" onClick={() => { showDrawer(item.name) }} key={item.id}>
-              <img className="items-item-img" src={`${ICONBASE}/${item.iconWithSuffix}`} alt={item.name} />
+              <img className="medium" src={`${ICONBASE}/${item.iconWithSuffix}`} alt={item.name} />
               <span className="items-item-name">{item.name}</span>
               <div className="items-item-count">
                 <input type="text" className="number" data-index={i} onClick={(e) => { e.stopPropagation() }} onKeyDown={handleOnKeyDown} onBlur={handleInputOnBlur} onChange={handleInputOnChange} value={item.count} />

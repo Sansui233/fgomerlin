@@ -151,7 +151,7 @@ const ItemDrawer: React.FC<Props> = ({ item, onClose, visible }: Props) => {
         <div className="stat-svt-container">
           {svtNeed.length === 0 ? <span>无从者规划需要此材料</span> :
             svtNeed.map((s) => (
-              <AvatarWithNumber id={s.id} name={s.name} src={s.iconWithSuffix} num={s.itemNum} />
+              <AvatarWithNumber id={s.id} name={s.name} iconWithSuffix={s.iconWithSuffix} num={s.itemNum} />
             ))
           }
         </div>

@@ -33,7 +33,7 @@ export function initdb() {
     [TableNames.freequests]: FREEQUESTS_TABLE
   }).upgrade(async trans => {
     Dexie.ignoreTransaction(()=> {
-      message.info("正在更新数据")
+      message.info("正在更新数据",3000)
       parseZipDataset().then(() => {
         message.success(`数据版本已更新至${version}, 刷新内容生效`)
         console.log('[db.ts] database upgraded to ' + version)
@@ -48,7 +48,7 @@ export function initdb() {
   db.on("populate", function () {
     Dexie.ignoreTransaction(() => {
       // Init your DB with some default statuses:
-      message.info("正在获取并导入数据……")
+      message.info("正在获取并导入数据……", 3000)
       parseZipDataset().then(() => {
         message.success("数据导入成功")
         console.log("[db.ts] Database is successfully created")
@@ -107,7 +107,7 @@ export async function putSetting(id: number, name: string, settingType: UserSett
         [id, Dexie.minKey, Dexie.minKey, Dexie.minKey],
         [id, Dexie.maxKey, Dexie.maxKey, Dexie.maxKey]
       ).delete().then((deleteCount) => {
-        // console.debug(`[db.ts] delete ${deleteCount} calc cells for servant ${id}`)
+        console.debug(`[db.ts] delete ${deleteCount} calc cells for servant ${id}`)
       })
       calcCells.forEach(async (c) => {
         await db.table(TableNames.calculator).put(c)

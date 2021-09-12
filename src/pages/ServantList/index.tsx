@@ -169,7 +169,7 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
           className="servant-list-content"
           itemCount={memServantFilter().length}
           height={1080}
-          width={394}
+          width={374}
           itemSize={76 + 7}
         >
           {({ index, style }) => {
