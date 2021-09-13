@@ -6,7 +6,7 @@ import { Servant } from '../pages/ServantList'
 import { parseZipDataset } from './dataset-resolve';
 import { Cell } from './calculator';
 import { ItemType, TableGlpkRow, TableNames, TableServantsRow, TableUserSettingRow, UserSettingType, ServantSetting, ItemSetting, TableItemsRow, TableFreeQuestsRow } from "./db-type";
-import { ItemsFormat, ServantsFormat } from './dataset-conf';
+import { ItemsFormat, ServantFormat } from './dataset-conf';
 
 export var db: Dexie;
 export var version = 2109.1
@@ -32,13 +32,13 @@ export function initdb() {
     [TableNames.glpk]: GLPK_TABLE,
     [TableNames.freequests]: FREEQUESTS_TABLE
   }).upgrade(async trans => {
-    Dexie.ignoreTransaction(()=> {
-      message.info("正在更新数据",5)
+    Dexie.ignoreTransaction(() => {
+      message.info("正在更新数据", 5)
       parseZipDataset().then(() => {
         message.success(`数据版本已更新至${version}, 刷新内容生效`)
         console.log('[db.ts] database upgraded to ' + version)
       }).catch((e) => {
-        message.error("数据版本未更新，错误信息：" + e +".请尝试点击右上角更新", 5)
+        message.error("数据版本未更新，错误信息：" + e + ".请尝试点击右上角更新", 5)
         throw e
       })
     })
@@ -66,7 +66,7 @@ export async function putVersion(dataVer: string) {
   await db.table(TableNames.src_info).put({ dataversion: dataVer })
 }
 
-export function putServant(id: number, name: string, detail: ServantsFormat) {
+export function putServant(id: number, name: string, detail: ServantFormat) {
   // console.debug('[db.ts] putServant')
   if (typeof (id) == "string") {
     id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
@@ -260,6 +260,16 @@ async function mapServantItems(results: TableServantsRow[]): Promise<Servant[]> 
       // queries_res[i] 为一个 query 查询完毕的结果，是个长度为 0 或 1 的数组，where stores the value corresponded to id in this query
       // 用 Promise.all 是为了合并结果为 Promise<Servant[]> 的形式
       const setting = queries_res[i].length !== 0 ? (queries_res[i][0].setting) as ServantSetting : undefined;
+      const phantasmColor = result.detail.noblePhantasm.map(n => {
+        return n.color
+      }).filter((color, index, arr) => {
+        return arr.indexOf(color, 0) === index;
+      })
+      const phantasmCategory = result.detail.noblePhantasm.map(n => {
+        return n.category
+      }).filter((category, index, arr) => {
+        return arr.indexOf(category, 0) === index;
+      })
       return {
         sNo: result.detail.no,
         sId: result.id,
@@ -271,6 +281,8 @@ async function mapServantItems(results: TableServantsRow[]): Promise<Servant[]> 
         skill1: setting ? setting.skills[0].current : 1,
         skill2: setting ? setting.skills[1].current : 1,
         skill3: setting ? setting.skills[2].current : 1,
+        phantasmColor,
+        phantasmCategory,
         isFollow: setting ? setting.isFollow : false
       }
     })

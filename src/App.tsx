@@ -1,8 +1,7 @@
-import { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { withRouter, Switch, Route, Redirect, Link } from "react-router-dom";
 import { Content } from 'antd/lib/layout/layout';
-import { message } from 'antd';
-import { Menu } from 'antd';
+import { message,Menu } from 'antd';
 import { CloudDownloadOutlined, FormatPainterOutlined } from "@ant-design/icons";
 import 'antd/dist/antd.css'
 import './App.css';
@@ -105,51 +104,50 @@ function App(props: any) {
       servantSiderEl.current.classList.remove('current-page')
     }
   }
-
   return (
-    <div className={state.isDark ? "app dark" : "app light"}>
-      <Menu className="app-menu" selectedKeys={[state.navCurrent]} mode="horizontal">
-        <Menu.Item className="menu-item" key={Pages.servantList}>
-          <Link to={handleSubNav(Pages.servantList)} onClick={addCurrentOnSidebar}>从者</Link>
-        </Menu.Item>
-        <Menu.Item className="menu-item" key={Pages.itemList}>
-          <Link to={`/${Pages.itemList}/materials`}>素材</Link>
-        </Menu.Item>
-        <Menu.Item className="menu-item" key={Pages.statistic}>
-          <Link to={`/${Pages.statistic}`}>统计</Link>
-        </Menu.Item>
-        <Menu.Item style={{ marginLeft: "auto" }} key="theme" className="menu-button">
-          <button className="clear-button" onClick={switchTheme}><FormatPainterOutlined /></button>
-        </Menu.Item>
-        <Menu.Item style={{ marginRight: "10px" }} key="fetch-data" className="menu-button">
-          <button className="clear-button" onClick={handleClickFetch}><CloudDownloadOutlined /></button>
-        </Menu.Item>
-      </Menu>
-      <div className="app-content">
-        <Switch>
-          <Route path={`/${Pages.servantList}`}>
-            <aside ref={servantSiderEl} className={state.pageCurrent === Pages.servantList ? "sider current-page" : "sider"}>
-              <ServantList removeCurrentOnSidebar={removeCurrentOnSidebar} />
-            </aside>
-            <Content className={state.pageCurrent === Pages.servantContent ? "content current-page" : "content"}>
-              <Route path={`/${Pages.servantList}/:id`} component={ServantCard} />
-            </Content>
-          </Route>
-          <Route path={`/${Pages.itemList}`}>
-            <aside ref={servantSiderEl} className={state.pageCurrent === Pages.itemList ? "item-sider current-page" : "item-sider"}>
-              <ItemCategory />
-            </aside>
-            <Content className={state.pageCurrent === Pages.itemContent ? "content current-page" : "content"}>
-              <Route path={`/${Pages.itemList}/:category`} component={ItemContents} />
-            </Content>
-          </Route>
-          <Route path={`/${Pages.statistic}`}>
-            <Statistic />
-          </Route>
-          <Redirect to={`/${Pages.servantList}`} />
-        </Switch>
+      <div className={state.isDark ? "app dark" : "app light"}>
+        <Menu className="app-menu" selectedKeys={[state.navCurrent]} mode="horizontal">
+          <Menu.Item className="menu-item" key={Pages.servantList}>
+            <Link to={handleSubNav(Pages.servantList)} onClick={addCurrentOnSidebar}>从者</Link>
+          </Menu.Item>
+          <Menu.Item className="menu-item" key={Pages.itemList}>
+            <Link to={`/${Pages.itemList}/materials`}>素材</Link>
+          </Menu.Item>
+          <Menu.Item className="menu-item" key={Pages.statistic}>
+            <Link to={`/${Pages.statistic}`}>统计</Link>
+          </Menu.Item>
+          <Menu.Item style={{ marginLeft: "auto" }} key="theme" className="menu-button">
+            <button className="clear-button" onClick={switchTheme}><FormatPainterOutlined /></button>
+          </Menu.Item>
+          <Menu.Item style={{ marginRight: "10px" }} key="fetch-data" className="menu-button">
+            <button className="clear-button" onClick={handleClickFetch}><CloudDownloadOutlined /></button>
+          </Menu.Item>
+        </Menu>
+        <div className="app-content">
+          <Switch>
+            <Route path={`/${Pages.servantList}`}>
+              <aside ref={servantSiderEl} className={state.pageCurrent === Pages.servantList ? "sider current-page" : "sider"}>
+                <ServantList removeCurrentOnSidebar={removeCurrentOnSidebar} />
+              </aside>
+              <Content className={state.pageCurrent === Pages.servantContent ? "content current-page" : "content"}>
+                <Route path={`/${Pages.servantList}/:id`} component={ServantCard} />
+              </Content>
+            </Route>
+            <Route path={`/${Pages.itemList}`}>
+              <aside ref={servantSiderEl} className={state.pageCurrent === Pages.itemList ? "item-sider current-page" : "item-sider"}>
+                <ItemCategory />
+              </aside>
+              <Content className={state.pageCurrent === Pages.itemContent ? "content current-page" : "content"}>
+                <Route path={`/${Pages.itemList}/:category`} component={ItemContents} />
+              </Content>
+            </Route>
+            <Route path={`/${Pages.statistic}`}>
+              <Statistic />
+            </Route>
+            <Redirect to={`/${Pages.servantList}`} />
+          </Switch>
+        </div>
       </div>
-    </div>
   );
 }
 

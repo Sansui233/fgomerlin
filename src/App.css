@@ -13,7 +13,7 @@ body::-webkit-scrollbar {
   height: 100%;
 }
 
-.app.light {
+.light {
   --sider-bg: #f0f0f0;
   --sider-bg-darker: #eaeaea;
   --item-bg: #fff;
@@ -27,14 +27,14 @@ body::-webkit-scrollbar {
   --underline: #dcdcdc;
   --toolbar-bg: var(--sider-bg);
 }
-.app.dark,
-.app.light {
+.dark,
+.light {
   --theme-primary: #1890ff;
   --icon-gray: #8d8d8d;
   --icon-pink: #ff5757;
   --box-shadow: rgba(0, 0, 0, 0.07058823529411765);
 }
-.app.dark {
+.dark {
   --item-bg: #313131;
   --sider-bg: #222;
   --content-bg: #292929;
@@ -51,6 +51,7 @@ body::-webkit-scrollbar {
 .app {
   min-height: 100%;
   background-color: var(--content-bg);
+  color: var(--text-primary);
   /* transition: background-color .3s;*/
 }
 
@@ -111,6 +112,9 @@ input.number:focus-visible {
   border-bottom: 1px solid var(--theme-primary);
   /* transition: background-color .3s;*/
 }
+input::placeholder {
+  color: var(--text-gray-lighter) !important;
+}
 .justify-center {
   margin-left: auto;
   margin-right: auto;
@@ -125,7 +129,8 @@ p {
   cursor: default;
 }
 
-/************** App **************/
+/*********************************** App ********************************/
+
 .app-menu {
   height: 46px;
   z-index: 99;
@@ -168,6 +173,9 @@ svg {
   color: var(--icon-gray);
 }
 button:hover svg {
+  color: var(--theme-primary);
+}
+button .open svg {
   color: var(--theme-primary);
 }
 .like svg {
@@ -229,6 +237,8 @@ svg {
   height: 44px;
   position: sticky;
   top: 0;
+  z-index: 3;
+  background-color: var(--sider-bg);
 }
 .search {
   flex-grow: 1;
@@ -250,6 +260,8 @@ svg {
 .servant-list-container .toolbar button.filter-like-button:hover svg {
   color: var(--icon-pink);
 }
+
+/******************* Antd restyle *********************/
 .ant-input {
   color: var(--text-primary);
   border: 1px solid var(--text-gray-lighter);
@@ -266,6 +278,16 @@ svg {
 .ant-btn:hover {
   background-color: var(--button-bg-hover);
 }
+.ant-select {
+  color: var(--text-primary);
+}
+.ant-select-show-search.ant-select .ant-select-selector {
+  background-color: var(--item-bg);
+  border-color: var(--text-gray-lighter);
+  margin: 0px 13px 0px 8px;
+}
+/************************ Servant List **************************/
+
 .servant-list-content {
   height: calc(100vh - 90px) !important;
   padding-top: 83px;
@@ -310,6 +332,99 @@ svg {
   height: 100%;
   border-radius: 6px;
 }
+.servant-list-filter-container {
+  background-color: var(--item-bg);
+  color: var(--text-primary);
+  margin: 0 13px 0 7px;
+  box-shadow: 0 4px 4px 0 var(--box-shadow);
+  border-radius: 5px;
+  opacity: 0;
+  height: 0;
+  animation: listback 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+.servant-list-filter-container.open {
+  z-index: 2;
+  opacity: 1;
+  height: 200px;
+  animation: listdrop 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+@keyframes listdrop {
+  0% {
+    opacity: 0;
+    height: 0;
+  }
+  35% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+    height: 200px;
+  }
+}
+@keyframes listback {
+  0% {
+    opacity: 1;
+    height: 200px;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+    height: 0;
+  }
+}
+.servant-list-filter {
+  margin: 0 auto;
+  text-align: center;
+  height: 100%;
+}
+.servant-list-filter div:first-child {
+  background-color: var(--content-bg);
+  border-bottom: 1px solid var(--underline);
+  font-weight: 500;
+}
+.servant-list-filter div:last-child {
+  padding: 5px 0;
+}
+.servant-list-filter span {
+  display: inline-block;
+  padding: 0px 3px;
+}
+.servant-list-filter span > input[type="checkbox"] {
+  position: absolute;
+  clip: rect(0, 0, 0, 0);
+}
+.servant-list-filter span > input[type="checkbox"]:checked + ::before {
+  content: "\2713";
+  background-color: var(--theme-primary);
+  font-size: 0.8em;
+  line-height: 0.9rem;
+  color: white;
+  width: 1rem;
+  height: 1rem;
+}
+.servant-list-filter span > label::before {
+  content: "\a0";
+  display: inline-block;
+  border: 1px solid silver;
+  width: 1em;
+  height: 1em;
+  font-weight: bold;
+  vertical-align: text-bottom;
+  margin-right: 0px;
+  margin-bottom: 1px;
+}
+.servant-list-filter span > label {
+  vertical-align: middle;
+}
+
+.servant-list-filter span > label > span {
+  line-height: 1rem;
+}
+
+/********************* Servant Card **************************/
+
 .servant-item-info {
   margin-left: 6px;
   height: 64px;

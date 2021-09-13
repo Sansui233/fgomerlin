@@ -2,19 +2,19 @@ export const DATASET_TEXT = "https://assets.namichan.site/dataset-text.zip"
 export const ICONBASE = "https://assets.namichan.site/icons"
 // export const ICONBASE = "https://pics.namichan.site/icons"
 
-// DON'T EDIT IT UNLESS YOU HAVE DIFFERENT VERSION OF DATASET
+// DON'T EDIT IT UNLESS YOUR VERSION OF DATASET IS DIFFERENT
 // The json format of dataset-text
 export type DataSetFormat = {
   version: string,
   unavailableSvts: Array<number>,
-  servants: { [sNo: string]: ServantsFormat },
+  servants: { [sNo: string]: ServantFormat },
   costumes: object,
   crafts: object,
   cmdCodes: object,
   events: object,
   items: { [name: string]: ItemsFormat },
   icons: { [name: string]: null }
-  freeQuests: { [name: string]: FreeQuestsFormat },
+  freeQuests: { [name: string]: FreeQuestFormat },
   svtQuests: object,
   glpk: GlpkFormat,
   mysticCodes: object,
@@ -22,7 +22,7 @@ export type DataSetFormat = {
   fsmSvtIdMapping: object
 }
 
-export type ServantsFormat = {
+export type ServantFormat = {
   "no": number,
   "svtId": number,
   "mcLink": string,
@@ -46,7 +46,7 @@ export type ServantsFormat = {
     "illustrator": string,
     "illustratorJp": string | null,
     "illustratorEn": string | null,
-    "className": "Shielder",
+    "className": ServantClass,
     "attribute": string,
     "isHumanoid": boolean,
     "isWeakToEA": boolean,
@@ -160,8 +160,8 @@ export type ServantsFormat = {
   "fandomIcons": { [key: string]: string },
   "fandomSprites": { [key: string]: string },
 }
-
-export type FreeQuestsFormat = {
+export type ServantClass = 'Shielder' | 'Saber' | 'Archer' | 'Lancer' | 'Rider' | 'Caster' | 'Assassin' | 'Berserker' | 'Ruler' | 'Avenger' | 'MoonCancer' | 'Alterego' | 'Foreigner' | 'Pretender' | 'Beast'
+export type FreeQuestFormat = {
   "chapter": string,
   "name": string,
   "nameJp": string,
@@ -198,8 +198,8 @@ type NoblePhantasmFormat = {
   "nameJp": string,
   "upperName": string,
   "upperNameJp": string,
-  "color": string,
-  "category": string,
+  "color": PhantasmColor,
+  "category": PhantasmCategory,
   "rank": string,
   "typeText": string,
   "effects": {
@@ -209,6 +209,9 @@ type NoblePhantasmFormat = {
     "lvData": [string, string, string, string, string] // length = 5
   }[]
 }
+
+export type PhantasmColor = 'Quick' | 'Arts' | 'Buster'
+export type PhantasmCategory = '全体' | '单体' | '辅助'
 
 export type SkillDetailFormat = {
   "state": string,

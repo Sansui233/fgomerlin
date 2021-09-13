@@ -1,5 +1,5 @@
 import { CellType } from "./calculator";
-import { FreeQuestsFormat, ItemsFormat, ServantsFormat } from "./dataset-conf";
+import { FreeQuestFormat, ItemsFormat, ServantFormat } from "./dataset-conf";
 
 export enum TableNames {
   servants = "servants",
@@ -11,7 +11,7 @@ export enum TableNames {
   freequests = 'freequests'
 }
 
-export type TableServantsRow = { id: number, name: string, detail: ServantsFormat }
+export type TableServantsRow = { id: number, name: string, detail: ServantFormat }
 export type TableItemsRow = { id: number, name: string, category: ItemType, detail: ItemsFormat }
 export enum ItemType {
   Stone = 1,
@@ -50,5 +50,5 @@ export type TableGlpkRow = {
 
 export type TableFreeQuestsRow = {
   questName: string,
-  detail: FreeQuestsFormat
+  detail: FreeQuestFormat
 }
