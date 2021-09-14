@@ -29,7 +29,7 @@ export type ServantSetting = {
   ascension: { current: number, target: number }, // 0-4
   finalLevel: { current: number, target: number }, //maxLevel-100
   skills: { current: number, target: number }[], // length 3
-  appendedSkills: { current: number, target: number }[] // length 3
+  appendSkills: { current: number, target: number }[] // length 3
 }
 export type ItemSetting = {
   count: number

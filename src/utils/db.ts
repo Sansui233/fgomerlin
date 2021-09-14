@@ -106,28 +106,36 @@ export function putFreeQuest(freequest: TableFreeQuestsRow) {
 
 // if id = -1 when putting items, it will be auto repeat
 export async function putSetting(id: number, name: string, settingType: UserSettingType, setting: ServantSetting | ItemSetting, calcCells?: Cell[]) {
+  const i = 1
+
+  console.time('=====setting====='+i)
   if (typeof (id) == "string") {
     id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
   }
   if (calcCells) {
     // put servant setting
     await db.transaction('rw', db.table(TableNames.user_setting), db.table(TableNames.calculator), async () => {
+      
       const row: TableUserSettingRow = { id, name, type: settingType, setting }
-      await db.table(TableNames.user_setting).put(row)
+      db.table(TableNames.user_setting).put(row)
+
       // Delete servant-related setting
-      await db.table(TableNames.calculator).where('[servantId+cellType+cellTargetLevel+itemName]').between(
+      db.table(TableNames.calculator).where('[servantId+cellType+cellTargetLevel+itemName]').between(
         [id, Dexie.minKey, Dexie.minKey, Dexie.minKey],
         [id, Dexie.maxKey, Dexie.maxKey, Dexie.maxKey]
-      ).delete().then((deleteCount) => {
-        console.debug(`[db.ts] delete ${deleteCount} calc cells for servant ${id}`)
-      })
+      ).delete()
+
       calcCells.forEach(async (c) => {
-        await db.table(TableNames.calculator).put(c)
+        db.table(TableNames.calculator).put(c)
       })
+
+      console.debug('cell length',calcCells.length)
+
     }).catch((e: Error) => {
       console.error('[db.ts]', e)
       throw e
     })
+    console.timeEnd('=====setting====='+i)
   } else {
     if (id === -1) {
       const item = await db.table(TableNames.items).where('name').equals(name).toArray()
@@ -338,10 +346,10 @@ function mapServantDetail(s: TableServantsRow[], settings: TableUserSettingRow[]
         { current: setting ? setting.skills[1].current : 1, target: setting ? setting.skills[1].target : 1 },
         { current: setting ? setting.skills[2].current : 1, target: setting ? setting.skills[2].target : 1 },
       ],
-      appendedSkills: [
-        { current: setting ? setting.appendedSkills[0].current : 0, target: setting ? setting.appendedSkills[0].target : 0 }, //0-10
-        { current: setting ? setting.appendedSkills[1].current : 0, target: setting ? setting.appendedSkills[1].target : 0 },
-        { current: setting ? setting.appendedSkills[2].current : 0, target: setting ? setting.appendedSkills[2].target : 0 },
+      appendSkills: [
+        { current: setting ? setting.appendSkills[0].current : 0, target: setting ? setting.appendSkills[0].target : 0 }, //0-10
+        { current: setting ? setting.appendSkills[1].current : 0, target: setting ? setting.appendSkills[1].target : 0 },
+        { current: setting ? setting.appendSkills[2].current : 0, target: setting ? setting.appendSkills[2].target : 0 },
       ]
     }
   }
@@ -364,10 +372,10 @@ function mapServantSetting(results: TableUserSettingRow[]): ServantSetting {
       { current: setting ? setting.skills[1].current : 1, target: setting ? setting.skills[1].target : 1 },
       { current: setting ? setting.skills[2].current : 1, target: setting ? setting.skills[2].target : 1 },
     ],
-    appendedSkills: [
-      { current: setting ? setting.appendedSkills[0].current : 0, target: setting ? setting.appendedSkills[0].target : 0 }, //0-10
-      { current: setting ? setting.appendedSkills[1].current : 0, target: setting ? setting.appendedSkills[1].target : 0 },
-      { current: setting ? setting.appendedSkills[2].current : 0, target: setting ? setting.appendedSkills[2].target : 0 },
+    appendSkills: [
+      { current: setting ? setting.appendSkills[0].current : 0, target: setting ? setting.appendSkills[0].target : 0 }, //0-10
+      { current: setting ? setting.appendSkills[1].current : 0, target: setting ? setting.appendSkills[1].target : 0 },
+      { current: setting ? setting.appendSkills[2].current : 0, target: setting ? setting.appendSkills[2].target : 0 },
     ]
   }
 }

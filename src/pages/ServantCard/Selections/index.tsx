@@ -1,5 +1,4 @@
 import { Select } from 'antd';
-import { useEffect, useState } from 'react';
 
 const { Option } = Select;
 
@@ -8,45 +7,40 @@ enum Node {
   target
 }
 
-export default function Selections(props: { mode: "skill" | "appendedskill" | "level" | "finalLevel", current: number, target: number, rarity?: number, changeSelection: (current: number, target: number) => void }) {
-  const [state, setstate] = useState({ current: props.current, target: props.target })
-
-  // Component will receive props
-  useEffect(() => {
-    setstate({ current: props.current, target: props.target })
-  }, [props])
-
+export default function Selections(props: {
+  mode: "skill" | "appendedskill" | "level" | "finalLevel",
+  current: number, target: number, rarity?: number,
+  changeSelection: (current: number, target: number) => void
+}) {
   function handleSelectionChange(param: Node) {
     if (param === Node.current) {
       return (val: string) => {
         const v = parseInt(val)
-        const target = v > state.target ? v : state.target;
-        setstate({ current: v, target })
+        const target = v > props.target ? v : props.target;
         props.changeSelection(v, target)
       }
     }
     return (val: string) => {
       const v = parseInt(val)
-      const current = state.current > v ? v : state.current;
-      setstate({ current, target: v })
+      const current = props.current > v ? v : props.current;
       props.changeSelection(current, v)
     }
   }
 
-  let numbers = []
+  let numbers: number[] = []
 
   switch (props.mode) {
     case "skill":
       numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
       return (
-        <div onClick={e=>{e.stopPropagation()}}>
-          <Select className="skill-select" value={state.current.toString()} onChange={handleSelectionChange(Node.current)}>
+        <div onClick={e => { e.stopPropagation() }}>
+          <Select className="skill-select" value={props.current.toString()} onChange={handleSelectionChange(Node.current)}>
             {numbers.map((i) => {
               return <Option key={i} value={i}>{i}</Option>
             })}
           </Select>
           <span className="text-gray">→</span>
-          <Select className="skill-select" value={state.target.toString()} onChange={handleSelectionChange(Node.target)}>
+          <Select className="skill-select" value={props.target.toString()} onChange={handleSelectionChange(Node.target)}>
             {numbers.map((i) => {
               return <Option key={i} value={i}>{i}</Option>
             })}
@@ -56,14 +50,14 @@ export default function Selections(props: { mode: "skill" | "appendedskill" | "l
     case "appendedskill":
       numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
       return (
-        <div onClick={e=>{e.stopPropagation()}}>
-          <Select className="skill-select" value={state.current.toString()} onChange={handleSelectionChange(Node.current)}>
+        <div onClick={e => { e.stopPropagation() }}>
+          <Select className="skill-select" value={props.current.toString()} onChange={handleSelectionChange(Node.current)}>
             {numbers.map((i) => {
               return <Option key={i} value={i}>{i}</Option>
             })}
           </Select>
           <span className="text-gray">→</span>
-          <Select className="skill-select" value={state.target.toString()} onChange={handleSelectionChange(Node.target)}>
+          <Select className="skill-select" value={props.target.toString()} onChange={handleSelectionChange(Node.target)}>
             {numbers.map((i) => {
               return <Option key={i} value={i}>{i}</Option>
             })}
@@ -73,14 +67,14 @@ export default function Selections(props: { mode: "skill" | "appendedskill" | "l
     case "level":
       numbers = [0, 1, 2, 3, 4];
       return (
-        <div onClick={e=>{e.stopPropagation()}}>
-          <Select className="skill-select" value={state.current.toString()} onChange={handleSelectionChange(Node.current)}>
+        <div onClick={e => { e.stopPropagation() }}>
+          <Select className="skill-select" value={props.current.toString()} onChange={handleSelectionChange(Node.current)}>
             {numbers.map((i) => {
               return <Option key={i} value={i}>{i}</Option>
             })}
           </Select>
           <span className="text-gray">→</span>
-          <Select className="skill-select" value={state.target.toString()} onChange={handleSelectionChange(Node.target)}>
+          <Select className="skill-select" value={props.target.toString()} onChange={handleSelectionChange(Node.target)}>
             {numbers.map((i) => {
               return <Option key={i} value={i}>{i}</Option>
             })}
@@ -109,21 +103,19 @@ export default function Selections(props: { mode: "skill" | "appendedskill" | "l
           numbers = [60, 70, 80, 90, 100]
           break;
       }
-      if (state.current < numbers[0]) {
-        setstate({ ...state, current: numbers[0] })
-      }
-      if (state.target < numbers[0]) {
-        setstate({ ...state, target: numbers[0] })
-      }
       return (
-        <div onClick={e=>{e.stopPropagation()}}>
-          <Select className="skill-select" value={state.current.toString()} onChange={handleSelectionChange(Node.current)}>
+        <div onClick={e => { e.stopPropagation() }}>
+          <Select className="skill-select"
+            value={(props.current < numbers[0] ? numbers[0] : props.current).toString()}
+            onChange={handleSelectionChange(Node.current)}>
             {numbers.map((i) => {
               return <Option key={`flc${i}`} value={i}>{i}</Option>
             })}
           </Select>
           <span className="text-gray">→</span>
-          <Select className="skill-select" value={state.target.toString()} onChange={handleSelectionChange(Node.target)}>
+          <Select className="skill-select"
+            value={(props.target < numbers[0] ? numbers[0] : props.target).toString()}
+            onChange={handleSelectionChange(Node.target)}>
             {numbers.map((i) => {
               return <Option key={`flt${i}`} value={i}>{i}</Option>
             })}

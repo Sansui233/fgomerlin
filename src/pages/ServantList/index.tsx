@@ -290,7 +290,7 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
         <button className="clear-button" onClick={toggleFilter}>
           {isFilterSettled ? <FilterFilled className="open" /> : <FilterOutlined className={filterVisible ? 'open' : ''} />}
         </button>
-        <Popover placement="bottom"
+        <Popover placement="bottom" title='排序'
           // visible={sorterVisible}
           content={
             <SortOptRenderer sortState={state.sort_option} setSort={setSortopt} />
@@ -443,7 +443,7 @@ function FilterRenderer(props: { filterOpt: FilterOption, setFilteropt: (opt: Fi
 
 function SortOptRenderer(props: { sortState: SortOption, setSort: (opt: SortOption) => any, close?: () => any }) {
   return (
-    <div className='sort-opts'>
+    <div className='popover-opts'>
       {sortOptions.map(k => {
         // { 'rareasc', 'raredsc', 'noasc', 'nodsc', 'classasc', 'classdsc' }
         return (

@@ -70,7 +70,7 @@ function scanSkills(servantId: number, setting: ServantSetting, itemCost: ItemCo
 function scanAppendedSkills(servantId: number, setting: ServantSetting, itemCost: ItemCostFormat): Cell[] {
   const cells: Cell[] = []
   // Iterate skill
-  setting.appendedSkills.forEach((skillSetting, i) => {
+  setting.appendSkills.forEach((skillSetting, i) => {
     const start = skillSetting.current
     const end = skillSetting.target
     const cellType = i === 0 ? CellType.askill1 : i === 1 ? CellType.askill2 : CellType.askill3

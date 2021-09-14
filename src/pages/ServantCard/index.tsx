@@ -1,4 +1,5 @@
-import { HeartFilled, HeartOutlined, LinkOutlined } from '@ant-design/icons';
+import { ControlOutlined, HeartFilled, HeartOutlined, LinkOutlined } from '@ant-design/icons';
+import { Popover } from 'antd';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import ArrowUp from '../../assets/icons/arrow-up.svg';
@@ -62,7 +63,7 @@ const initDetail: ServantDetail = {
       { current: 1, target: 1 },
       { current: 1, target: 1 },
     ],
-    appendedSkills: [
+    appendSkills: [
       { current: 1, target: 1 },
       { current: 1, target: 1 },
       { current: 1, target: 1 },
@@ -100,6 +101,7 @@ export default function ServantCard(props: any) {
     }).catch((e: Error) => {
       setstate(initDetail)
       console.error("[ServantCard] Error when load servant detail: ", e)
+      // TODO 全局错误尝试重建计算器与数据库
     })
   }, [id])
 
@@ -169,15 +171,15 @@ export default function ServantCard(props: any) {
     }
   }
 
-  function changeAppendedSkill(skill_index: number) {
+  function changeAppendSkill(skill_index: number) {
     if (skill_index > 2) {
       console.error(`[ServantCard] appended skill_index ${skill_index} out of range`)
     }
     const i = skill_index
     return (current: number, target: number) => {
-      const new_appendedskills = [...state.userSettings.appendedSkills];
+      const new_appendedskills = [...state.userSettings.appendSkills];
       new_appendedskills[i] = { current, target };
-      const userSettings: ServantSetting = { ...state.userSettings, appendedSkills: new_appendedskills };
+      const userSettings: ServantSetting = { ...state.userSettings, appendSkills: new_appendedskills };
       putSetting(state.basicInfo.sId, state.basicInfo.sName, UserSettingType.Servant, userSettings, composeCalcCells({ ...state, userSettings })).then(() => {
         setstate({ ...state, userSettings })
       })
@@ -207,7 +209,7 @@ export default function ServantCard(props: any) {
           })
         case 'ascension':
           return state.basicInfo.itemCost.ascension.map((lv, i) => {
-            return { currentLevel: i, targetLevel: i+1, items: lv }
+            return { currentLevel: i, targetLevel: i + 1, items: lv }
           })
         case 'finalLevel':
         default:
@@ -225,6 +227,43 @@ export default function ServantCard(props: any) {
     },
     [drawer.cate, state.basicInfo.itemCost.appendSkill, state.basicInfo.itemCost.ascension, state.basicInfo.itemCost.skill, state.basicInfo.sRarity],
   )
+
+  function QuickSkillSetRenderer(props: { setFunc: (num: 310 | 999 | 666 | 444) => any }) {
+    return (
+      <div className="popover-opts" >
+        <li onClick={() => props.setFunc(310)}>310</li>
+        <li onClick={() => props.setFunc(999)}>999</li>
+        <li onClick={() => props.setFunc(666)}>666</li>
+        <li onClick={() => props.setFunc(444)}>444</li>
+      </div>
+    )
+  }
+
+  function quickSetSkill(setnum: 310 | 999 | 666 | 444, field: 'current' | 'target', setType: 'skills' | 'appendSkills') {
+    const selectFunc = setType === 'skills' ? changeSkill : changeAppendSkill
+    const params = (skill_index: number) => {
+      if (field === 'current') {
+        return {
+          310: { current: state.userSettings[setType][skill_index][field], target: 10 },
+          999: { current: state.userSettings[setType][skill_index][field], target: 9 },
+          666: { current: state.userSettings[setType][skill_index][field], target: 6 },
+          444: { current: state.userSettings[setType][skill_index][field], target: 4 }
+        }
+      } else {
+        return {
+          310: { current: 10, target: state.userSettings[setType][skill_index][field] },
+          999: { current: 9, target: state.userSettings[setType][skill_index][field] },
+          666: { current: 6, target: state.userSettings[setType][skill_index][field] },
+          444: { current: 4, target: state.userSettings[setType][skill_index][field] }
+        }
+      }
+    }
+    console.debug(setnum, field, setType)
+    console.debug('params',params)
+    for (let i = 0; i < 3; i++) {
+      selectFunc(i)(params(i)[setnum].current, params(i)[setnum].target)
+    }
+  }
 
 
   return (
@@ -247,55 +286,103 @@ export default function ServantCard(props: any) {
           </div>
         </section>
         {
-          state.basicInfo.sObtain === "无法召唤" || state.basicInfo.sObtain === "无法获得" ? '' : (<React.Fragment>
-
-            <section className="servant-card-setting-list">
-              <p className="list-item-indentation list-title">等级提升</p>
-              <div className="servant-card-setting-list-item list-item-indentation"
-                onClick={() => { showDrawer('', 'ascension') }}>
-                <img src={ArrowUp} alt="再临" className="servant-card-icon" />
-                <span className="servant-card-setting-list-item-name">灵基再临</span>
-                <Selections mode="level" {...state.userSettings.ascension} changeSelection={changeLevel} />
-              </div>
-              <div className="servant-card-setting-list-item list-item-indentation"
-                onClick={() => { showDrawer('', 'finalLevel') }}>
-                <img src={ICONBASE + "/圣杯.jpg"} alt="🏆" className="servant-card-icon" />
-                <span className="servant-card-setting-list-item-name">圣杯转临</span>
-                <Selections mode="finalLevel" {...state.userSettings.finalLevel} rarity={state.basicInfo.sRarity} changeSelection={changeFinalLevel} />
-              </div>
-            </section>
-            <section className="servant-card-setting-list">
-              <p className="list-item-indentation list-title">技能强化</p>
-              {state.basicInfo.activeSkills.map((as, index) => {
-                const skill = as.skills[as.skills.length - 1]
-                return (
-                  <div className="servant-card-setting-list-item list-item-indentation" key={index}
-                    onClick={() => { showDrawer(skill.name, 'skill') }}
+          state.basicInfo.sObtain === "无法召唤" || state.basicInfo.sObtain === "无法获得" ? ''
+            :
+            (<React.Fragment>
+              <section className="servant-card-setting-list">
+                <p className="list-item-indentation list-title">
+                  等级提升</p>
+                <div className="servant-card-setting-list-item list-item-indentation"
+                  onClick={() => { showDrawer('', 'ascension') }}>
+                  <img src={ArrowUp} alt="再临" className="servant-card-icon" />
+                  <span className="servant-card-setting-list-item-name">灵基再临</span>
+                  <Selections mode="level" {...state.userSettings.ascension} changeSelection={changeLevel} />
+                </div>
+                <div className="servant-card-setting-list-item list-item-indentation"
+                  onClick={() => { showDrawer('', 'finalLevel') }}>
+                  <img src={ICONBASE + "/圣杯.jpg"} alt="🏆" className="servant-card-icon" />
+                  <span className="servant-card-setting-list-item-name">圣杯转临</span>
+                  <Selections mode="finalLevel" {...state.userSettings.finalLevel} rarity={state.basicInfo.sRarity} changeSelection={changeFinalLevel} />
+                </div>
+              </section>
+              <section className="servant-card-setting-list">
+                <p className="list-item-indentation list-title">技能强化
+                  <Popover
+                    placement="bottom"
+                    title='快速设定'
+                    content={<QuickSkillSetRenderer
+                      setFunc={(num: 310 | 999 | 666 | 444) => {
+                        quickSetSkill(num, 'current', 'skills')
+                      }}
+                    />}
                   >
-                    <img src={ICONBASE + "/" + skill.icon} alt="skill1" className="servant-card-icon" />
-                    <span className="servant-card-setting-list-item-name">{skill.name}</span>
-                    <Selections mode="skill" {...state.userSettings.skills[index]} changeSelection={changeSkill(index)} />
-                  </div>
-                )
-              })}
-            </section>
-
-            <section className="servant-card-setting-list">
-              <p className="list-item-indentation list-title">附加技能</p>
-              {state.basicInfo.appendedSkills.map((skill, index) => {
-                return (
-                  <div className="servant-card-setting-list-item list-item-indentation" key={index}
-                    onClick={() => { showDrawer(skill.name, 'appendskill') }}
+                    <ControlOutlined />
+                  </Popover>
+                  <Popover
+                    placement="bottom"
+                    title='快速设定'
+                    content={<QuickSkillSetRenderer
+                      setFunc={(num: 310 | 999 | 666 | 444) => {
+                        quickSetSkill(num, 'target', 'skills')
+                      }}
+                    />}
                   >
-                    <img src={ICONBASE + "/" + skill.icon + '.png'} alt="skill1" className="servant-card-icon" />
-                    <span className="servant-card-setting-list-item-name">{skill.name}</span>
-                    <Selections mode="skill" {...state.userSettings.appendedSkills[index]} changeSelection={changeAppendedSkill(index)} />
-                  </div>
-                )
-              })}
-            </section>
+                    <ControlOutlined />
+                  </Popover>
+                </p>
+                {state.basicInfo.activeSkills.map((as, index) => {
+                  const skill = as.skills[as.skills.length - 1]
+                  return (
+                    <div className="servant-card-setting-list-item list-item-indentation" key={index}
+                      onClick={() => { showDrawer(skill.name, 'skill') }}
+                    >
+                      <img src={ICONBASE + "/" + skill.icon} alt="skill1" className="servant-card-icon" />
+                      <span className="servant-card-setting-list-item-name">{skill.name}</span>
+                      <Selections mode="skill" {...state.userSettings.skills[index]} changeSelection={changeSkill(index)} />
+                    </div>
+                  )
+                })}
+              </section>
 
-          </React.Fragment>)
+              <section className="servant-card-setting-list">
+                <p className="list-item-indentation list-title">附加技能
+                  <Popover
+                    placement="bottom"
+                    title='快速设定'
+                    content={<QuickSkillSetRenderer
+                      setFunc={(num: 310 | 999 | 666 | 444) => {
+                        quickSetSkill(num, 'current', 'appendSkills')
+                      }}
+                    />}
+                  >
+                    <ControlOutlined />
+                  </Popover>
+                  <Popover
+                    placement="bottom"
+                    title='快速设定'
+                    content={<QuickSkillSetRenderer
+                      setFunc={(num: 310 | 999 | 666 | 444) => {
+                        quickSetSkill(num, 'target', 'appendSkills')
+                      }}
+                    />}
+                  >
+                    <ControlOutlined />
+                  </Popover>
+                </p>
+                {state.basicInfo.appendedSkills.map((skill, index) => {
+                  return (
+                    <div className="servant-card-setting-list-item list-item-indentation" key={index}
+                      onClick={() => { showDrawer(skill.name, 'appendskill') }}
+                    >
+                      <img src={ICONBASE + "/" + skill.icon + '.png'} alt="skill1" className="servant-card-icon" />
+                      <span className="servant-card-setting-list-item-name">{skill.name}</span>
+                      <Selections mode="skill" {...state.userSettings.appendSkills[index]} changeSelection={changeAppendSkill(index)} />
+                    </div>
+                  )
+                })}
+              </section>
+
+            </React.Fragment>)
         }
       </div>
       <SkillDrawer

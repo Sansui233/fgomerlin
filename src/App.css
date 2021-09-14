@@ -86,7 +86,7 @@ img:after {
   padding: 0.3em;
   color: var(--text-primary);
   word-break: break-all;
-  overflow:hidden;
+  overflow: hidden;
 }
 img.small {
   width: 24px;
@@ -318,10 +318,9 @@ svg {
 }
 .app .ant-popover {
   color: var(--text-primary);
-  box-shadow: 0 4px 4px 0 var(--box-shadow);
 }
 .app .ant-popover-arrow-content {
-  background-color: var(--item-bg);
+  background-color: var(--content-bg);
 }
 .app .ant-popover-inner {
   background-color: var(--item-bg);
@@ -453,18 +452,31 @@ input[type="checkbox"] + label::before {
 .servant-list-filter span > label > span {
   line-height: 1rem;
 }
-.sort-opts {
+.popover-opts {
   cursor: default;
-  padding: 5px 0;
+  color: var(--text-primary);
+  background-color: var(--item-bg);
+  padding-bottom: 0.6em;
 }
-.sort-opts > li {
-  padding: 0.3em 14px;
+.app .ant-popover-title {
+  min-width: unset;
+  min-height: unset;
+  margin: 0;
+  color: var(--text-gray);
+  background-color: var(--content-bg);
+  font-weight: 500;
+  border-bottom: 1px solid var(--underline);
 }
-.sort-opts > li:hover,
-.sort-opts > li.current {
+
+.popover-opts > li {
+  padding: 0.3em 1em;
+  cursor: pointer;
+}
+.popover-opts > li:hover,
+.popover-opts > li.current {
   background-color: var(--button-bg-hover);
 }
-.sort-opts > li.current {
+.popover-opts > li.current {
   color: var(--theme-primary);
 }
 
@@ -1022,7 +1034,7 @@ li.quest .detail {
   .servant-list-container .toolbar > button svg {
     font-size: 1.2rem;
   }
-  .sort-opts {
+  .popover-opts {
     font-size: 1rem;
   }
   .content {
