@@ -1,3 +1,4 @@
+import { message } from "antd";
 import axios from "axios";
 import JSZip from "jszip"
 import { DATASET_TEXT } from "./dataset-conf";
@@ -7,19 +8,32 @@ import { TableGlpkRow, TableNames } from "./db-type";
 
 
 async function fetchTextDataSet(): Promise<{ [key: string]: JSZip.JSZipObject; }> {
+  const msgKey = 'download'
   console.log("[dataset-resolve] getting text pack...")
-  const response = await axios({
-    method: 'get',
-    url: DATASET_TEXT,
-    responseType: 'arraybuffer'  // 类型必须为arraybuffer
-  })
-
-  const zipData = await JSZip.loadAsync(response.data);
-  return zipData.files;
+  const hide = message.loading({ content: '正在获取最新数据...', key: msgKey, duration: 0 })
+  try {
+    const response = await axios({
+      method: 'get',
+      url: DATASET_TEXT,
+      responseType: 'arraybuffer',  // 类型必须为arraybuffer
+      onDownloadProgress: (progressEvent) => {
+        const total = (progressEvent.total / 1048576).toFixed(1)
+        const loaded = (progressEvent.loaded / 1048576).toFixed(1)
+        message.loading({ content: `正在获取最新数据 ${loaded}MB/${total}MB`, key: msgKey, duration: 0 })
+      }
+    })
+    const zipData = await JSZip.loadAsync(response.data);
+    message.success({ content: '下载完成', key: msgKey, duration: 1 })
+    return zipData.files;
+  } catch (error) {
+    hide()
+    throw error
+  }
 }
 
 export async function parseZipDataset() {
   const files = await fetchTextDataSet()
+  message.info({ content: '正在写入数据...', duration: 1.5 })
   console.debug('[dataset-resolve] parsing files...')
   for (const filename of Object.keys(files)) {
     console.debug('[dataset-resolve] parsing', filename)
@@ -62,8 +76,8 @@ async function storeToDatabase(dataObject: DataSetFormat) {
   }
   return await db.transaction(
     'rw',
-    db.table(TableNames.servants), 
-    db.table(TableNames.items), 
+    db.table(TableNames.servants),
+    db.table(TableNames.items),
     db.table(TableNames.glpk),
     db.table(TableNames.freequests),
     async () => {

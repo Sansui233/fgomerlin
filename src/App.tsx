@@ -60,7 +60,6 @@ function App(props: any) {
   }, [props.location.pathname])
 
   async function handleClickFetch() {
-    message.info('正在获取并处理数据...');
     return parseZipDataset().then(() => {
       message.success('更新数据成功');
       console.log("[App.tsx] DONE database updated");
@@ -107,8 +106,8 @@ function App(props: any) {
     }
   }
   return (
-    <ConfigProvider getPopupContainer={() => document.getElementById('app')!}>
-      <div className={state.isDark ? "app dark" : "app light"} id='app'>
+    <ConfigProvider getPopupContainer={() => document.getElementById('popover-anchor')!}>
+      <div className={state.isDark ? "app dark" : "app light"}>
         <Menu className="app-menu" selectedKeys={[state.navCurrent]} mode="horizontal">
           <Menu.Item className="menu-item" key={Pages.servantList}>
             <Link to={handleSubNav(Pages.servantList)} onClick={addCurrentOnSidebar}>从者</Link>
@@ -150,6 +149,7 @@ function App(props: any) {
             <Redirect to={`/${Pages.servantList}`} />
           </Switch>
         </div>
+        <div id="popover-anchor"></div>
       </div>
     </ConfigProvider>
   );

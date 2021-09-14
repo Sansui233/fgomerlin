@@ -11,7 +11,7 @@ export default function ServantItem(props: { servant: Servant, changeFollow: (sI
   return (
     <SidebarItem key={sId}>
       <div className="sidebar-item-img-container">
-        <img src={ICONBASE + "/" + sImg} alt={sName} />
+        <img className="medium" src={ICONBASE + "/" + sImg} alt={sName} />
       </div>
       <div className="servant-item-info">
         <p className="servant-item-info-name">{sName}</p>

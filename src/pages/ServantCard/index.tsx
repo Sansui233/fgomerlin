@@ -285,7 +285,7 @@ export default function ServantCard(props: any) {
               {state.basicInfo.appendedSkills.map((skill, index) => {
                 return (
                   <div className="servant-card-setting-list-item list-item-indentation" key={index}
-                    onClick={() => { showDrawer(skill.name, 'skill') }}
+                    onClick={() => { showDrawer(skill.name, 'appendskill') }}
                   >
                     <img src={ICONBASE + "/" + skill.icon + '.png'} alt="skill1" className="servant-card-icon" />
                     <span className="servant-card-setting-list-item-name">{skill.name}</span>

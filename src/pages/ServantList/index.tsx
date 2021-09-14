@@ -13,6 +13,7 @@ import { Link } from 'react-router-dom';
 import { FixedSizeList } from 'react-window';
 
 import { Pages } from '../../App';
+import cookies from '../../lib/cookies';
 import { PhantasmCategory, PhantasmColor, ServantClass } from '../../utils/dataset-type';
 import { getServantList, getServantSetting, putSetting } from '../../utils/db';
 import { UserSettingType } from '../../utils/db-type';
@@ -36,6 +37,7 @@ export type Servant = {
   isFollow: boolean,
 }
 const initServants: Servant[] = []
+
 type FilterOption = {
   sClass: string[],
   sPhantasmColor: PhantasmColor[] // Quick Art Buster TODO should use Set instead of Array
@@ -46,7 +48,11 @@ const initFilter: FilterOption = {
   sPhantasmColor: [],
   sPhantasmCategory: [],
 }
-enum SortOption { 'rareasc', 'raredsc', 'noasc', 'nodsc', 'classasc', 'classdsc' }
+
+const sortOptions = ['rareasc', 'raredsc', 'noasc', 'nodsc', 'classasc', 'classdsc'] as const
+type sortTuple = typeof sortOptions;
+type SortOption = sortTuple[number]
+const initSortopt: SortOption = cookies.getCookie('sort_option') as SortOption || 'noasc'
 
 export default function ServantList(props: { removeCurrentOnSidebar: () => void }) {
   const [state, setState] = useState({
@@ -55,16 +61,28 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
     needFollow: false,
     query: "",
     filter_options: initFilter,
-    sort_options: SortOption.noasc
+    sort_option: initSortopt
   })
   const [filterVisible, setfiltervisible] = useState(false)
+  // const [sorterVisible, setsortervisible] = useState(false)
 
   const reloadFromDB = useCallback(
     async () => {
-      setState(s => { return { servants: s.servants, needFollow: s.needFollow, isLoaded: false, query: "", filter_options: s.filter_options, sort_options: SortOption.noasc } })
+      setState(s => {
+        return { ...s, isLoaded: false, }
+      })
       const servants = await getServantList()
       console.log(`[ServantList] reload from db successfully. Total ${servants.length} items`)
-      setState(s => { return { servants, needFollow: false, isLoaded: true, query: "", filter_options: initFilter, sort_options: SortOption.noasc } })
+      setState(s => {
+        return {
+          servants,
+          needFollow: cookies.getCookie('filter_follow') === 'true' ? true : false,
+          isLoaded: true,
+          query: "",
+          filter_options: initFilter,
+          sort_option: cookies.getCookie('sort_option') as SortOption || 'noasc'
+        }
+      })
     },
     [],
   )
@@ -130,6 +148,7 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
   }
 
   function changeFilterFollow() {
+    cookies.setCookie('filter_follow', (!state.needFollow).toString())
     setState({ ...state, needFollow: !state.needFollow })
   }
 
@@ -140,6 +159,15 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
         filter_options: { ...opt }
       }
     })
+  }
+  function setSortopt(opt: SortOption) {
+    setState(s => {
+      return {
+        ...s,
+        sort_option: opt
+      }
+    })
+    cookies.setCookie('sort_option', opt)
   }
 
   function matchQueryString(servant: Servant, query: string) {
@@ -202,28 +230,28 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
     () => {
       const classSort: ServantClass[] = ['Shielder', 'Saber', 'Archer', 'Lancer', 'Rider', 'Caster', 'Assassin', 'Berserker', 'Ruler', 'Avenger', 'MoonCancer', 'Alterego', 'Foreigner', 'Pretender', 'Beast']
       if (filteredServants.length <= 1) return filteredServants;
-      switch (state.sort_options) {
-        case SortOption.noasc:
+      switch (state.sort_option) {
+        case 'noasc':
           return filteredServants.sort((prev, cu) => {
             return prev.sNo - cu.sNo
           })
-        case SortOption.nodsc:
+        case 'nodsc':
           return filteredServants.sort((prev, cu) => {
             return cu.sNo - prev.sNo
           })
-        case SortOption.rareasc:
-          return filteredServants.sort((prev, cu) => {
-            return cu.sRarity - prev.sRarity
-          })
-        case SortOption.raredsc:
+        case 'rareasc':
           return filteredServants.sort((prev, cu) => {
             return prev.sRarity - cu.sRarity
           })
-        case SortOption.classasc:
+        case 'raredsc':
+          return filteredServants.sort((prev, cu) => {
+            return cu.sRarity - prev.sRarity
+          })
+        case 'classasc':
           return filteredServants.sort((prev, cu) => {
             return classSort.indexOf(prev.sClass) - classSort.indexOf(cu.sClass)
           })
-        case SortOption.classdsc:
+        case 'classdsc':
           return filteredServants.sort((prev, cu) => {
             return classSort.indexOf(cu.sClass) - classSort.indexOf(prev.sClass)
           })
@@ -231,44 +259,21 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
           return filteredServants
       }
     }
-    , [filteredServants, state.sort_options]
+    , [filteredServants, state.sort_option]
   )
 
   function toggleFilter() {
     setfiltervisible(s => !s)
   }
+  // function toggleSorter() {
+  //   setsortervisible(s => !s)
+  // }
 
   const isFilterSettled = useMemo(() => {
     return ((opt: FilterOption): boolean => {
       return opt.sClass.length !== 0 || opt.sPhantasmColor.length !== 0 || opt.sPhantasmCategory.length !== 0
     })(state.filter_options)
   }, [state.filter_options])
-
-  function sortOptRenderer() {
-    return (
-      <div className='sort-opts'>
-        {Object.keys(SortOption).map(k => {
-          // { 'rareasc', 'raredsc', 'noasc', 'nodsc', 'classasc', 'classdsc' }
-          switch (k) {
-            case 'rareasc':
-              return <li>稀有度升序</li>
-            case 'raredsc':
-              return <li>稀有度降序</li>
-            case 'noasc':
-              return <li>序号升序</li>
-            case 'nodsc':
-              return <li>序号降序</li>
-            case 'classasc':
-              return <li>职阶升序</li>
-            case 'classdsc':
-              return <li>职阶降序</li>
-            default:
-              return null
-          }
-        })}
-      </div>
-    )
-  }
 
   function servantItemRenderer(s: Servant) {
     return (
@@ -285,7 +290,13 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
         <button className="clear-button" onClick={toggleFilter}>
           {isFilterSettled ? <FilterFilled className="open" /> : <FilterOutlined className={filterVisible ? 'open' : ''} />}
         </button>
-        <Popover placement="bottom" content={sortOptRenderer} trigger="click">
+        <Popover placement="bottom"
+          // visible={sorterVisible}
+          content={
+            <SortOptRenderer sortState={state.sort_option} setSort={setSortopt} />
+          }
+          trigger="click"
+        >
           <button className="clear-button">
             <SortAscendingOutlined />
           </button>
@@ -425,6 +436,42 @@ function FilterRenderer(props: { filterOpt: FilterOption, setFilteropt: (opt: Fi
           </div>
         </section>
       </div>
+    </div>
+  )
+}
+
+
+function SortOptRenderer(props: { sortState: SortOption, setSort: (opt: SortOption) => any, close?: () => any }) {
+  return (
+    <div className='sort-opts'>
+      {sortOptions.map(k => {
+        // { 'rareasc', 'raredsc', 'noasc', 'nodsc', 'classasc', 'classdsc' }
+        return (
+          <li key={k}
+            className={props.sortState === k ? 'current' : ''}
+            onClick={() => { props.setSort(k); props.close?.() }}>
+            {(() => {
+              switch (k) {
+                case 'rareasc':
+                  return '稀有度升序 ↑'
+                case 'raredsc':
+                  return '稀有度降序 ↓'
+                case 'noasc':
+                  return '序号升序 ↑'
+                case 'nodsc':
+                  return '序号降序 ↓'
+                case 'classasc':
+                  return '职阶升序 ↑'
+                case 'classdsc':
+                  return '职阶降序 ↓'
+                default:
+                  return null
+              }
+            })()
+            }
+          </li>)
+
+      })}
     </div>
   )
 }

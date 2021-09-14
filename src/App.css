@@ -48,6 +48,8 @@ body::-webkit-scrollbar {
   --toolbar-bg: #292929;
 }
 
+/***************************** Frame class ******************************/
+
 .app {
   min-height: 100%;
   background-color: var(--content-bg);
@@ -70,6 +72,7 @@ img {
   object-fit: scale-down;
   position: relative; /*伪元素定位*/
   overflow: hidden;
+  font-size: 0.9em;
 }
 img:after {
   content: attr(alt);
@@ -80,9 +83,10 @@ img:after {
   height: 100%;
   width: 100%;
   text-align: left;
-  font-size: 0.9em;
   padding: 0.3em;
   color: var(--text-primary);
+  word-break: break-all;
+  overflow:hidden;
 }
 img.small {
   width: 24px;
@@ -92,7 +96,8 @@ img.small:after {
   padding: 0.1em;
   text-align: center;
 }
-img.medium {
+img.medium,
+img.medium:after {
   width: 55px;
   height: 60px;
 }
@@ -129,7 +134,11 @@ p {
   cursor: default;
 }
 
-/*********************************** App ********************************/
+/***********************************************************
+*********************************************************** 
+*********************** App Common ************************
+***********************************************************
+***********************************************************/
 
 .app-menu {
   height: 46px;
@@ -143,6 +152,14 @@ p {
   overflow-y: hidden;
   background-color: var(--content-bg);
   /* transition: background-color .3s;*/
+}
+
+#popover-anchor {
+  position: absolute;
+  width: 100%;
+  height: 0;
+  top: 0;
+  z-index: 9;
 }
 .sider {
   position: fixed;
@@ -252,7 +269,12 @@ svg {
   color: var(--icon-pink);
 }
 
-/******************* Antd restyle *********************/
+/**********************************************************
+*********************************************************** 
+****************** Antd restyle ***************************
+*********************************************************** 
+**********************************************************/
+
 .app .ant-layout-content {
   background-color: var(--content-bg);
   color: var(--text-primary);
@@ -307,7 +329,15 @@ svg {
 .app .ant-popover-inner-content {
   color: var(--text-primary);
 }
-/************************ Servant List **************************/
+.app .ant-popover-inner-content {
+  padding: 0;
+}
+
+/***********************************************************
+***********************************************************
+************************ Servant List *********************
+***********************************************************
+***********************************************************/
 
 .servant-list-content {
   height: calc(100vh - 90px) !important;
@@ -317,6 +347,9 @@ svg {
 .servant-list-content a {
   color: var(--text-primary);
   cursor: unset;
+}
+a:hover .sidebar-item-container {
+  color: var(--text-primary);
 }
 .sidebar-item-container {
   position: relative;
@@ -348,9 +381,7 @@ svg {
   height: 60px;
   margin-left: 9px;
 }
-.sidebar-item-img-container img {
-  width: 100%;
-  height: 100%;
+.sidebar-item-img-container > img {
   border-radius: 6px;
 }
 .servant-list-filter-container {
@@ -422,8 +453,26 @@ input[type="checkbox"] + label::before {
 .servant-list-filter span > label > span {
   line-height: 1rem;
 }
+.sort-opts {
+  cursor: default;
+  padding: 5px 0;
+}
+.sort-opts > li {
+  padding: 0.3em 14px;
+}
+.sort-opts > li:hover,
+.sort-opts > li.current {
+  background-color: var(--button-bg-hover);
+}
+.sort-opts > li.current {
+  color: var(--theme-primary);
+}
 
-/********************* Servant Card **************************/
+/***********************************************************
+***********************************************************
+********************* Servant Card **************************
+***********************************************************
+***********************************************************/
 
 .servant-item-info {
   margin-left: 6px;
@@ -915,7 +964,11 @@ li.quest .detail {
   margin: 1px;
 }
 
-/******************************************* Mobile *******************************************/
+/***********************************************************
+***********************************************************
+*********************** Mobile ****************************
+***********************************************************
+***********************************************************/
 
 @media screen and (max-width: 720px) {
   .app {
@@ -926,9 +979,6 @@ li.quest .detail {
   }
   .app .ant-input-search-button {
     height: 35px;
-  }
-  .app .ant-popover-arrow {
-    display: none;
   }
   input[type="color"],
   input[type="date"],
@@ -971,6 +1021,9 @@ li.quest .detail {
   }
   .servant-list-container .toolbar > button svg {
     font-size: 1.2rem;
+  }
+  .sort-opts {
+    font-size: 1rem;
   }
   .content {
     width: 100vw !important;

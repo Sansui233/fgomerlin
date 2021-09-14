@@ -135,8 +135,9 @@ function ItemRenderer(props: {
 }) {
   return (
     <section className="itemcost" id="nav-itemcost">
-      <h2>升级材料</h2>
-      {props.itemCost.map((lv) => (
+      <h2>材料</h2>
+      {props.itemCost.length === 0 ? <span style={{paddingLeft:'20px'}}>无需材料</span>
+      :props.itemCost.map((lv) => (
         <li key={'lv'+lv.currentLevel}>
           <div>Lv.{lv.currentLevel}&nbsp;→&nbsp;{lv.targetLevel}</div>
           <div>{Object.entries(lv.items).map(([name, num], i) => {
