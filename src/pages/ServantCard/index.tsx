@@ -1,9 +1,9 @@
 import { HeartFilled, HeartOutlined, LinkOutlined } from '@ant-design/icons';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import ArrowUp from '../../assets/icons/arrow-up.svg';
 import SkillDrawer from '../../components/SkillDrawer';
-import { composeCalcCells } from '../../utils/calculator';
+import { ascensionGenerator, composeCalcCells } from '../../utils/calculator';
 import { ICONBASE } from '../../utils/dataset-conf';
 import { ItemCostFormat, SkillDetailFormat } from '../../utils/dataset-type';
 import { getServantDetail, putSetting } from '../../utils/db';
@@ -70,21 +70,25 @@ const initDetail: ServantDetail = {
   },
 }
 
+type DrawerCate = 'skill' | 'appendskill' | 'ascension' | 'finalLevel' | ''
+const initDrawercate: DrawerCate = ''
+
 export default function ServantCard(props: any) {
   const { id } = props.match.params
   const [state, setstate] = useState(initDetail)
+
   const [drawer, setdrawer] = useState({
     visible: false,
     targetSkill: '',
-    isApeendSkill: false
+    cate: initDrawercate
   })
 
   const closeDrawer = () => {
     setdrawer(s => { return { ...s, visible: false } })
   }
 
-  const showDrawer = (skillName: string, isApeendSkill: boolean) => {
-    setdrawer(s => { return { ...s, targetSkill: skillName, visible: true, isApeendSkill } })
+  const showDrawer = (skillName: string, cate: DrawerCate) => {
+    setdrawer(s => { return { ...s, targetSkill: skillName, visible: true, cate } })
   }
 
   // ComponentDidMount or when id changed
@@ -180,27 +184,52 @@ export default function ServantCard(props: any) {
     }
   }
 
-  function composeItemCost(): { currentLevel: number, targetLevel: number, items: { [itemName: string]: number } }[] {
-    if (drawer.isApeendSkill) {
-      const ic = state.basicInfo.itemCost.appendSkill.map((lv, i) => {
-        return { currentLevel: i + 1, targetLevel: i + 2, items: lv }
-      })
-      ic.unshift({
-        currentLevel: 0,
-        targetLevel: 1,
-        items: { "从者硬币": 120 }
-      })
-      return ic
-    } else {
-      return state.basicInfo.itemCost.skill.map((lv, i) => {
-        return { currentLevel: i + 1, targetLevel: i + 2, items: lv }
-      })
-    }
-  }
+  const composeItemCost = useCallback(
+    (): {
+      currentLevel: number,
+      targetLevel: number,
+      items: { [itemName: string]: number }
+    }[] => {
+      switch (drawer.cate) {
+        case 'appendskill':
+          const ic = state.basicInfo.itemCost.appendSkill.map((lv, i) => {
+            return { currentLevel: i + 1, targetLevel: i + 2, items: lv }
+          })
+          ic.unshift({
+            currentLevel: 0,
+            targetLevel: 1,
+            items: { "从者硬币": 120 }
+          })
+          return ic
+        case 'skill':
+          return state.basicInfo.itemCost.skill.map((lv, i) => {
+            return { currentLevel: i + 1, targetLevel: i + 2, items: lv }
+          })
+        case 'ascension':
+          return state.basicInfo.itemCost.ascension.map((lv, i) => {
+            return { currentLevel: i, targetLevel: i+1, items: lv }
+          })
+        case 'finalLevel':
+        default:
+          const { levelStage, qpCost } = ascensionGenerator(state.basicInfo.sRarity)
+          return qpCost.map((qp, i) => {
+            return {
+              currentLevel: levelStage[i], targetLevel: levelStage[i + 1],
+              items: {
+                "圣杯": 1,
+                'QP': qp
+              }
+            }
+          })
+      }
+    },
+    [drawer.cate, state.basicInfo.itemCost.appendSkill, state.basicInfo.itemCost.ascension, state.basicInfo.itemCost.skill, state.basicInfo.sRarity],
+  )
+
 
   return (
     <div className="servant-card-container">
-      <div className={drawer.visible?"servant-card masked":"servant-card"}>
+      <div className={drawer.visible ? "servant-card masked" : "servant-card"}>
         <section className="servant-card-head list-item-indentation">
           <div className="servant-card-img-container">
             <img src={ICONBASE + "/" + state.basicInfo.sImg} alt="avatar" />
@@ -222,12 +251,14 @@ export default function ServantCard(props: any) {
 
             <section className="servant-card-setting-list">
               <p className="list-item-indentation list-title">等级提升</p>
-              <div className="servant-card-setting-list-item list-item-indentation">
+              <div className="servant-card-setting-list-item list-item-indentation"
+                onClick={() => { showDrawer('', 'ascension') }}>
                 <img src={ArrowUp} alt="再临" className="servant-card-icon" />
                 <span className="servant-card-setting-list-item-name">灵基再临</span>
                 <Selections mode="level" {...state.userSettings.ascension} changeSelection={changeLevel} />
               </div>
-              <div className="servant-card-setting-list-item list-item-indentation">
+              <div className="servant-card-setting-list-item list-item-indentation"
+                onClick={() => { showDrawer('', 'finalLevel') }}>
                 <img src={ICONBASE + "/圣杯.jpg"} alt="🏆" className="servant-card-icon" />
                 <span className="servant-card-setting-list-item-name">圣杯转临</span>
                 <Selections mode="finalLevel" {...state.userSettings.finalLevel} rarity={state.basicInfo.sRarity} changeSelection={changeFinalLevel} />
@@ -239,7 +270,7 @@ export default function ServantCard(props: any) {
                 const skill = as.skills[as.skills.length - 1]
                 return (
                   <div className="servant-card-setting-list-item list-item-indentation" key={index}
-                    onClick={() => { showDrawer(skill.name, false) }}
+                    onClick={() => { showDrawer(skill.name, 'skill') }}
                   >
                     <img src={ICONBASE + "/" + skill.icon} alt="skill1" className="servant-card-icon" />
                     <span className="servant-card-setting-list-item-name">{skill.name}</span>
@@ -254,7 +285,7 @@ export default function ServantCard(props: any) {
               {state.basicInfo.appendedSkills.map((skill, index) => {
                 return (
                   <div className="servant-card-setting-list-item list-item-indentation" key={index}
-                    onClick={() => { showDrawer(skill.name, true) }}
+                    onClick={() => { showDrawer(skill.name, 'skill') }}
                   >
                     <img src={ICONBASE + "/" + skill.icon + '.png'} alt="skill1" className="servant-card-icon" />
                     <span className="servant-card-setting-list-item-name">{skill.name}</span>
@@ -267,19 +298,18 @@ export default function ServantCard(props: any) {
           </React.Fragment>)
         }
       </div>
-        <SkillDrawer
-          skills={
-            drawer.isApeendSkill ?
-              state.basicInfo.appendedSkills.map(sk => {
-                return [{ ...sk, icon: sk.icon + '.png' }]
-              })
-              :
-              state.basicInfo.activeSkills.map(as => as.skills)
-          }
-          targetSkillName={drawer.targetSkill}
-          onClose={closeDrawer}
-          itemCost={composeItemCost()}
-          visible={drawer.visible} />
+      <SkillDrawer
+        skills={
+          drawer.cate === 'appendskill' ? state.basicInfo.appendedSkills.map(sk => {
+            return [{ ...sk, icon: sk.icon + '.png' }]
+          }) : drawer.cate === 'skill' ? state.basicInfo.activeSkills.map(
+            as => as.skills
+          ) : null
+        }
+        targetSkillName={drawer.targetSkill}
+        onClose={closeDrawer}
+        itemCost={composeItemCost()}
+        visible={drawer.visible} />
     </div>
   )
 }

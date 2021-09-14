@@ -1,15 +1,23 @@
-import { useEffect, useState, useCallback, useMemo } from 'react'
-import { Link } from "react-router-dom";
-import { FilterFilled, FilterOutlined, HeartFilled, HeartOutlined, ReloadOutlined, SortAscendingOutlined } from "@ant-design/icons";
-import { FixedSizeList } from 'react-window';
+import {
+  FilterFilled,
+  FilterOutlined,
+  HeartFilled,
+  HeartOutlined,
+  ReloadOutlined,
+  SortAscendingOutlined,
+} from '@ant-design/icons';
 import { Popover } from 'antd';
 import Search from 'antd/lib/input/Search';
-import ServantItem from './ServantItem';
-import { getServantList, getServantSetting, putSetting } from '../../utils/db';
-import { UserSettingType } from '../../utils/db-type'
-import Emitter, { EvtArgTypes, EvtNames, EvtSources, ServantState } from '../../utils/events'
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { FixedSizeList } from 'react-window';
+
 import { Pages } from '../../App';
-import { PhantasmCategory, PhantasmColor, ServantClass } from "../../utils/dataset-type";
+import { PhantasmCategory, PhantasmColor, ServantClass } from '../../utils/dataset-type';
+import { getServantList, getServantSetting, putSetting } from '../../utils/db';
+import { UserSettingType } from '../../utils/db-type';
+import Emitter, { EvtArgTypes, EvtNames, EvtSources, ServantState } from '../../utils/events';
+import ServantItem from './ServantItem';
 
 export type Servant = {
   sId: number,
@@ -19,6 +27,7 @@ export type Servant = {
   sNameJp: string,
   sClass: ServantClass,
   sImg: string,
+  sRarity: number,
   skill1: number,
   skill2: number,
   skill3: number,
@@ -46,16 +55,16 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
     needFollow: false,
     query: "",
     filter_options: initFilter,
-    sort_option: SortOption.noasc
+    sort_options: SortOption.noasc
   })
   const [filterVisible, setfiltervisible] = useState(false)
 
   const reloadFromDB = useCallback(
     async () => {
-      setState(s => { return { servants: s.servants, needFollow: s.needFollow, isLoaded: false, query: "", filter_options: s.filter_options, sort_option: SortOption.noasc } })
+      setState(s => { return { servants: s.servants, needFollow: s.needFollow, isLoaded: false, query: "", filter_options: s.filter_options, sort_options: SortOption.noasc } })
       const servants = await getServantList()
       console.log(`[ServantList] reload from db successfully. Total ${servants.length} items`)
-      setState(s => { return { servants, needFollow: false, isLoaded: true, query: "", filter_options: initFilter, sort_option: SortOption.noasc } })
+      setState(s => { return { servants, needFollow: false, isLoaded: true, query: "", filter_options: initFilter, sort_options: SortOption.noasc } })
     },
     [],
   )
@@ -128,9 +137,7 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
     setState(s => {
       return {
         ...s,
-        filter_options: {
-          ...opt,
-        }
+        filter_options: { ...opt }
       }
     })
   }
@@ -191,13 +198,41 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
     [state.query, state.servants, state.needFollow, state.filter_options]
   )
 
-  function servantItemRenderer(s: Servant) {
-    return (
-      <Link key={s.sId} to={`/${Pages.servantList}/${s.sId}`} onClick={props.removeCurrentOnSidebar}>
-        <ServantItem servant={s} changeFollow={changeFollow}></ServantItem>
-      </Link>
-    )
-  }
+  const sortFilteredServants = useMemo(
+    () => {
+      const classSort: ServantClass[] = ['Shielder', 'Saber', 'Archer', 'Lancer', 'Rider', 'Caster', 'Assassin', 'Berserker', 'Ruler', 'Avenger', 'MoonCancer', 'Alterego', 'Foreigner', 'Pretender', 'Beast']
+      if (filteredServants.length <= 1) return filteredServants;
+      switch (state.sort_options) {
+        case SortOption.noasc:
+          return filteredServants.sort((prev, cu) => {
+            return prev.sNo - cu.sNo
+          })
+        case SortOption.nodsc:
+          return filteredServants.sort((prev, cu) => {
+            return cu.sNo - prev.sNo
+          })
+        case SortOption.rareasc:
+          return filteredServants.sort((prev, cu) => {
+            return cu.sRarity - prev.sRarity
+          })
+        case SortOption.raredsc:
+          return filteredServants.sort((prev, cu) => {
+            return prev.sRarity - cu.sRarity
+          })
+        case SortOption.classasc:
+          return filteredServants.sort((prev, cu) => {
+            return classSort.indexOf(prev.sClass) - classSort.indexOf(cu.sClass)
+          })
+        case SortOption.classdsc:
+          return filteredServants.sort((prev, cu) => {
+            return classSort.indexOf(cu.sClass) - classSort.indexOf(prev.sClass)
+          })
+        default:
+          return filteredServants
+      }
+    }
+    , [filteredServants, state.sort_options]
+  )
 
   function toggleFilter() {
     setfiltervisible(s => !s)
@@ -209,7 +244,7 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
     })(state.filter_options)
   }, [state.filter_options])
 
-  const sortRenderer = () => {
+  function sortOptRenderer() {
     return (
       <div className='sort-opts'>
         {Object.keys(SortOption).map(k => {
@@ -235,6 +270,14 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
     )
   }
 
+  function servantItemRenderer(s: Servant) {
+    return (
+      <Link key={s.sId} to={`/${Pages.servantList}/${s.sId}`} onClick={props.removeCurrentOnSidebar}>
+        <ServantItem servant={s} changeFollow={changeFollow}></ServantItem>
+      </Link>
+    )
+  }
+
   return (
     <div className="servant-list-container">
       <div className="toolbar">
@@ -242,7 +285,7 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
         <button className="clear-button" onClick={toggleFilter}>
           {isFilterSettled ? <FilterFilled className="open" /> : <FilterOutlined className={filterVisible ? 'open' : ''} />}
         </button>
-        <Popover placement="bottom" content={sortRenderer} trigger="click">
+        <Popover placement="bottom" content={sortOptRenderer} trigger="click">
           <button className="clear-button">
             <SortAscendingOutlined />
           </button>
@@ -257,7 +300,7 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
       {state.isLoaded ?
         <FixedSizeList
           className="servant-list-content"
-          itemCount={filteredServants.length}
+          itemCount={sortFilteredServants.length}
           height={1080}
           width={374}
           itemSize={76 + 7}
@@ -265,7 +308,7 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
           {({ index, style }) => {
             return (
               <div style={style}>
-                {servantItemRenderer(filteredServants[index])}
+                {servantItemRenderer(sortFilteredServants[index])}
               </div>
             )
           }}
@@ -276,10 +319,14 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
 
 function FilterRenderer(props: { filterOpt: FilterOption, setFilteropt: (opt: FilterOption) => any, visible: boolean }) {
 
-  const classes = [{ '剑': "Saber" }, { '弓': "Archer" }, { '枪': "Lancer" },
+  type ClassMap = { [name: string]: ServantClass | 'Other' }
+  type ColorMap = { [name: string]: PhantasmColor }
+  type CategoryMap = { [name: string]: PhantasmCategory }
+
+  const classes: ClassMap[] = [{ '剑': "Saber" }, { '弓': "Archer" }, { '枪': "Lancer" },
   { '骑': "Rider" }, { '杀': "Assassin" }, { '术': "Caster" }, { '狂': "Berserker" }, { '其他': "Other" }]
-  const phantasmColor = [{ 'Quick': "Quick" }, { 'Arts': 'Arts' }, { 'Buster': 'Buster' }]
-  const phantasmCategory = [{ '全体': '全体' }, { '单体': '单体' }, { '辅助': '辅助' }]
+  const phantasmColor: ColorMap[] = [{ 'Quick': "Quick" }, { 'Arts': 'Arts' }, { 'Buster': 'Buster' }]
+  const phantasmCategory: CategoryMap[] = [{ '全体': '全体' }, { '单体': '单体' }, { '辅助': '辅助' }]
 
   const toggle = (type: 'c' | 'ph' | 'phc', val: string | PhantasmColor | PhantasmCategory) => {
     switch (type) {

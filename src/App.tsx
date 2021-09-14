@@ -1,18 +1,19 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { withRouter, Switch, Route, Redirect, Link } from "react-router-dom";
-import { Content } from 'antd/lib/layout/layout';
-import { message, Menu } from 'antd';
-import { ConfigProvider } from 'antd';
-import { CloudDownloadOutlined, FormatPainterOutlined } from "@ant-design/icons";
-import 'antd/dist/antd.css'
 import './App.css';
-import { parseZipDataset } from "./utils/dataset-resolve";
-import cookies from "./lib/cookies"
-import ServantList from './pages/ServantList';
-import ServantCard from './pages/ServantCard';
+import 'antd/dist/antd.css';
+
+import { CloudDownloadOutlined, FormatPainterOutlined } from '@ant-design/icons';
+import { ConfigProvider, Menu, message } from 'antd';
+import { Content } from 'antd/lib/layout/layout';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link, Redirect, Route, Switch, withRouter } from 'react-router-dom';
+
+import cookies from './lib/cookies';
 import ItemCategory from './pages/ItemCategory';
 import ItemContents from './pages/ItemContents';
+import ServantCard from './pages/ServantCard';
+import ServantList from './pages/ServantList';
 import Statistic from './pages/Statistic';
+import { parseZipDataset } from './utils/dataset-resolve';
 
 
 export const Pages = {

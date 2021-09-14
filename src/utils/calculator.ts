@@ -141,7 +141,7 @@ function scanAscention(servantId: number, setting: ServantSetting, itemCost: Ite
 
 function scanFinalLevel(servantId: number, rarity: number, setting: ServantSetting): Cell[] {
   const cells: Cell[] = []
-  const { levelStage, qpCost } = qpCostGenerator(rarity)
+  const { levelStage, qpCost } = ascensionGenerator(rarity)
   const start = levelStage.indexOf(setting.finalLevel.current)
   const end = levelStage.indexOf(setting.finalLevel.target)
   // start range 0 - (levelStage.length-1) exp. 0-10 len 11
@@ -217,7 +217,7 @@ export async function countServantsInItem(itemName: string, cells: Cell[]){
   return servants
 }
 
-const qpCostGenerator = (rarity: number): { levelStage: number[], qpCost: number[] } => {
+export const ascensionGenerator = (rarity: number): { levelStage: number[], qpCost: number[] } => {
   switch (rarity) {
     case 0:
       return {

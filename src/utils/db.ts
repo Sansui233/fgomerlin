@@ -1,12 +1,24 @@
-import Dexie from 'dexie';
 import { message } from 'antd';
+import Dexie from 'dexie';
+
 import { ItemInfo } from '../pages/ItemContents';
 import { ServantBasic, ServantDetail } from '../pages/ServantCard';
-import { Servant } from '../pages/ServantList'
-import { parseZipDataset } from './dataset-resolve';
+import { Servant } from '../pages/ServantList';
 import { Cell } from './calculator';
-import { ItemType, TableGlpkRow, TableNames, TableServantsRow, TableUserSettingRow, UserSettingType, ServantSetting, ItemSetting, TableItemsRow, TableFreeQuestsRow } from "./db-type";
-import { ItemsFormat, ServantFormat } from "./dataset-type";
+import { parseZipDataset } from './dataset-resolve';
+import { ItemsFormat, ServantFormat } from './dataset-type';
+import {
+  ItemSetting,
+  ItemType,
+  ServantSetting,
+  TableFreeQuestsRow,
+  TableGlpkRow,
+  TableItemsRow,
+  TableNames,
+  TableServantsRow,
+  TableUserSettingRow,
+  UserSettingType,
+} from './db-type';
 
 export var db: Dexie;
 export var version = 2109.1
@@ -35,7 +47,7 @@ export function initdb() {
     Dexie.ignoreTransaction(() => {
       message.info("正在更新数据", 5)
       parseZipDataset().then(() => {
-        message.success(`数据版本已更新至${version}, 刷新内容生效`)
+        message.success(`数据版本已更新至${version}, 刷新后生效`)
         console.log('[db.ts] database upgraded to ' + version)
       }).catch((e) => {
         message.error("数据版本未更新，错误信息：" + e + ".请尝试点击右上角更新", 5)
@@ -277,6 +289,7 @@ async function mapServantItems(results: TableServantsRow[]): Promise<Servant[]> 
         sNickNames: result.detail.info.nicknames,
         sNameJp: result.detail.info.nameJp,
         sClass: result.detail.info.className,
+        sRarity: result.detail.info.rarity2 ? result.detail.info.rarity2 : result.detail.info.rarity,
         sImg: result.detail.icon,
         skill1: setting ? setting.skills[0].current : 1,
         skill2: setting ? setting.skills[1].current : 1,
