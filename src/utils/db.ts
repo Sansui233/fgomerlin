@@ -105,25 +105,28 @@ export function putFreeQuest(freequest: TableFreeQuestsRow) {
 }
 
 /**
- * set calcCells = null when putting items
- * When putting item, you can set id = -1 when you don't know it
+ * calcCells is for servant setting. Item don't need it
+ * DO NOT USE EMPTY ARRAY When putting servant setting without cell update (such as when change isFollow), just leave calcCell undefined
+ * When putting item, you can set id = -1 if you don't know it. Name is always neccessary
  */
 export async function putSetting(id: number, name: string, settingType: UserSettingType, setting: ServantSetting | ItemSetting, calcCells?: Cell[]) {
   console.time('=====setting time cost=====')
   if (typeof (id) == "string") {
     id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
   }
-  if (settingType === UserSettingType.Servant && calcCells && id !== -1) {
+  if (settingType === UserSettingType.Servant && id !== -1) {
     // put servant setting
     return db.transaction('rw', db.table(TableNames.user_setting), db.table(TableNames.calculator), async () => {
 
       const row: TableUserSettingRow = { id, name, type: settingType, setting }
-      const calcRow: TableCalculatoreRow = { servantId: id, cells: calcCells }
       db.table(TableNames.user_setting).put(row)
-      db.table(TableNames.calculator).where('servantId').equals(id).delete()
-      db.table(TableNames.calculator).put(calcRow)
-
-      console.debug('cell length', calcCells.length)
+      
+      if(calcCells !== undefined){
+        const calcRow: TableCalculatoreRow = { servantId: id, cells: calcCells }
+        db.table(TableNames.calculator).where('servantId').equals(id).delete()
+        db.table(TableNames.calculator).put(calcRow)
+        console.debug('cell length', calcCells.length)
+      }
 
     }).catch((e: Error) => {
       console.error('[db.ts]', e)

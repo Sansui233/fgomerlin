@@ -125,7 +125,7 @@ export default function ServantCard(props: any) {
   function changeFollow() {
     const userSettings: ServantSetting = { ...state.userSettings, isFollow: !state.userSettings.isFollow };
     // save to database
-    putSetting(state.basicInfo.sId, state.basicInfo.sName, UserSettingType.Servant, userSettings, []).then(() => {
+    putSetting(state.basicInfo.sId, state.basicInfo.sName, UserSettingType.Servant, userSettings).then(() => {
       setstate({ ...state, userSettings })
       // notify sidebar
       Emitter.dataEmit(EvtNames.ModifyServant, EvtSources.ServatContent, {
