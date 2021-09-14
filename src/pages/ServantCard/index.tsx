@@ -125,7 +125,7 @@ export default function ServantCard(props: any) {
   function changeFollow() {
     const userSettings: ServantSetting = { ...state.userSettings, isFollow: !state.userSettings.isFollow };
     // save to database
-    putSetting(state.basicInfo.sId, state.basicInfo.sName, UserSettingType.Servant, userSettings).then(() => {
+    putSetting(state.basicInfo.sId, state.basicInfo.sName, UserSettingType.Servant, userSettings, []).then(() => {
       setstate({ ...state, userSettings })
       // notify sidebar
       Emitter.dataEmit(EvtNames.ModifyServant, EvtSources.ServatContent, {
@@ -150,38 +150,41 @@ export default function ServantCard(props: any) {
     })
   }
 
-  function changeSkill(skill_index: number) { // 写成高阶函数以保存 index 变量
-    if (skill_index > 2) {
+  /**
+   * See Servant Setting for skillType 
+  */
+  function changeSkill(skill_index: number | 'all', skillType: 'skills' | 'appendSkills') { // 写成高阶函数以保存 index 变量
+    if (typeof skill_index === 'number' && skill_index > 2) {
       console.error(`[ServantCard] skill_index ${skill_index} out of range`)
     }
-    const i = skill_index
-    return (current: number, target: number) => {
-      const new_skills = [...state.userSettings.skills];
-      new_skills[i] = { current, target };
-      const userSettings: ServantSetting = { ...state.userSettings, skills: new_skills };
-      putSetting(state.basicInfo.sId, state.basicInfo.sName, UserSettingType.Servant, userSettings, composeCalcCells({ ...state, userSettings })).then(() => {
+    return (current?: number, target?: number, batchSet?: { current: number, target: number }[]) => {
+      const new_skills = [...state.userSettings[skillType]];
+      if (typeof skill_index === 'number' && current !== undefined && target !== undefined) {
+        new_skills[skill_index] = { current, target };
+      } else if (batchSet) {
+        for (let i = 0; i < new_skills.length; i++) {
+          new_skills[i] = { current: batchSet[i].current, target: batchSet[i].target };
+        }
+      }
+      console.debug(skillType, new_skills)
+      const userSettings: ServantSetting = { ...state.userSettings, [skillType]: new_skills };
+      putSetting(
+        state.basicInfo.sId,
+        state.basicInfo.sName,
+        UserSettingType.Servant,
+        userSettings,
+        composeCalcCells({ ...state, userSettings })
+      ).then(() => {
         setstate({ ...state, userSettings })
-        Emitter.dataEmit(EvtNames.ModifyServant, EvtSources.ServatContent, {
-          id: state.basicInfo.sId,
-          skills: new_skills.map((skill) => {
-            return skill.current
+        // Emit Event to sidebar list
+        if (skillType === 'skills') {
+          Emitter.dataEmit(EvtNames.ModifyServant, EvtSources.ServatContent, {
+            id: state.basicInfo.sId,
+            skills: new_skills.map((skill) => {
+              return skill.current
+            })
           })
-        })
-      })
-    }
-  }
-
-  function changeAppendSkill(skill_index: number) {
-    if (skill_index > 2) {
-      console.error(`[ServantCard] appended skill_index ${skill_index} out of range`)
-    }
-    const i = skill_index
-    return (current: number, target: number) => {
-      const new_appendedskills = [...state.userSettings.appendSkills];
-      new_appendedskills[i] = { current, target };
-      const userSettings: ServantSetting = { ...state.userSettings, appendSkills: new_appendedskills };
-      putSetting(state.basicInfo.sId, state.basicInfo.sName, UserSettingType.Servant, userSettings, composeCalcCells({ ...state, userSettings })).then(() => {
-        setstate({ ...state, userSettings })
+        }
       })
     }
   }
@@ -228,43 +231,50 @@ export default function ServantCard(props: any) {
     [drawer.cate, state.basicInfo.itemCost.appendSkill, state.basicInfo.itemCost.ascension, state.basicInfo.itemCost.skill, state.basicInfo.sRarity],
   )
 
-  function QuickSkillSetRenderer(props: { setFunc: (num: 310 | 999 | 666 | 444) => any }) {
+  function QuickSkillSetRenderer(props: { setFunc: (num: 310 | 999 | 666 | 444 | 111 | 0) => any, isAppend?: boolean }) {
     return (
       <div className="popover-opts" >
         <li onClick={() => props.setFunc(310)}>310</li>
         <li onClick={() => props.setFunc(999)}>999</li>
         <li onClick={() => props.setFunc(666)}>666</li>
         <li onClick={() => props.setFunc(444)}>444</li>
+        <li onClick={() => props.setFunc(111)}>111</li>
+        {props.isAppend ? <li onClick={() => props.setFunc(0)}>000</li> : null}
       </div>
     )
   }
 
-  function quickSetSkill(setnum: 310 | 999 | 666 | 444, field: 'current' | 'target', setType: 'skills' | 'appendSkills') {
-    const selectFunc = setType === 'skills' ? changeSkill : changeAppendSkill
+  function quickSetSkill(setnum: 310 | 999 | 666 | 444 | 111 | 0, field: 'current' | 'target', skillType: 'skills' | 'appendSkills') {
+    const remainField = field === 'current' ? 'target' : 'current'
     const params = (skill_index: number) => {
-      if (field === 'current') {
+      if (field === 'target') {
+        const current = state.userSettings[skillType][skill_index][remainField]
         return {
-          310: { current: state.userSettings[setType][skill_index][field], target: 10 },
-          999: { current: state.userSettings[setType][skill_index][field], target: 9 },
-          666: { current: state.userSettings[setType][skill_index][field], target: 6 },
-          444: { current: state.userSettings[setType][skill_index][field], target: 4 }
+          310: { current: current < 10 ? current : 10, target: 10 },
+          999: { current: current < 9 ? current : 9, target: 9 },
+          666: { current: current < 6 ? current : 6, target: 6 },
+          444: { current: current < 4 ? current : 4, target: 4 },
+          111: { current: current < 1 ? current : 1, target: 1 },
+          0: { current: current < 0 ? current : 0, target: 0 }
         }
       } else {
+        const target = state.userSettings[skillType][skill_index][remainField]
         return {
-          310: { current: 10, target: state.userSettings[setType][skill_index][field] },
-          999: { current: 9, target: state.userSettings[setType][skill_index][field] },
-          666: { current: 6, target: state.userSettings[setType][skill_index][field] },
-          444: { current: 4, target: state.userSettings[setType][skill_index][field] }
+          310: { current: 10, target: 10 < target ? target : 10 },
+          999: { current: 9, target: 9 < target ? target : 9 },
+          666: { current: 6, target: 6 < target ? target : 6 },
+          444: { current: 4, target: 4 < target ? target : 4 },
+          111: { current: 1, target: 1 < target ? target : 1 },
+          0: { current: 0, target: 0 < target ? target : 0 }
         }
       }
     }
-    console.debug(setnum, field, setType)
-    console.debug('params',params)
-    for (let i = 0; i < 3; i++) {
-      selectFunc(i)(params(i)[setnum].current, params(i)[setnum].target)
-    }
-  }
 
+    const paramsSet = [0, 1, 2].map((i) => {
+      return params(i)[setnum]
+    })
+    changeSkill('all', skillType)(undefined, undefined, paramsSet)
+  }
 
   return (
     <div className="servant-card-container">
@@ -311,23 +321,23 @@ export default function ServantCard(props: any) {
                     placement="bottom"
                     title='快速设定'
                     content={<QuickSkillSetRenderer
-                      setFunc={(num: 310 | 999 | 666 | 444) => {
-                        quickSetSkill(num, 'current', 'skills')
+                      setFunc={(num: 310 | 999 | 666 | 444 | 111 | 0) => {
+                        quickSetSkill(num, 'target', 'skills')
                       }}
                     />}
                   >
-                    <ControlOutlined />
+                    <ControlOutlined className="sevant-card-quickset-skill right" />
                   </Popover>
                   <Popover
                     placement="bottom"
                     title='快速设定'
                     content={<QuickSkillSetRenderer
-                      setFunc={(num: 310 | 999 | 666 | 444) => {
-                        quickSetSkill(num, 'target', 'skills')
+                      setFunc={(num: 310 | 999 | 666 | 444 | 111 | 0) => {
+                        quickSetSkill(num, 'current', 'skills')
                       }}
                     />}
                   >
-                    <ControlOutlined />
+                    <ControlOutlined className="sevant-card-quickset-skill left" />
                   </Popover>
                 </p>
                 {state.basicInfo.activeSkills.map((as, index) => {
@@ -338,7 +348,7 @@ export default function ServantCard(props: any) {
                     >
                       <img src={ICONBASE + "/" + skill.icon} alt="skill1" className="servant-card-icon" />
                       <span className="servant-card-setting-list-item-name">{skill.name}</span>
-                      <Selections mode="skill" {...state.userSettings.skills[index]} changeSelection={changeSkill(index)} />
+                      <Selections mode="skill" {...state.userSettings.skills[index]} changeSelection={changeSkill(index, 'skills')} />
                     </div>
                   )
                 })}
@@ -349,24 +359,28 @@ export default function ServantCard(props: any) {
                   <Popover
                     placement="bottom"
                     title='快速设定'
-                    content={<QuickSkillSetRenderer
-                      setFunc={(num: 310 | 999 | 666 | 444) => {
-                        quickSetSkill(num, 'current', 'appendSkills')
-                      }}
-                    />}
+                    content={
+                      <QuickSkillSetRenderer
+                        isAppend={true}
+                        setFunc={(num: 310 | 999 | 666 | 444 | 111 | 0) => {
+                          quickSetSkill(num, 'target', 'appendSkills')
+                        }}
+                      />}
                   >
-                    <ControlOutlined />
+                    <ControlOutlined className="sevant-card-quickset-skill right" />
                   </Popover>
                   <Popover
                     placement="bottom"
                     title='快速设定'
-                    content={<QuickSkillSetRenderer
-                      setFunc={(num: 310 | 999 | 666 | 444) => {
-                        quickSetSkill(num, 'target', 'appendSkills')
-                      }}
-                    />}
+                    content={
+                      <QuickSkillSetRenderer
+                        isAppend={true}
+                        setFunc={(num: 310 | 999 | 666 | 444 | 111 | 0) => {
+                          quickSetSkill(num, 'current', 'appendSkills')
+                        }}
+                      />}
                   >
-                    <ControlOutlined />
+                    <ControlOutlined className="sevant-card-quickset-skill left" />
                   </Popover>
                 </p>
                 {state.basicInfo.appendedSkills.map((skill, index) => {
@@ -376,7 +390,7 @@ export default function ServantCard(props: any) {
                     >
                       <img src={ICONBASE + "/" + skill.icon + '.png'} alt="skill1" className="servant-card-icon" />
                       <span className="servant-card-setting-list-item-name">{skill.name}</span>
-                      <Selections mode="skill" {...state.userSettings.appendSkills[index]} changeSelection={changeAppendSkill(index)} />
+                      <Selections mode="skill" {...state.userSettings.appendSkills[index]} changeSelection={changeSkill(index, 'appendSkills')} />
                     </div>
                   )
                 })}

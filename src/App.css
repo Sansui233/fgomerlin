@@ -581,7 +581,26 @@ p.servant-item-info-other {
 .servant-card-like:hover svg {
   color: var(--icon-pink);
 }
+.sevant-card-quickset-skill{
+  float: right;
+  font-size: 22px;
+}
+.sevant-card-quickset-skill svg {
+  opacity: .4;
+}
+.sevant-card-quickset-skill:hover svg{
+  opacity: 1;
+  color: var(--theme-primary);
+}
+.sevant-card-quickset-skill.left {
+  padding: 0 10px;
+  margin-right: 48px;
+}
+.sevant-card-quickset-skill.right {
+  padding: 0 10px;
+  margin-right: 15px;
 
+}
 .servant-card-setting-list {
   margin: 33px 0;
 }

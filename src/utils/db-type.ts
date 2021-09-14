@@ -1,4 +1,4 @@
-import { CellType } from "./calculator";
+import { Cell } from "./calculator";
 import { FreeQuestFormat, ItemsFormat, ServantFormat } from "./dataset-type";
 
 export enum TableNames {
@@ -26,10 +26,14 @@ export enum UserSettingType {
 }
 export type ServantSetting = {
   isFollow: boolean,
-  ascension: { current: number, target: number }, // 0-4
-  finalLevel: { current: number, target: number }, //maxLevel-100
-  skills: { current: number, target: number }[], // length 3
-  appendSkills: { current: number, target: number }[] // length 3
+  /** 0-4 */
+  ascension: { current: number, target: number },
+  /** maxLevel-100 */
+  finalLevel: { current: number, target: number },
+  /** length 3 */
+  skills: { current: number, target: number }[],
+  /** length 3 */
+  appendSkills: { current: number, target: number }[]
 }
 export type ItemSetting = {
   count: number
@@ -37,7 +41,10 @@ export type ItemSetting = {
 
 export type TableSrcinfoRow = { dataversion: string }
 
-export type TableCalculatoreRow = { servantId: number, cellType: CellType, cellTargetLevel: number, itemName: string, qpCost: number }
+export type TableCalculatoreRow = {
+  servantId: number,
+  cells: Cell[]
+}
 
 export type TableGlpkRow = {
   item: string,

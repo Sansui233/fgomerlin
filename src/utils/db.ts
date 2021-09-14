@@ -11,6 +11,7 @@ import {
   ItemSetting,
   ItemType,
   ServantSetting,
+  TableCalculatoreRow,
   TableFreeQuestsRow,
   TableGlpkRow,
   TableItemsRow,
@@ -28,9 +29,9 @@ const SERVANT_TABLE = "id, name"
 const ITEM_TABLE = "id, name, category"
 const USER_SETTING = "id, name, type"
 const SRCINFO_TABLE = "dataversion"
-const CALCULATOR_TABLE = "[servantId+cellType+cellTargetLevel+itemName]" // See doc for details
-const GLPK_TABLE = "item" // See dataset-conf
-const FREEQUESTS_TABLE = "questName" // See dataset-conf
+const CALCULATOR_TABLE = "servantId"
+const GLPK_TABLE = "item"
+const FREEQUESTS_TABLE = "questName"
 
 
 export function initdb() {
@@ -60,7 +61,6 @@ export function initdb() {
   db.on("populate", function () {
     Dexie.ignoreTransaction(() => {
       // Init your DB with some default statuses:
-      message.info("正在获取并导入数据……", 3000)
       parseZipDataset().then(() => {
         message.success("数据导入成功")
         console.log("[db.ts] Database is successfully created")
@@ -104,50 +104,50 @@ export function putFreeQuest(freequest: TableFreeQuestsRow) {
   return db.table(TableNames.freequests).put(freequest)
 }
 
-// if id = -1 when putting items, it will be auto repeat
+/**
+ * set calcCells = null when putting items
+ * When putting item, you can set id = -1 when you don't know it
+ */
 export async function putSetting(id: number, name: string, settingType: UserSettingType, setting: ServantSetting | ItemSetting, calcCells?: Cell[]) {
-  const i = 1
-
-  console.time('=====setting====='+i)
+  console.time('=====setting time cost=====')
   if (typeof (id) == "string") {
     id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
   }
-  if (calcCells) {
+  if (settingType === UserSettingType.Servant && calcCells && id !== -1) {
     // put servant setting
-    await db.transaction('rw', db.table(TableNames.user_setting), db.table(TableNames.calculator), async () => {
-      
+    return db.transaction('rw', db.table(TableNames.user_setting), db.table(TableNames.calculator), async () => {
+
       const row: TableUserSettingRow = { id, name, type: settingType, setting }
+      const calcRow: TableCalculatoreRow = { servantId: id, cells: calcCells }
       db.table(TableNames.user_setting).put(row)
+      db.table(TableNames.calculator).where('servantId').equals(id).delete()
+      db.table(TableNames.calculator).put(calcRow)
 
-      // Delete servant-related setting
-      db.table(TableNames.calculator).where('[servantId+cellType+cellTargetLevel+itemName]').between(
-        [id, Dexie.minKey, Dexie.minKey, Dexie.minKey],
-        [id, Dexie.maxKey, Dexie.maxKey, Dexie.maxKey]
-      ).delete()
-
-      calcCells.forEach(async (c) => {
-        db.table(TableNames.calculator).put(c)
-      })
-
-      console.debug('cell length',calcCells.length)
+      console.debug('cell length', calcCells.length)
 
     }).catch((e: Error) => {
       console.error('[db.ts]', e)
       throw e
-    })
-    console.timeEnd('=====setting====='+i)
-  } else {
+    }).finally(
+      () => console.timeEnd('=====setting time cost=====')
+    )
+
+  } else if (settingType === UserSettingType.Item && !calcCells) {
+    // put item setting
+    let realId = id
     if (id === -1) {
       const item = await db.table(TableNames.items).where('name').equals(name).toArray()
       if (item.length !== 0) {
-        id = (item[0] as ItemInfo).id
+        realId = (item[0] as ItemInfo).id
       } else {
         throw new Error(`[db.ts] item ${name} not found`)
       }
     }
     // put item setting
-    const row: TableUserSettingRow = { id, name, type: settingType, setting }
+    const row: TableUserSettingRow = { id: realId, name, type: settingType, setting }
     return db.table(TableNames.user_setting).put(row)
+  } else {
+    throw new Error(`[db.ts] [putSetting] Params Invalid: id: ${id}, name: ${name}, type: ${settingType}, cells: ${calcCells?.length}`)
   }
 }
 
@@ -253,8 +253,11 @@ export function getItemSettings(): Promise<{ id: number, name: string, type: Use
   return db.table(TableNames.user_setting).where('type').equals(UserSettingType.Item).toArray()
 }
 
-export function getCalcCells(): Promise<Cell[]> {
-  return db.table(TableNames.calculator).toArray()
+export async function getCalcCells(): Promise<Cell[]> {
+  const rows = (await db.table(TableNames.calculator).toArray()) as TableCalculatoreRow[]
+  return rows.flatMap(r => {
+    return r.cells
+  })
 }
 
 export async function getGlpkObj(itemName: string): Promise<TableGlpkRow> {
