@@ -1,6 +1,7 @@
 import axios from "axios";
 import JSZip from "jszip"
-import { DataSetFormat, DATASET_TEXT, GlpkFormat } from "./dataset-conf";
+import { DATASET_TEXT } from "./dataset-conf";
+import { DataSetFormat, GlpkFormat } from "./dataset-type";
 import { db, putFreeQuest, putGlpkObj, putItem, putServant, putVersion } from "./db";
 import { TableGlpkRow, TableNames } from "./db-type";
 

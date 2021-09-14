@@ -1,7 +1,8 @@
-import SidebarItem from '../../components/SidebarItemContainer'
-import { Link } from 'react-router-dom'
-import { ICONBASE } from '../../utils/dataset-conf'
-import { Pages } from '../../App'
+import { Link } from 'react-router-dom';
+
+import { Pages } from '../../App';
+import SidebarItem from '../../components/SidebarItemContainer';
+import { ICONBASE } from '../../utils/dataset-conf';
 
 
 export default function ItemCategory() {

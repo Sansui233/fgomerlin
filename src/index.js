@@ -5,7 +5,7 @@ import './index.css';
 import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
-import { initdb } from './utils/db';
+import { initdb } from './utils/db/db';
 
 // Database initialize
 initdb()

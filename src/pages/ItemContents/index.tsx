@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react'
-import { getItemList, getItemSetting, putSetting } from '../../utils/db'
-import { UserSettingType } from '../../utils/db-type'
-import { ItemType } from "../../utils/db-type";
-import { ICONBASE } from '../../utils/dataset-conf'
+import React, { useEffect, useState } from 'react';
+
 import ItemDrawer from '../../components/ItemDrawer';
+import { ICONBASE } from '../../utils/dataset-conf';
+import { getItemList, getItemSetting, putSetting } from '../../utils/db';
+import { ItemType, UserSettingType } from '../../utils/db-type';
 
 export type ItemInfo = {
   id: number,

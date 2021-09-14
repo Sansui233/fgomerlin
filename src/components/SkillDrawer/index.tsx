@@ -1,7 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { ICONBASE, SkillDetailFormat } from '../../utils/dataset-conf';
+import './index.css';
+
+import React, { useEffect, useRef, useState } from 'react';
+
+import { ICONBASE } from '../../utils/dataset-conf';
+import { SkillDetailFormat } from '../../utils/dataset-type';
 import AvatarWithNumber from '../AvatarWithNumber';
-import './index.css'
 
 type Props = {
   /**

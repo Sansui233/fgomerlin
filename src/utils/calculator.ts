@@ -1,8 +1,8 @@
-import { ItemInfo } from "../pages/ItemContents"
-import { ServantBasic, ServantDetail } from "../pages/ServantCard"
-import { ItemCostFormat } from "./dataset-conf"
-import { getItemInfo, getServantBasic} from "./db"
-import { ServantSetting } from "./db-type"
+import { ItemInfo } from '../pages/ItemContents';
+import { ServantBasic, ServantDetail } from '../pages/ServantCard';
+import { ItemCostFormat } from './dataset-type';
+import { getItemInfo, getServantBasic } from './db';
+import { ServantSetting } from './db-type';
 
 export type Cell = {
   // indexes

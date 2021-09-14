@@ -1,8 +1,9 @@
-import React from 'react'
-import { Servant } from '..'
-import { ICONBASE } from '../../../utils/dataset-conf'
-import { HeartOutlined, HeartFilled } from "@ant-design/icons"
-import SidebarItem from '../../../components/SidebarItemContainer'
+import { HeartFilled, HeartOutlined } from '@ant-design/icons';
+import React from 'react';
+
+import { Servant } from '..';
+import SidebarItem from '../../../components/SidebarItemContainer';
+import { ICONBASE } from '../../../utils/dataset-conf';
 
 export default function ServantItem(props: { servant: Servant, changeFollow: (sId: number) => void }) {
   const { sId, sNo, sName, sNameJp, sClass, sImg, skill1, skill2, skill3, isFollow } = props.servant

@@ -6,7 +6,7 @@ import { Servant } from '../pages/ServantList'
 import { parseZipDataset } from './dataset-resolve';
 import { Cell } from './calculator';
 import { ItemType, TableGlpkRow, TableNames, TableServantsRow, TableUserSettingRow, UserSettingType, ServantSetting, ItemSetting, TableItemsRow, TableFreeQuestsRow } from "./db-type";
-import { ItemsFormat, ServantFormat } from './dataset-conf';
+import { ItemsFormat, ServantFormat } from "./dataset-type";
 
 export var db: Dexie;
 export var version = 2109.1

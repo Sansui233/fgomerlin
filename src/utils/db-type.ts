@@ -1,5 +1,5 @@
 import { CellType } from "./calculator";
-import { FreeQuestFormat, ItemsFormat, ServantFormat } from "./dataset-conf";
+import { FreeQuestFormat, ItemsFormat, ServantFormat } from "./dataset-type";
 
 export enum TableNames {
   servants = "servants",

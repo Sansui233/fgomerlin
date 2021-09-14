@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { withRouter, Switch, Route, Redirect, Link } from "react-router-dom";
 import { Content } from 'antd/lib/layout/layout';
-import { message,Menu } from 'antd';
+import { message, Menu } from 'antd';
+import { ConfigProvider } from 'antd';
 import { CloudDownloadOutlined, FormatPainterOutlined } from "@ant-design/icons";
 import 'antd/dist/antd.css'
 import './App.css';
@@ -105,7 +106,8 @@ function App(props: any) {
     }
   }
   return (
-      <div className={state.isDark ? "app dark" : "app light"}>
+    <ConfigProvider getPopupContainer={() => document.getElementById('app')!}>
+      <div className={state.isDark ? "app dark" : "app light"} id='app'>
         <Menu className="app-menu" selectedKeys={[state.navCurrent]} mode="horizontal">
           <Menu.Item className="menu-item" key={Pages.servantList}>
             <Link to={handleSubNav(Pages.servantList)} onClick={addCurrentOnSidebar}>从者</Link>
@@ -148,6 +150,7 @@ function App(props: any) {
           </Switch>
         </div>
       </div>
+    </ConfigProvider>
   );
 }
 

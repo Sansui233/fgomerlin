@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react'
-import { HeartFilled, HeartOutlined, LinkOutlined } from "@ant-design/icons";
-import { getServantDetail, putSetting } from '../../utils/db'
-import { UserSettingType, ServantSetting } from '../../utils/db-type'
-import Selections from './Selections';
-import { ICONBASE, ItemCostFormat, SkillDetailFormat } from '../../utils/dataset-conf';
+import { HeartFilled, HeartOutlined, LinkOutlined } from '@ant-design/icons';
+import React, { useEffect, useState } from 'react';
+
 import ArrowUp from '../../assets/icons/arrow-up.svg';
-import Emitter, { EvtSources, EvtNames, EvtArgTypes, ServantState } from '../../utils/events';
-import { composeCalcCells } from '../../utils/calculator';
 import SkillDrawer from '../../components/SkillDrawer';
+import { composeCalcCells } from '../../utils/calculator';
+import { ICONBASE } from '../../utils/dataset-conf';
+import { ItemCostFormat, SkillDetailFormat } from '../../utils/dataset-type';
+import { getServantDetail, putSetting } from '../../utils/db';
+import { ServantSetting, UserSettingType } from '../../utils/db-type';
+import Emitter, { EvtArgTypes, EvtNames, EvtSources, ServantState } from '../../utils/events';
+import Selections from './Selections';
 
 export type ServantBasic = {
   sId: number,

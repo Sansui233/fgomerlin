@@ -1,10 +1,12 @@
+import './index.css';
+
 import { CloseOutlined } from '@ant-design/icons';
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react';
+
+import { ReactComponent as SortIcon } from '../../assets/icons/sort-amount-down-alt-solid.svg';
 import { ICONBASE } from '../../utils/dataset-conf';
 import { getCalcCells, getFreeQuest, getGlpkObj, getServantBasic } from '../../utils/db';
-import './index.css'
-import { ReactComponent as SortIcon } from '../../assets/icons/sort-amount-down-alt-solid.svg'
-import AvatarWithNumber from '../AvatarWithNumber'
+import AvatarWithNumber from '../AvatarWithNumber';
 
 type Props = {
   item: {

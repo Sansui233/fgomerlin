@@ -1,5 +1,6 @@
-import React from 'react'
-import { ICONBASE } from '../../../utils/dataset-conf'
+import React from 'react';
+
+import { ICONBASE } from '../../../utils/dataset-conf';
 
 export default function ItemStat(props: {
   title: string, isInsufficientOnly: boolean, items: {

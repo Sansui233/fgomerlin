@@ -1,11 +1,12 @@
-import { Checkbox } from 'antd'
-import React, { useState, useEffect } from 'react'
-import ItemDrawer from '../../components/ItemDrawer'
-import { countItemsNeeded } from '../../utils/calculator'
-import { ICONBASE } from '../../utils/dataset-conf'
-import { getCalcCells, getItemSettings } from '../../utils/db'
-import { ItemInfo } from '../ItemContents'
-import ItemStat from './ItemStat/ index'
+import { Checkbox } from 'antd';
+import React, { useEffect, useState } from 'react';
+
+import ItemDrawer from '../../components/ItemDrawer';
+import { countItemsNeeded } from '../../utils/calculator';
+import { ICONBASE } from '../../utils/dataset-conf';
+import { getCalcCells, getItemSettings } from '../../utils/db';
+import { ItemInfo } from '../ItemContents';
+import ItemStat from './ItemStat/ index';
 
 const initItems: {
   itemName: string;

@@ -246,10 +246,13 @@ svg {
 }
 .servant-list-container .toolbar > button {
   padding: unset;
-  padding-left: 0.5em;
+  padding: 0 0.25em;
   flex-grow: 0;
   color: var(--text-gray);
   cursor: pointer;
+}
+.servant-list-container .toolbar > button:first-of-type{
+margin-left: 0.25em;
 }
 .servant-list-container .toolbar > button:last-of-type {
   padding-right: 1em;
@@ -285,6 +288,19 @@ svg {
   background-color: var(--item-bg);
   border-color: var(--text-gray-lighter);
   margin: 0px 13px 0px 8px;
+}
+.ant-popover {
+  color: var(--text-primary);
+  box-shadow: 0 4px 4px 0 var(--box-shadow);
+}
+.ant-popover-arrow-content {
+  background-color: var(--item-bg);
+}
+.ant-popover-inner {
+  background-color: var(--item-bg);
+}
+.ant-popover-inner-content {
+  color: var(--text-primary);
 }
 /************************ Servant List **************************/
 
@@ -335,67 +351,45 @@ svg {
 .servant-list-filter-container {
   background-color: var(--item-bg);
   color: var(--text-primary);
-  margin: 0 13px 0 7px;
+  margin: 0 7px 0 7px;
   box-shadow: 0 4px 4px 0 var(--box-shadow);
   border-radius: 5px;
   opacity: 0;
-  height: 0;
-  animation: listback 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  height: 0px;
+  transition: opacity 0.5s, height 0.5s;
+  overflow-y: auto;
+}
+.servant-list-filter-container::-webkit-scrollbar {
+  display: none;
 }
 .servant-list-filter-container.open {
   z-index: 2;
   opacity: 1;
-  height: 200px;
-  animation: listdrop 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-}
-@keyframes listdrop {
-  0% {
-    opacity: 0;
-    height: 0;
-  }
-  35% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-    height: 200px;
-  }
-}
-@keyframes listback {
-  0% {
-    opacity: 1;
-    height: 200px;
-  }
-  50% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 0;
-    height: 0;
-  }
+  height: 190px;
 }
 .servant-list-filter {
   margin: 0 auto;
-  text-align: center;
   height: 100%;
 }
 .servant-list-filter div:first-child {
   background-color: var(--content-bg);
-  border-bottom: 1px solid var(--underline);
   font-weight: 500;
+  color: var(--text-gray);
+  padding-left: 18px;
 }
 .servant-list-filter div:last-child {
   padding: 5px 0;
+  padding-left: 12px;
 }
 .servant-list-filter span {
   display: inline-block;
   padding: 0px 3px;
 }
-.servant-list-filter span > input[type="checkbox"] {
+input[type="checkbox"] {
   position: absolute;
   clip: rect(0, 0, 0, 0);
 }
-.servant-list-filter span > input[type="checkbox"]:checked + ::before {
+input[type="checkbox"]:checked + label::before {
   content: "\2713";
   background-color: var(--theme-primary);
   font-size: 0.8em;
@@ -404,7 +398,8 @@ svg {
   width: 1rem;
   height: 1rem;
 }
-.servant-list-filter span > label::before {
+input[type="checkbox"] + label::before {
+  text-align: center;
   content: "\a0";
   display: inline-block;
   border: 1px solid silver;
@@ -742,6 +737,9 @@ div.blank-item-placeholder {
   width: 4em;
   text-align: right;
 }
+.item-drawer.open {
+  z-index: 3;
+}
 .item-drawer .drawer-content {
   padding-top: 46px;
   background-color: var(--item-bg) !important;
@@ -920,6 +918,9 @@ li.quest .detail {
   .ant-input-search-button {
     height: 35px;
   }
+  .ant-popover-arrow{
+    display: none;
+  }
   input[type="color"],
   input[type="date"],
   input[type="datetime-local"],
@@ -1033,9 +1034,6 @@ li.quest .detail {
   .item-qp {
     justify-content: center;
   }
-  .item-content .item-drawer .drawer-content {
-    padding-top: 76px;
-  }
 }
 
 /*********************** Animation *****************************/
@@ -1073,5 +1071,57 @@ li.quest .detail {
     -webkit-filter: blur(0px);
     filter: blur(0px);
     opacity: 1;
+  }
+}
+@-webkit-keyframes listdrop {
+  0% {
+    opacity: 0;
+    height: 0;
+  }
+  35% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+    height: 190px;
+  }
+}
+@keyframes listdrop {
+  0% {
+    opacity: 0;
+    height: 0;
+  }
+  35% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+    height: 190px;
+  }
+}
+@keyframes listback {
+  0% {
+    opacity: 1;
+    height: 190px;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+    height: 0;
+  }
+}
+@-webkit-keyframes listback {
+  0% {
+    opacity: 1;
+    height: 190px;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+    height: 0;
   }
 }

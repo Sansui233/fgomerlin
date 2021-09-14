@@ -2,13 +2,14 @@ import { useEffect, useState, useCallback, useMemo } from 'react'
 import { Link } from "react-router-dom";
 import { FilterFilled, FilterOutlined, HeartFilled, HeartOutlined, ReloadOutlined, SortAscendingOutlined } from "@ant-design/icons";
 import { FixedSizeList } from 'react-window';
+import { Popover } from 'antd';
 import Search from 'antd/lib/input/Search';
 import ServantItem from './ServantItem';
 import { getServantList, getServantSetting, putSetting } from '../../utils/db';
 import { UserSettingType } from '../../utils/db-type'
 import Emitter, { EvtArgTypes, EvtNames, EvtSources, ServantState } from '../../utils/events'
 import { Pages } from '../../App';
-import { PhantasmCategory, PhantasmColor, ServantClass } from '../../utils/dataset-conf';
+import { PhantasmCategory, PhantasmColor, ServantClass } from "../../utils/dataset-type";
 
 export type Servant = {
   sId: number,
@@ -36,6 +37,7 @@ const initFilter: FilterOption = {
   sPhantasmColor: [],
   sPhantasmCategory: [],
 }
+enum SortOption { 'rareasc', 'raredsc', 'noasc', 'nodsc', 'classasc', 'classdsc' }
 
 export default function ServantList(props: { removeCurrentOnSidebar: () => void }) {
   const [state, setState] = useState({
@@ -43,16 +45,17 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
     isLoaded: false,
     needFollow: false,
     query: "",
-    filter_options: initFilter
+    filter_options: initFilter,
+    sort_option: SortOption.noasc
   })
   const [filterVisible, setfiltervisible] = useState(false)
 
   const reloadFromDB = useCallback(
     async () => {
-      setState(s => { return { servants: s.servants, needFollow: s.needFollow, isLoaded: false, query: "", filter_options: s.filter_options } })
+      setState(s => { return { servants: s.servants, needFollow: s.needFollow, isLoaded: false, query: "", filter_options: s.filter_options, sort_option: SortOption.noasc } })
       const servants = await getServantList()
       console.log(`[ServantList] reload from db successfully. Total ${servants.length} items`)
-      setState(s => { return { servants, needFollow: false, isLoaded: true, query: "", filter_options: initFilter } })
+      setState(s => { return { servants, needFollow: false, isLoaded: true, query: "", filter_options: initFilter, sort_option: SortOption.noasc } })
     },
     [],
   )
@@ -179,16 +182,10 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
     () =>
       ((query: string, servants: Servant[], needFollow: boolean, options: FilterOption): Servant[] => {
         return servants.filter(servant => {
-          if (needFollow === true && servant.isFollow === false) {
-            return false
-          }
-          if (!matchQueryString(servant, query)) {
-            return false
-          }
-          if (!matchQueryOpt(servant, options)) {
-            return false
-          }
-          return true
+          const matchFollow = !(needFollow === true && servant.isFollow === false)
+          const matchQuery = matchQueryString(servant, query)
+          const matchFilterOption = matchQueryOpt(servant, options)
+          return matchFollow && matchQuery && matchFilterOption
         })
       })(state.query, state.servants, state.needFollow, state.filter_options),
     [state.query, state.servants, state.needFollow, state.filter_options]
@@ -212,21 +209,50 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
     })(state.filter_options)
   }, [state.filter_options])
 
+  const sortRenderer = () => {
+    return (
+      <div className='sort-opts'>
+        {Object.keys(SortOption).map(k => {
+          // { 'rareasc', 'raredsc', 'noasc', 'nodsc', 'classasc', 'classdsc' }
+          switch (k) {
+            case 'rareasc':
+              return <li>稀有度升序</li>
+            case 'raredsc':
+              return <li>稀有度降序</li>
+            case 'noasc':
+              return <li>序号升序</li>
+            case 'nodsc':
+              return <li>序号降序</li>
+            case 'classasc':
+              return <li>职阶升序</li>
+            case 'classdsc':
+              return <li>职阶降序</li>
+            default:
+              return null
+          }
+        })}
+      </div>
+    )
+  }
+
   return (
     <div className="servant-list-container">
       <div className="toolbar">
         <Search className="search" placeholder="输入名称或昵称" onChange={searchOnChange} />
         <button className="clear-button" onClick={toggleFilter}>
-          {isFilterSettled ? <FilterFilled className="open"/> : <FilterOutlined className={filterVisible?'open':''}/>}
+          {isFilterSettled ? <FilterFilled className="open" /> : <FilterOutlined className={filterVisible ? 'open' : ''} />}
         </button>
-        <button className="clear-button">
-          <SortAscendingOutlined />
-        </button>
+        <Popover placement="bottom" content={sortRenderer} trigger="click">
+          <button className="clear-button">
+            <SortAscendingOutlined />
+          </button>
+        </Popover>
         <button className="clear-button filter-like-button" onClick={changeFilterFollow}>
           {state.needFollow ? <HeartFilled className="like" /> : <HeartOutlined />}
         </button>
         <button className="clear-button" onClick={reloadFromDB}><ReloadOutlined /></button>
       </div>
+
       <FilterRenderer filterOpt={state.filter_options} setFilteropt={setFilteropt} visible={filterVisible} />
       {state.isLoaded ?
         <FixedSizeList
