@@ -3,7 +3,8 @@ import { EventEmitter } from 'events';
 // used when sharing the same event name in bi-direction communication
 export enum EvtSources {
   ServantSidebar,
-  ServatContent,
+  ServantContent,
+  ItemContent,
 }
 
 export enum EvtNames {
@@ -12,7 +13,7 @@ export enum EvtNames {
 }
 
 export type ServantState = { id: number, isFollow?: boolean, skills?: number[] }
-export type ItemState = { id: number, num: number }
+export type ItemState = { name: string, count: number }
 export type EvtArgTypes = ServantState | ItemState
 
 

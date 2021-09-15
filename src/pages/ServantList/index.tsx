@@ -104,7 +104,7 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
         console.error("Servant list is not initialized")
         return
       }
-      const sIndex = state.servants.findIndex(servant => servant.sId === newState.id)
+      const sIndex = state.servants.findIndex(servant => servant.sId === (newState as ServantState).id)
       const s = state.servants[sIndex]
       const st = newState as ServantState;
       const newServants = [...state.servants];
@@ -212,7 +212,11 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
       opt.sPhantasmCategory.some(phc => {
         return servant.phantasmCategory.some(sphc => sphc === phc)
       })
-    return classMatch && colorMatch && categoryMatch ? true : false
+    const rarityMatch = opt.sRarities.size === 0 ?
+      true
+      :
+      opt.sRarities.has(servant.sRarity)
+    return classMatch && colorMatch && categoryMatch && rarityMatch ? true : false
   }
 
   const filteredServants = useMemo(

@@ -110,7 +110,7 @@ export function putFreeQuest(freequest: TableFreeQuestsRow) {
  * When putting item, you can set id = -1 if you don't know it. Name is always neccessary
  */
 export async function putSetting(id: number, name: string, settingType: UserSettingType, setting: ServantSetting | ItemSetting, calcCells?: Cell[]) {
-  console.time('=====setting time cost=====')
+
   if (typeof (id) == "string") {
     id = parseInt(id, 10) // 即便 TS 会类型检查，也没有办法保证传入的就一定是 number……
   }
@@ -127,13 +127,11 @@ export async function putSetting(id: number, name: string, settingType: UserSett
         db.table(TableNames.calculator).put(calcRow)
         console.debug('cell length', calcCells.length)
       }
-
+      
     }).catch((e: Error) => {
       console.error('[db.ts]', e)
       throw e
-    }).finally(
-      () => console.timeEnd('=====setting time cost=====')
-    )
+    })
 
   } else if (settingType === UserSettingType.Item && !calcCells) {
     // put item setting

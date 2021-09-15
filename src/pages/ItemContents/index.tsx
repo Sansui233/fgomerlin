@@ -4,6 +4,7 @@ import ItemDrawer from '../../components/ItemDrawer';
 import { ICONBASE } from '../../utils/dataset-conf';
 import { getItemList, getItemSetting, putSetting } from '../../utils/db';
 import { ItemType, UserSettingType } from '../../utils/db-type';
+import Emitter, { EvtNames, EvtSources } from '../../utils/events';
 
 export type ItemInfo = {
   id: number,
@@ -49,8 +50,8 @@ export default function ItemContents(props: any) {
     }).then(() => {
       const hash = decodeURI(props.location.hash).slice(1)
       const e = document.getElementById(hash)
-      if(e){
-        e?.scrollIntoView({behavior: "smooth", block: "center"})
+      if (e) {
+        e?.scrollIntoView({ behavior: "smooth", block: "center" })
         setCurrentItem(hash)
         setShowDrawer(true)
       }
@@ -79,6 +80,12 @@ export default function ItemContents(props: any) {
       return
     }
     putSetting(itemstates[i].id, itemstates[i].name, UserSettingType.Item, { count: num })
+      .then(() => {
+        Emitter.dataEmit(EvtNames.ModifyItem, EvtSources.ItemContent, {
+          name: itemstates[i].name,
+          count: num
+        })
+      })
   }
 
   // focus on next item when press enter

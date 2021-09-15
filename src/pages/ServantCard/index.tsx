@@ -111,8 +111,8 @@ export default function ServantCard(props: any) {
   // Subscribe event
   useEffect(() => {
     // event handler
-    function updateFollow(src: EvtSources, newState: EvtArgTypes) {
-      if (src === EvtSources.ServatContent) {
+    const updateFollow = (src: EvtSources, newState: EvtArgTypes) => {
+      if (src === EvtSources.ServantContent) {
         return // ignore events sent by self
       }
       const st = newState as ServantState;
@@ -131,7 +131,7 @@ export default function ServantCard(props: any) {
     putSetting(state.basicInfo.sId, state.basicInfo.sName, UserSettingType.Servant, userSettings).then(() => {
       setstate({ ...state, userSettings })
       // notify sidebar
-      Emitter.dataEmit(EvtNames.ModifyServant, EvtSources.ServatContent, {
+      Emitter.dataEmit(EvtNames.ModifyServant, EvtSources.ServantContent, {
         id: state.basicInfo.sId,
         isFollow: !state.userSettings.isFollow,
       })
@@ -156,7 +156,7 @@ export default function ServantCard(props: any) {
   /**
    * See Servant Setting for skillType 
   */
-  function changeSkill(skill_index: number | 'all', skillType: 'skills' | 'appendSkills') { // 写成高阶函数以保存 index 变量
+  function changeSkill(skill_index: number | 'all', skillType: 'skills' | 'appendSkills') { // 以保存参数信息
     if (typeof skill_index === 'number' && skill_index > 2) {
       console.error(`[ServantCard] skill_index ${skill_index} out of range`)
     }
@@ -181,7 +181,7 @@ export default function ServantCard(props: any) {
         setstate({ ...state, userSettings })
         // Emit Event to sidebar list
         if (skillType === 'skills') {
-          Emitter.dataEmit(EvtNames.ModifyServant, EvtSources.ServatContent, {
+          Emitter.dataEmit(EvtNames.ModifyServant, EvtSources.ServantContent, {
             id: state.basicInfo.sId,
             skills: new_skills.map((skill) => {
               return skill.current
@@ -296,15 +296,11 @@ export default function ServantCard(props: any) {
       default:
         newSettings = {
           ...state.userSettings,
-          ascension: { current: state.userSettings.ascension.current, target: 10 },
+          ascension: { current: 4, target: 4 },
           skills: [
-            { current: state.userSettings.skills[0].current, target: 10 },
-            { current: state.userSettings.skills[1].current, target: 10 },
-            { current: state.userSettings.skills[2].current, target: 10 }],
-          appendSkills: [
-            { current: state.userSettings.appendSkills[0].current, target: 10 },
-            { current: state.userSettings.appendSkills[0].current, target: 10 },
-            { current: state.userSettings.appendSkills[0].current, target: 10 }],
+            { current: 10, target: 10 },
+            { current: 10, target: 10 },
+            { current: 10, target: 10 }]
         }
     }
 
@@ -322,7 +318,7 @@ export default function ServantCard(props: any) {
     ).then(() => {
       setstate(s => { return { ...state, userSettings: newSettings } })
     })
-    Emitter.dataEmit(EvtNames.ModifyServant, EvtSources.ServatContent, {
+    Emitter.dataEmit(EvtNames.ModifyServant, EvtSources.ServantContent, {
       id: state.basicInfo.sId,
       skills: newSettings.skills.map((skill) => {
         return skill.current
