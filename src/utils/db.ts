@@ -5,7 +5,7 @@ import cookies from '../lib/cookies';
 import { ItemInfo } from '../pages/ItemContents';
 import { ServantBasic, ServantDetail } from '../pages/ServantCard';
 import { Servant } from '../pages/ServantList';
-import { Cell } from './calculator';
+import { Cell, composeCalcCells } from './calculator';
 import { parseZipDataset } from './dataset-resolve';
 import { ItemsFormat, ServantFormat } from './dataset-type';
 import {
@@ -278,6 +278,32 @@ export async function getFreeQuest(questName: string): Promise<TableFreeQuestsRo
   return result[0]
 }
 
+export async function reconstructCalctable() {
+  const settings = (await db.table(TableNames.user_setting)
+    .where('type')
+    .equals(UserSettingType.Servant)
+    .toArray()) as TableUserSettingRow[]
+  Promise.all(settings.map(setting => getServantBasic(setting.id))).then(sInfos => {
+    const cellRows: TableCalculatoreRow[] = sInfos.map((info, i) => {
+      if (info.sId !== settings[i].id) {
+        throw new Error(`Info and setting not match error:
+        info: ${info.sId},${info.sName}
+        setting: ${settings[i].id}, ${settings[i].name}`)
+      }
+      return {
+        servantId: info.sId,
+        cells: composeCalcCells({ basicInfo: info, userSettings: mapServantSetting(settings[i]) })
+      }
+    })
+    db.transaction('rw', db.table(TableNames.calculator), async() => {
+      await db.table(TableNames.calculator).clear()
+      cellRows.forEach((r) => {
+        db.table(TableNames.calculator).put(r)
+      })
+    })
+  })
+}
+
 async function mapServantItems(results: TableServantsRow[]): Promise<Servant[]> {
   const queries = results.map(result => db.table(TableNames.user_setting).where("id").equals(result.id).toArray())
   return Promise.all(queries).then((queries_res) => {
@@ -360,8 +386,17 @@ function mapServantDetail(s: TableServantsRow[], settings: TableUserSettingRow[]
   }
 }
 
-function mapServantSetting(results: TableUserSettingRow[]): ServantSetting {
-  const setting = results.length !== 0 ? (results[0].setting as ServantSetting) : undefined;
+/**
+ * 
+ * @param results an array containes up to 1 servant info
+ * @returns 
+ */
+function mapServantSetting(results: TableUserSettingRow[] | TableUserSettingRow): ServantSetting {
+  const setting = results instanceof Array ?
+    (results.length !== 0 ?
+      (results[0].setting as ServantSetting) : undefined
+    )
+    : results.setting as ServantSetting;
   return {
     isFollow: setting ? setting.isFollow : false,
     ascension: {

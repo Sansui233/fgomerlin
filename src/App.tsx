@@ -1,8 +1,8 @@
 import './App.css';
 import 'antd/dist/antd.css';
 
-import { CloudDownloadOutlined, FormatPainterOutlined } from '@ant-design/icons';
-import { ConfigProvider, Menu, message } from 'antd';
+import {BulbOutlined, CalculatorOutlined, CloudDownloadOutlined, MenuOutlined } from '@ant-design/icons';
+import { ConfigProvider, Menu, message, Popover } from 'antd';
 import { Content } from 'antd/lib/layout/layout';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, Redirect, Route, Switch, withRouter } from 'react-router-dom';
@@ -14,6 +14,7 @@ import ServantCard from './pages/ServantCard';
 import ServantList from './pages/ServantList';
 import Statistic from './pages/Statistic';
 import { parseZipDataset } from './utils/dataset-resolve';
+import { reconstructCalctable } from './utils/db';
 
 
 export const Pages = {
@@ -67,8 +68,8 @@ function App(props: any) {
   async function handleClickFetch() {
     return parseZipDataset().then(() => {
       message.success({
-        content:'更新数据成功',
-        className: state.isDark?'message-restyle-dark': '',
+        content: '更新数据成功',
+        className: state.isDark ? 'message-restyle-dark' : '',
       });
       console.log("[App.tsx] DONE database updated");
       setTimeout(() => {
@@ -76,8 +77,8 @@ function App(props: any) {
       }, 500)
     }).catch((err) => {
       message.error({
-        content:'获取远程数据失败, 错误信息：' + err,
-        className: state.isDark?'message-restyle-dark': '',
+        content: '获取远程数据失败, 错误信息：' + err,
+        className: state.isDark ? 'message-restyle-dark' : '',
       })
     })
   }
@@ -116,6 +117,24 @@ function App(props: any) {
       servantSiderEl.current.classList.remove('current-page')
     }
   }
+
+  const moreOptionRender = () => {
+    return (
+      <div className="popover-menu-opts popover-opts">
+        <li onClick={reCalc}><CalculatorOutlined />重建计算器</li>
+      </div>
+    )
+  }
+
+  function reCalc() {
+    reconstructCalctable().then(
+      message.success({ content: '重建计算器成功', className: state.isDark ? 'message-restyle-dark' : ''})
+    ).catch(e => {
+      console.error(e)
+      message.error({ content: '重建计算器失败，错误信息:' + e, className: state.isDark ? 'message-restyle-dark' : ''})
+    })
+  }
+
   return (
     <ConfigProvider getPopupContainer={() => document.getElementById('popover-anchor')!}>
       <div className={state.isDark ? "app dark" : "app light"}>
@@ -130,10 +149,15 @@ function App(props: any) {
             <Link to={`/${Pages.statistic}`}>统计</Link>
           </Menu.Item>
           <Menu.Item style={{ marginLeft: "auto" }} key="theme" className="menu-button">
-            <button className="clear-button" onClick={switchTheme}><FormatPainterOutlined /></button>
+            <button className="clear-button" onClick={switchTheme}><BulbOutlined /></button>
           </Menu.Item>
-          <Menu.Item style={{ marginRight: "10px" }} key="fetch-data" className="menu-button">
+          <Menu.Item key="fetch-data" className="menu-button">
             <button className="clear-button" onClick={handleClickFetch}><CloudDownloadOutlined /></button>
+          </Menu.Item>
+          <Menu.Item style={{ marginRight: "10px" }} key="more" className="menu-button">
+            <Popover placement="bottom" content={moreOptionRender} trigger="click">
+              <button className="clear-button" ><MenuOutlined /></button>
+            </Popover>
           </Menu.Item>
         </Menu>
         <div className="app-content">
