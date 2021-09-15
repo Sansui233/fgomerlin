@@ -36,7 +36,7 @@ async function fetchTextDataSet(): Promise<{ [key: string]: JSZip.JSZipObject; }
 
 export async function parseZipDataset() {
   const files = await fetchTextDataSet()
-  message.info({ content: '正在写入数据...', duration: 1.5, className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : '' })
+  message.info({ content: '正在导入数据...', duration: 1.5, className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : '' })
   console.debug('[dataset-resolve] parsing files...')
   for (const filename of Object.keys(files)) {
     console.debug('[dataset-resolve] parsing', filename)

@@ -377,7 +377,7 @@ export default function ServantCard(props: any) {
               <section className="servant-card-setting-list">
                 <p className="list-item-indentation list-title">技能强化
                   <Popover
-                    placement="bottom"
+                    placement="top"
                     title='快速设定'
                     trigger='click'
                     content={<QuickSkillSetRenderer
@@ -389,7 +389,7 @@ export default function ServantCard(props: any) {
                     <span className="sevant-card-quickset-skill right"><Slider /></span>
                   </Popover>
                   <Popover
-                    placement="bottom"
+                    placement="top"
                     title='快速设定'
                     trigger='click'
                     content={<QuickSkillSetRenderer
@@ -418,7 +418,7 @@ export default function ServantCard(props: any) {
               <section className="servant-card-setting-list">
                 <p className="list-item-indentation list-title">附加技能
                   <Popover
-                    placement="bottom"
+                    placement="top"
                     title='快速设定'
                     trigger='click'
                     content={
@@ -432,7 +432,7 @@ export default function ServantCard(props: any) {
                     <span className="sevant-card-quickset-skill right"><Slider /></span>
                   </Popover>
                   <Popover
-                    placement="bottom"
+                    placement="top"
                     title='快速设定'
                     trigger='click'
                     content={

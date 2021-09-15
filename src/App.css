@@ -568,6 +568,7 @@ p.servant-item-info-other {
   flex: 0 0 auto;
   max-width: 6em;
   color: var(--text-gray);
+  cursor: default;
 }
 .servant-item-like {
   flex: 0 0 auto;

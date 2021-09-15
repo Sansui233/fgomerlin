@@ -121,17 +121,22 @@ function App(props: any) {
   const moreOptionRender = () => {
     return (
       <div className="popover-menu-opts popover-opts">
-        <li onClick={reCalc}><CalculatorOutlined />重建计算器</li>
+        <li onClick={reCalc}><CalculatorOutlined />重新统计</li>
       </div>
     )
   }
 
   function reCalc() {
-    reconstructCalctable().then(
-      message.success({ content: '重建计算器成功', className: state.isDark ? 'message-restyle-dark' : ''})
-    ).catch(e => {
+    reconstructCalctable().then( () => {
+      message.success({ content: '统计成功', className: state.isDark ? 'message-restyle-dark' : ''})
+      if(window.location.pathname.includes(Pages.statistic)){
+        setTimeout(() => {
+          window.location.reload()
+        }, 500)
+      }
+    }).catch(e => {
       console.error(e)
-      message.error({ content: '重建计算器失败，错误信息:' + e, className: state.isDark ? 'message-restyle-dark' : ''})
+      message.error({ content: '统计失败，错误信息:' + e, className: state.isDark ? 'message-restyle-dark' : ''})
     })
   }
 
