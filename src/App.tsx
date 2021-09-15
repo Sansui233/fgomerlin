@@ -66,13 +66,19 @@ function App(props: any) {
 
   async function handleClickFetch() {
     return parseZipDataset().then(() => {
-      message.success('更新数据成功');
+      message.success({
+        content:'更新数据成功',
+        className: state.isDark?'message-restyle-dark': '',
+      });
       console.log("[App.tsx] DONE database updated");
       setTimeout(() => {
         window.location.reload()
       }, 500)
     }).catch((err) => {
-      message.error('获取远程数据失败\n 错误信息：' + err)
+      message.error({
+        content:'获取远程数据失败, 错误信息：' + err,
+        className: state.isDark?'message-restyle-dark': '',
+      })
     })
   }
 

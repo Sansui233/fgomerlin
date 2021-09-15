@@ -1,6 +1,7 @@
 import { message } from "antd";
 import axios from "axios";
 import JSZip from "jszip"
+import cookies from "../lib/cookies";
 import { DATASET_TEXT } from "./dataset-conf";
 import { DataSetFormat, GlpkFormat } from "./dataset-type";
 import { db, putFreeQuest, putGlpkObj, putItem, putServant, putVersion } from "./db";
@@ -10,7 +11,7 @@ import { TableGlpkRow, TableNames } from "./db-type";
 async function fetchTextDataSet(): Promise<{ [key: string]: JSZip.JSZipObject; }> {
   const msgKey = 'download'
   console.log("[dataset-resolve] getting text pack...")
-  const hide = message.loading({ content: '正在获取最新数据...', key: msgKey, duration: 0 })
+  const hide = message.loading({ content: '正在获取最新数据...', key: msgKey, duration: 0,className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : ''})
   try {
     const response = await axios({
       method: 'get',
@@ -19,11 +20,13 @@ async function fetchTextDataSet(): Promise<{ [key: string]: JSZip.JSZipObject; }
       onDownloadProgress: (progressEvent) => {
         const total = (progressEvent.total / 1048576).toFixed(1)
         const loaded = (progressEvent.loaded / 1048576).toFixed(1)
-        message.loading({ content: `正在获取最新数据 ${loaded}MB/${total}MB`, key: msgKey, duration: 0 })
+        message.loading({
+          content: `正在获取最新数据 ${loaded}MB/${total}MB`, key: msgKey, duration: 0, className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : ''
+        })
       }
     })
     const zipData = await JSZip.loadAsync(response.data);
-    message.success({ content: '下载完成', key: msgKey, duration: 1 })
+    message.success({ content: '下载完成', key: msgKey, duration: 1, className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : '', })
     return zipData.files;
   } catch (error) {
     hide()
@@ -33,7 +36,7 @@ async function fetchTextDataSet(): Promise<{ [key: string]: JSZip.JSZipObject; }
 
 export async function parseZipDataset() {
   const files = await fetchTextDataSet()
-  message.info({ content: '正在写入数据...', duration: 1.5 })
+  message.info({ content: '正在写入数据...', duration: 1.5, className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : '' })
   console.debug('[dataset-resolve] parsing files...')
   for (const filename of Object.keys(files)) {
     console.debug('[dataset-resolve] parsing', filename)

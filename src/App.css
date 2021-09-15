@@ -13,6 +13,12 @@ body::-webkit-scrollbar {
   height: 100%;
 }
 
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #292929 !important;
+  }
+}
+
 .light {
   --sider-bg: #f0f0f0;
   --sider-bg-darker: #eaeaea;
@@ -333,6 +339,32 @@ svg {
   padding: 0;
 }
 
+.app .ant-select-dropdown {
+  color: var(--text-primary);
+  background-color: var(--item-bg);
+}
+
+.app .ant-select-item {
+  color: var(--text-primary);
+}
+
+.app .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background-color: var(--content-header-bg);
+}
+
+.app .ant-checkbox-inner {
+  background-color: var(--item-bg);
+  border-color: var(--text-gray-lighter);
+}
+
+.ant-message .message-restyle-dark {
+  color: #ddd;
+}
+
+.ant-message .message-restyle-dark .ant-message-notice-content{
+  background-color: #313131;
+}
+
 /***********************************************************
 ***********************************************************
 ************************ Servant List *********************
@@ -438,7 +470,7 @@ input[type="checkbox"] + label::before {
   text-align: center;
   content: "\a0";
   display: inline-block;
-  border: 1px solid silver;
+  border: 1px solid var(--text-gray-lighter);
   width: 1em;
   height: 1em;
   font-weight: bold;
@@ -613,6 +645,7 @@ p.servant-item-info-other {
 .sevant-card-quickset-skill {
   float: right;
   font-size: 1rem;
+  cursor: pointer;
 }
 .sevant-card-quickset-skill svg {
   opacity: 0.4;
@@ -878,9 +911,9 @@ div.blank-item-placeholder {
 }
 .item-drawer .drawer-title > h3 > span {
   font-size: 0.75em;
-    font-weight: normal;
-    padding-left: .5em;
-    color: var(--text-gray);
+  font-weight: normal;
+  padding-left: 0.5em;
+  color: var(--text-gray);
 }
 .item-drawer .close-button {
   width: 2em;

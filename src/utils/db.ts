@@ -1,5 +1,6 @@
 import { message } from 'antd';
 import Dexie from 'dexie';
+import cookies from '../lib/cookies';
 
 import { ItemInfo } from '../pages/ItemContents';
 import { ServantBasic, ServantDetail } from '../pages/ServantCard';
@@ -46,12 +47,12 @@ export function initdb() {
     [TableNames.freequests]: FREEQUESTS_TABLE
   }).upgrade(async trans => {
     Dexie.ignoreTransaction(() => {
-      message.info("正在更新数据", 5)
+      message.info({ content: "正在更新数据", className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : '', })
       parseZipDataset().then(() => {
-        message.success(`数据版本已更新至${version}, 刷新后生效`)
+        message.success({ content: `数据版本已更新至${version}, 刷新后生效`, className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : '' })
         console.log('[db.ts] database upgraded to ' + version)
       }).catch((e) => {
-        message.error("数据版本未更新，错误信息：" + e + ".请尝试点击右上角更新", 5)
+        message.error({ content: "数据版本未更新，错误信息：" + e + ".请尝试点击右上角更新", className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : '' }, 5)
         throw e
       })
     })
@@ -62,13 +63,13 @@ export function initdb() {
     Dexie.ignoreTransaction(() => {
       // Init your DB with some default statuses:
       parseZipDataset().then(() => {
-        message.success("数据导入成功")
+        message.success({ content: "数据导入成功", className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : '' })
         console.log("[db.ts] Database is successfully created")
         setTimeout(() => {
           window.location.reload()
         }, 500)
       }).catch((e) => {
-        message.error("数据未初始化，错误信息：" + e)
+        message.error({ content: "数据未初始化，错误信息：" + e, className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : '' })
       })
     })
   });
@@ -120,14 +121,14 @@ export async function putSetting(id: number, name: string, settingType: UserSett
 
       const row: TableUserSettingRow = { id, name, type: settingType, setting }
       db.table(TableNames.user_setting).put(row)
-      
-      if(calcCells !== undefined){
+
+      if (calcCells !== undefined) {
         const calcRow: TableCalculatoreRow = { servantId: id, cells: calcCells }
         db.table(TableNames.calculator).where('servantId').equals(id).delete()
         db.table(TableNames.calculator).put(calcRow)
         console.debug('cell length', calcCells.length)
       }
-      
+
     }).catch((e: Error) => {
       console.error('[db.ts]', e)
       throw e
