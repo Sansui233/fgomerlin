@@ -104,8 +104,8 @@ export default function Statistic() {
           <img className="small" src={`${ICONBASE}/QP.png`} alt="qp" />
           <span>QP</span>
           <div style={{ textAlign: 'left' }}>
-            <span>所需：{qpNeeded()}<br /></span>
-            <span>剩余：<span className={qpLeft() < 0 ? 'insufficient' : ''}>{qpLeft()}</span></span>
+            <span>所需：{qpNeeded().toLocaleString()}<br /></span>
+            <span>剩余：<span className={qpLeft() < 0 ? 'insufficient' : ''}>{qpLeft().toLocaleString()}</span></span>
           </div>
         </div>
         <ItemStat showDrawer={showDrawer} title="铜素材" items={filter(2, 1)} isInsufficientOnly={viewState.isInsufficientOnly} />

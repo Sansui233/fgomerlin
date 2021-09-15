@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import ItemDrawer from '../../components/ItemDrawer';
 import { ICONBASE } from '../../utils/dataset-conf';
@@ -33,15 +33,35 @@ export default function ItemContents(props: any) {
   }
 
   const [itemstates, setitemstate] = useState(initstate)
-  const [qpstate, setqpstate] = useState(0)
+  const [qpstate, setqpstate] = useState('0')
   const [isShowDrawer, setShowDrawer] = useState(false)
   const [currentItem, setCurrentItem] = useState("")
+  const setqpWrapper = useCallback(
+    (qpnum: number) => {
+      const qpstr = String(qpnum)
+      let result = ''
+      let i = 0
+      while (3 * i < qpstr.length) {
+        if(i === 0){
+          console.log('qpstr', qpstr)
+          result = qpstr.slice(-3 * (i+1))
+        }else {
+          result = qpstr.slice(-3 * (i+1), -3 * i) + ',' + result
+        }
+        i++
+      }
+      console.log('qp result', result)
+      if (result === '') result = '0'
+      setqpstate(result)
+    },
+    [setqpstate],
+  )
 
   useEffect(() => {
     getItemSetting('QP').then((item) => {
-      setqpstate(item.setting.count)
+      setqpWrapper(item.setting.count)
     })
-  }, [])
+  }, [setqpWrapper])
 
   // Component on mount
   useEffect(() => {
@@ -110,19 +130,21 @@ export default function ItemContents(props: any) {
   // Only number is accepted
   function handleQpOnChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.value === "") {
-      setqpstate(0)
+      setqpWrapper(0)
       return
     }
-    const num = parseInt(e.target.value)
+    const v = e.target.value.split(',').join('')
+    const num = parseInt(v)
     if (isNaN(num)) {
       return
     }
-    setqpstate(num)
+    setqpWrapper(num)
   }
 
   // submit data to database
   function handleQPpOnBlur(e: React.FocusEvent<HTMLInputElement>) {
-    const num = parseInt(e.target.value)
+    const v = e.target.value.split(',').join('')
+    const num = parseInt(v)
     putSetting(-1, 'QP', UserSettingType.Item, { count: num })
   }
 

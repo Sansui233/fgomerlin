@@ -18,16 +18,21 @@ import { parseZipDataset } from './utils/dataset-resolve';
 
 export const Pages = {
   // For router
-  servantList: "servants",
-  itemList: "items",
-  statistic: "statistic",
+  servantList: "servants" as const,
+  itemList: "items" as const,
+  statistic: "statistic" as const,
+  itemCategory: {
+    materials: 'materials' as const,
+    stones: 'stones' as const,
+    chess: 'chess' as const
+  },
   // Not for router
   servantContent: "content",
   itemContent: "item-content",
 }
 
-let navCurrent = Pages.servantList // header selection controller
-let pageCurrent = Pages.servantList // class controller
+let navCurrent: string = Pages.servantList // header selection controller
+let pageCurrent: string = Pages.servantList // class controller
 
 function App(props: any) {
   const servantSiderEl = useRef<HTMLDivElement>(null);
