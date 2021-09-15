@@ -1,8 +1,11 @@
-import { ControlOutlined, HeartFilled, HeartOutlined, LinkOutlined } from '@ant-design/icons';
+import { HeartFilled, HeartOutlined, LinkOutlined } from '@ant-design/icons';
 import { Popover } from 'antd';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import ArrowUp from '../../assets/icons/arrow-up.svg';
+import { ReactComponent as Slider } from '../../assets/icons/sliders-h-solid.svg'
+import { ReactComponent as Eraser } from '../../assets/icons/eraser-solid.svg'
+import { ReactComponent as DoubleUp } from '../../assets/icons/angle-double-up-solid.svg'
 import SkillDrawer from '../../components/SkillDrawer';
 import { ascensionGenerator, composeCalcCells } from '../../utils/calculator';
 import { ICONBASE } from '../../utils/dataset-conf';
@@ -276,6 +279,57 @@ export default function ServantCard(props: any) {
     changeSkill('all', skillType)(undefined, undefined, paramsSet)
   }
 
+  function quickSetAll(opt: 'clear' | 'top') {
+    let newSettings: ServantSetting
+    const sInfo = state.basicInfo
+    switch (opt) {
+      case 'clear':
+        newSettings = {
+          ...state.userSettings,
+          ascension: { current: 0, target: 0 },
+          finalLevel: { current: 0, target: 0 },
+          skills: [{ current: 1, target: 1 }, { current: 1, target: 1 }, { current: 1, target: 1 }],
+          appendSkills: [{ current: 0, target: 0 }, { current: 0, target: 0 }, { current: 0, target: 0 }],
+        }
+        break;
+      case 'top':
+      default:
+        newSettings = {
+          ...state.userSettings,
+          ascension: { current: state.userSettings.ascension.current, target: 10 },
+          skills: [
+            { current: state.userSettings.skills[0].current, target: 10 },
+            { current: state.userSettings.skills[1].current, target: 10 },
+            { current: state.userSettings.skills[2].current, target: 10 }],
+          appendSkills: [
+            { current: state.userSettings.appendSkills[0].current, target: 10 },
+            { current: state.userSettings.appendSkills[0].current, target: 10 },
+            { current: state.userSettings.appendSkills[0].current, target: 10 }],
+        }
+    }
+
+    const cells = composeCalcCells({
+      basicInfo: sInfo,
+      userSettings: newSettings,
+    })
+
+    putSetting(
+      sInfo.sId,
+      sInfo.sName,
+      UserSettingType.Servant,
+      newSettings,
+      cells,
+    ).then(() => {
+      setstate(s => { return { ...state, userSettings: newSettings } })
+    })
+    Emitter.dataEmit(EvtNames.ModifyServant, EvtSources.ServatContent, {
+      id: state.basicInfo.sId,
+      skills: newSettings.skills.map((skill) => {
+        return skill.current
+      })
+    })
+  }
+
   return (
     <div className="servant-card-container">
       <div className={drawer.visible ? "servant-card masked" : "servant-card"}>
@@ -299,9 +353,18 @@ export default function ServantCard(props: any) {
           state.basicInfo.sObtain === "无法召唤" || state.basicInfo.sObtain === "无法获得" ? ''
             :
             (<React.Fragment>
+              <div className="toolbar">
+                <span onClick={() => quickSetAll('clear') } >
+                  <Eraser style={{marginRight: '2px'}}/>
+                  <span>重置</span>
+                </span>
+                <span onClick={() => quickSetAll('top')} >
+                  <DoubleUp />
+                  <span>满破</span>
+                </span>
+              </div>
               <section className="servant-card-setting-list">
-                <p className="list-item-indentation list-title">
-                  等级提升</p>
+                <p className="list-item-indentation list-title">等级提升</p>
                 <div className="servant-card-setting-list-item list-item-indentation"
                   onClick={() => { showDrawer('', 'ascension') }}>
                   <img src={ArrowUp} alt="再临" className="servant-card-icon" />
@@ -326,7 +389,7 @@ export default function ServantCard(props: any) {
                       }}
                     />}
                   >
-                    <ControlOutlined className="sevant-card-quickset-skill right" />
+                    <span className="sevant-card-quickset-skill right"><Slider /></span>
                   </Popover>
                   <Popover
                     placement="bottom"
@@ -337,7 +400,7 @@ export default function ServantCard(props: any) {
                       }}
                     />}
                   >
-                    <ControlOutlined className="sevant-card-quickset-skill left" />
+                    <span className="sevant-card-quickset-skill left"><Slider /></span>
                   </Popover>
                 </p>
                 {state.basicInfo.activeSkills.map((as, index) => {
@@ -367,7 +430,7 @@ export default function ServantCard(props: any) {
                         }}
                       />}
                   >
-                    <ControlOutlined className="sevant-card-quickset-skill right" />
+                    <span className="sevant-card-quickset-skill right"><Slider /></span>
                   </Popover>
                   <Popover
                     placement="bottom"
@@ -380,7 +443,7 @@ export default function ServantCard(props: any) {
                         }}
                       />}
                   >
-                    <ControlOutlined className="sevant-card-quickset-skill left" />
+                    <span className="sevant-card-quickset-skill left"><Slider /></span>
                   </Popover>
                 </p>
                 {state.basicInfo.appendedSkills.map((skill, index) => {

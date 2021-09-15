@@ -42,11 +42,13 @@ type FilterOption = {
   sClass: string[],
   sPhantasmColor: PhantasmColor[] // Quick Art Buster TODO should use Set instead of Array
   sPhantasmCategory: PhantasmCategory[], // 全体 单体 辅助
+  sRarities: Set<number> // 1,2,3,4,5
 }
 const initFilter: FilterOption = {
   sClass: [],
   sPhantasmColor: [],
   sPhantasmCategory: [],
+  sRarities: new Set()
 }
 
 const sortOptions = ['rareasc', 'raredsc', 'noasc', 'nodsc', 'classasc', 'classdsc'] as const
@@ -338,14 +340,15 @@ function FilterRenderer(props: { filterOpt: FilterOption, setFilteropt: (opt: Fi
   { '骑': "Rider" }, { '杀': "Assassin" }, { '术': "Caster" }, { '狂': "Berserker" }, { '其他': "Other" }]
   const phantasmColor: ColorMap[] = [{ 'Quick': "Quick" }, { 'Arts': 'Arts' }, { 'Buster': 'Buster' }]
   const phantasmCategory: CategoryMap[] = [{ '全体': '全体' }, { '单体': '单体' }, { '辅助': '辅助' }]
+  const rarities = [5, 4, 3, 2, 1]
 
-  const toggle = (type: 'c' | 'ph' | 'phc', val: string | PhantasmColor | PhantasmCategory) => {
+  const toggle = (type: 'c' | 'ph' | 'phc' | 'rar', val: string | PhantasmColor | PhantasmCategory | number) => {
     switch (type) {
       case 'c':
         const newC = [...props.filterOpt.sClass]
-        const i = newC.indexOf(val)
+        const i = newC.indexOf(val as string)
         if (i === -1) {
-          newC.push(val)
+          newC.push(val as string)
         }
         else {
           newC.splice(i, 1)
@@ -374,6 +377,16 @@ function FilterRenderer(props: { filterOpt: FilterOption, setFilteropt: (opt: Fi
         }
         props.setFilteropt({ ...props.filterOpt, sPhantasmCategory: newNc })
         break;
+      case 'rar':
+        const newRar = new Set(props.filterOpt.sRarities)
+        const v = val as number
+        if (newRar.has(v)) {
+          newRar.delete(v)
+        } else {
+          newRar.add(v)
+        }
+        props.setFilteropt({ ...props.filterOpt, sRarities: newRar })
+        break;
       default:
         break;
     }
@@ -398,6 +411,24 @@ function FilterRenderer(props: { filterOpt: FilterOption, setFilteropt: (opt: Fi
                 </span>
               )
             })}</div>
+        </section>
+        <section>
+          <div>稀有度</div>
+          <div>
+            {rarities.map(r => {
+              const showName = 'rarity' + r
+              return (
+                <span key={r}>
+                  <input type="checkbox"
+                    id={showName}
+                    checked={props.filterOpt.sRarities.has(r)}
+                    onChange={() => toggle('rar', r)}
+                  />
+                  <label htmlFor={showName}><span>{r}星</span></label>
+                </span>
+              )
+            })}
+          </div>
         </section>
         <section>
           <div>宝具颜色</div>

@@ -248,6 +248,7 @@ svg {
   color: var(--text-gray);
   cursor: pointer;
 }
+
 .servant-list-container .toolbar > button > span {
   vertical-align: middle;
   transform: translateY(-1px);
@@ -397,7 +398,7 @@ a:hover .sidebar-item-container {
 .servant-list-filter-container.open {
   z-index: 2;
   opacity: 1;
-  max-height: 190px;
+  max-height: 300px;
 }
 .servant-list-filter-container::-webkit-scrollbar {
   display: none;
@@ -581,28 +582,56 @@ p.servant-item-info-other {
 .servant-card-like:hover svg {
   color: var(--icon-pink);
 }
-.sevant-card-quickset-skill{
+.servant-card-container .toolbar {
+  text-align: right;
+  margin-top: 5px;
+}
+.servant-card-container .toolbar > span {
+  font-size: 0.85rem;
+  color: var(--text-gray);
+  padding: 0 6px;
+  vertical-align: middle;
+  cursor: pointer;
+}
+.servant-card-container .toolbar > span > span {
+  vertical-align: middle;
+  padding-left: 2px;
+}
+.servant-card-container .toolbar > span svg {
+  vertical-align: middle;
+  font-size: 1.25rem;
+  opacity: 0.6;
+}
+.servant-card-container .toolbar span:hover {
+  color: var(--theme-primary);
+}
+.servant-card-container .toolbar span:hover svg{
+  color: var(--theme-primary);
+  opacity: 1;
+}
+.sevant-card-quickset-skill {
   float: right;
-  font-size: 22px;
+  font-size: 1rem;
 }
 .sevant-card-quickset-skill svg {
-  opacity: .4;
+  opacity: 0.4;
+  width: 1em;
+  height: 1em;
 }
-.sevant-card-quickset-skill:hover svg{
+.sevant-card-quickset-skill:hover svg {
   opacity: 1;
   color: var(--theme-primary);
 }
 .sevant-card-quickset-skill.left {
   padding: 0 10px;
-  margin-right: 48px;
+  margin-right: 54px;
 }
 .sevant-card-quickset-skill.right {
   padding: 0 10px;
   margin-right: 15px;
-
 }
 .servant-card-setting-list {
-  margin: 33px 0;
+  margin-bottom: 33px;
 }
 p.list-title {
   color: var(--text-gray);
@@ -1063,6 +1092,7 @@ li.quest .detail {
   .servant-card-container {
     margin-left: unset;
   }
+  
   .sidebar-item-hover-layer {
     border-radius: 0;
   }
