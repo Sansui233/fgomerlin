@@ -379,6 +379,7 @@ export default function ServantCard(props: any) {
                   <Popover
                     placement="bottom"
                     title='快速设定'
+                    trigger='click'
                     content={<QuickSkillSetRenderer
                       setFunc={(num: 310 | 999 | 666 | 444 | 111 | 0) => {
                         quickSetSkill(num, 'target', 'skills')
@@ -390,6 +391,7 @@ export default function ServantCard(props: any) {
                   <Popover
                     placement="bottom"
                     title='快速设定'
+                    trigger='click'
                     content={<QuickSkillSetRenderer
                       setFunc={(num: 310 | 999 | 666 | 444 | 111 | 0) => {
                         quickSetSkill(num, 'current', 'skills')
@@ -418,6 +420,7 @@ export default function ServantCard(props: any) {
                   <Popover
                     placement="bottom"
                     title='快速设定'
+                    trigger='click'
                     content={
                       <QuickSkillSetRenderer
                         isAppend={true}
@@ -431,6 +434,7 @@ export default function ServantCard(props: any) {
                   <Popover
                     placement="bottom"
                     title='快速设定'
+                    trigger='click'
                     content={
                       <QuickSkillSetRenderer
                         isAppend={true}
