@@ -67,9 +67,14 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: var(--text-primary);
-  opacity: .85Ø;
+  opacity: 0.85ø;
 }
 
 .text-gray {
@@ -186,6 +191,7 @@ p {
 .content {
   height: 100%;
 }
+
 button {
   background-color: var(--item-bg);
   /* transition: background-color .3s;*/
@@ -236,6 +242,20 @@ svg {
   font-size: 20px;
   -webkit-transform: translateY(3px);
   transform: translateY(3px);
+}
+
+.bgimg {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  opacity: 0.6;
+  transform: rotate(-35deg) translateY(85px) translateX(80px) scale(1.2);
+  mix-blend-mode: multiply;
+  opacity: 0.2;
+}
+.dark .bgimg {
+  mix-blend-mode: screen;
+  opacity: 0.05;
 }
 
 .servant-list-container {
@@ -371,7 +391,7 @@ svg {
   color: #ddd;
 }
 
-.ant-message .message-restyle-dark .ant-message-notice-content{
+.ant-message .message-restyle-dark .ant-message-notice-content {
   background-color: #313131;
 }
 .app-info-modal-content {
@@ -464,7 +484,7 @@ a:hover .sidebar-item-container {
 }
 .servant-list-filter span {
   display: inline-block;
-  padding: 0px 3px;
+  padding-right: 3px;
 }
 input[type="checkbox"] {
   position: absolute;
@@ -473,22 +493,23 @@ input[type="checkbox"] {
 input[type="checkbox"]:checked + label::before {
   content: "\2713";
   background-color: var(--theme-primary);
-  font-size: 0.8em;
-  line-height: 0.9rem;
+  width: 1em;
+  height: 1em;
+  font-size: 1em;
+  line-height: 0.8rem;
   color: white;
-  width: 1rem;
-  height: 1rem;
 }
 input[type="checkbox"] + label::before {
   text-align: center;
   content: "\a0";
   display: inline-block;
   border: 1px solid var(--text-gray-lighter);
+  background-color: var(--item-bg);
   width: 1em;
   height: 1em;
   font-weight: bold;
   vertical-align: text-bottom;
-  margin-right: 0px;
+  margin-right: 2px;
   margin-bottom: 1px;
 }
 .servant-list-filter span > label {
@@ -532,7 +553,7 @@ input[type="checkbox"] + label::before {
   color: var(--theme-primary);
 }
 
-.popover-opts > li  svg {
+.popover-opts > li svg {
   font-size: 1rem;
   margin-right: 5px;
   margin-bottom: -2px;
@@ -1126,7 +1147,7 @@ li.quest .detail {
   }
   .app .ant-select-selection-item {
     font-size: 1rem;
-}
+  }
   .app-content {
     width: 100%;
   }
@@ -1158,6 +1179,7 @@ li.quest .detail {
     width: 100vw !important;
     z-index: 1;
   }
+
   .servant-card-container {
     margin-left: unset;
   }

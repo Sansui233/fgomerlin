@@ -1,4 +1,3 @@
-import { Checkbox } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 import ItemDrawer from '../../components/ItemDrawer';
@@ -97,7 +96,11 @@ export default function Statistic() {
       <div className="statistic-content">
         <div className="statistic-toolbar">
           <div className="statistic-toolbar-content">
-            <Checkbox checked={viewState.isInsufficientOnly} onChange={handleSetView} /> 仅显示不足
+            <input type="checkbox"
+              id='insufficient'
+              checked={viewState.isInsufficientOnly}
+              onChange={handleSetView} />
+            <label htmlFor='insufficient'><span>仅显示不足</span></label>
           </div>
         </div>
         <div className="stats-qp">

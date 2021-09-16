@@ -17,6 +17,7 @@ import { parseZipDataset } from './utils/dataset-resolve';
 import { getAllSettings, putAllSettings, reconstructCalctable } from './utils/db';
 import { TableUserSettingRow, UserSettingType } from './utils/db-type';
 import AppInfoModal from './components/AppInfoModal';
+import bgimg from './assets/imgs/merlin-line.png'
 
 
 export const Pages = {
@@ -242,6 +243,7 @@ function App(props: any) {
               </aside>
               <Content className={state.pageCurrent === Pages.servantContent ? "content current-page" : "content"}>
                 <Route path={`/${Pages.servantList}/:id`} component={ServantCard} />
+                {window.location.pathname===`/${Pages.servantList}`?<img src={bgimg} alt='' className='bgimg'/>:''}
               </Content>
             </Route>
             <Route path={`/${Pages.itemList}`}>
