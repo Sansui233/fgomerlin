@@ -38,7 +38,7 @@ body::-webkit-scrollbar {
   --theme-primary: #1890ff;
   --icon-gray: #8d8d8d;
   --icon-pink: #ff5757;
-  --box-shadow: rgba(0, 0, 0, 0.07058823529411765);
+  --box-shadow: rgba(0, 0, 0, 0.07);
 }
 .dark {
   --item-bg: #313131;
@@ -67,12 +67,18 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary);
+  opacity: .85Ø;
+}
+
 .text-gray {
   color: var(--text-gray);
 }
 .clear-button {
   border: unset;
   background-color: unset;
+  cursor: pointer;
 }
 img {
   object-fit: scale-down;
@@ -148,7 +154,7 @@ p {
 
 .app-menu {
   height: 46px;
-  z-index: 99;
+  z-index: 8;
   position: fixed;
   width: 100%;
   top: 0;
@@ -368,7 +374,10 @@ svg {
 .ant-message .message-restyle-dark .ant-message-notice-content{
   background-color: #313131;
 }
-
+.app-info-modal-content {
+  background-color: var(--item-bg);
+  color: var(--text-primary);
+}
 /***********************************************************
 ***********************************************************
 ************************ Servant List *********************

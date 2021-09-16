@@ -62,7 +62,9 @@ export function initdb() {
   db.on("populate", function () {
     Dexie.ignoreTransaction(() => {
       // Init your DB with some default statuses:
-      parseZipDataset().then(() => {
+      parseZipDataset().then(()=>{
+        return reconstructCalctable()
+      }).then(() => {
         message.success({ content: "数据导入成功", className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : '' })
         console.log("[db.ts] Database is successfully created")
         setTimeout(() => {
@@ -77,6 +79,9 @@ export function initdb() {
 
 export async function putVersion(dataVer: string) {
   await db.table(TableNames.src_info).put({ dataversion: dataVer })
+}
+export async function getVersion() {
+  return (await db.table(TableNames.src_info).toArray())[0].dataversion
 }
 
 export function putServant(id: number, name: string, detail: ServantFormat) {

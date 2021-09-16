@@ -1,7 +1,7 @@
 import 'antd/dist/antd.css';
 import './App.css';
 
-import { BulbOutlined, CalculatorOutlined, CloudDownloadOutlined, ExportOutlined, ImportOutlined, MenuOutlined } from '@ant-design/icons';
+import { BulbOutlined, CalculatorOutlined, CloudDownloadOutlined, ExportOutlined, ImportOutlined, InfoCircleOutlined, MenuOutlined } from '@ant-design/icons';
 import { ConfigProvider, Menu, message, Popover } from 'antd';
 import { Content } from 'antd/lib/layout/layout';
 import React, { useEffect, useRef, useState } from 'react';
@@ -16,6 +16,7 @@ import Statistic from './pages/Statistic';
 import { parseZipDataset } from './utils/dataset-resolve';
 import { getAllSettings, putAllSettings, reconstructCalctable } from './utils/db';
 import { TableUserSettingRow, UserSettingType } from './utils/db-type';
+import AppInfoModal from './components/AppInfoModal';
 
 
 export const Pages = {
@@ -44,6 +45,8 @@ function App(props: any) {
     pageCurrent,
     isDark: cookies.getCookie('isdark') === "true" ? true : false,
   })
+  const [infoModal, setInfoModel] = useState(false)
+  const [showmenu, setshowmenu] = useState(false)
 
   // pageOnChange
   useEffect(() => {
@@ -122,10 +125,11 @@ function App(props: any) {
   const moreOptionRender = () => {
     return (
       <div className="popover-menu-opts popover-opts">
-        <li onClick={importSetting}><ImportOutlined />导入规划</li>
-        <li onClick={exportSetting}><ExportOutlined />导出规划</li>
-        <li onClick={reCalc}><CalculatorOutlined />重新统计</li>
-        <li onClick={handleClickFetch}><CloudDownloadOutlined />更新数据包</li>
+        <li onClick={()=>{importSetting();setshowmenu(false)}}><ImportOutlined />导入规划</li>
+        <li onClick={()=>{exportSetting();setshowmenu(false)}}><ExportOutlined />导出规划</li>
+        <li onClick={()=>{reCalc();setshowmenu(false)}}><CalculatorOutlined />重新统计</li>
+        <li onClick={()=>{handleClickFetch();setshowmenu(false)}}><CloudDownloadOutlined />更新数据包</li>
+        <li onClick={()=>{setInfoModel(true);setshowmenu(false)}}><InfoCircleOutlined />App信息</li>
       </div>
     )
   }
@@ -186,6 +190,8 @@ function App(props: any) {
             throw new Error('数据格式有误')
           }
           putAllSettings(obj, 'overlay').then(() => {
+            return reconstructCalctable()
+          }).then(() => {
             message.success({
               content: '导入成功',
               className: state.isDark ? 'message-restyle-dark' : '',
@@ -223,8 +229,8 @@ function App(props: any) {
             <button className="clear-button" onClick={switchTheme}><BulbOutlined /></button>
           </Menu.Item>
           <Menu.Item style={{ marginRight: "10px" }} key="more" className="menu-button">
-            <Popover placement="bottom" content={moreOptionRender} trigger="click">
-              <button className="clear-button" ><MenuOutlined /></button>
+            <Popover placement="bottom" content={moreOptionRender} trigger="click" visible={showmenu}>
+              <button className="clear-button" onClick={()=> setshowmenu(!showmenu)}><MenuOutlined /></button>
             </Popover>
           </Menu.Item>
         </Menu>
@@ -253,6 +259,7 @@ function App(props: any) {
           </Switch>
         </div>
         <div id="popover-anchor"></div>
+        {infoModal ? <AppInfoModal close={() => setInfoModel(false)} /> : ''}
       </div>
     </ConfigProvider>
   );
