@@ -10,6 +10,7 @@ import { TableGlpkRow, TableNames } from "./db-type";
 
 async function fetchTextDataSet(): Promise<{ [key: string]: JSZip.JSZipObject; }> {
   const msgKey = 'download'
+  let refreshFlag = ''
   console.log("[dataset-resolve] getting text pack...")
   const hide = message.loading({ content: '正在获取最新数据...', key: msgKey, duration: 0,className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : ''})
   try {
@@ -20,9 +21,12 @@ async function fetchTextDataSet(): Promise<{ [key: string]: JSZip.JSZipObject; }
       onDownloadProgress: (progressEvent) => {
         const total = (progressEvent.total / 1048576).toFixed(1)
         const loaded = (progressEvent.loaded / 1048576).toFixed(1)
-        message.loading({
-          content: `正在获取最新数据 ${loaded}MB/${total}MB`, key: msgKey, duration: 0, className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : ''
-        })
+        if(loaded !== refreshFlag){// limit refresh rate
+          refreshFlag = loaded
+          message.loading({
+            content: `正在获取最新数据 ${loaded}MB/${total}MB`, key: msgKey, duration: 0, className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : ''
+          })
+        }
       }
     })
     const zipData = await JSZip.loadAsync(response.data);
