@@ -1,7 +1,7 @@
-import './App.css';
 import 'antd/dist/antd.css';
+import './App.css';
 
-import {BulbOutlined, CalculatorOutlined, CloudDownloadOutlined, MenuOutlined } from '@ant-design/icons';
+import { BulbOutlined, CalculatorOutlined, CloudDownloadOutlined, ExportOutlined, ImportOutlined, MenuOutlined } from '@ant-design/icons';
 import { ConfigProvider, Menu, message, Popover } from 'antd';
 import { Content } from 'antd/lib/layout/layout';
 import React, { useEffect, useRef, useState } from 'react';
@@ -14,7 +14,8 @@ import ServantCard from './pages/ServantCard';
 import ServantList from './pages/ServantList';
 import Statistic from './pages/Statistic';
 import { parseZipDataset } from './utils/dataset-resolve';
-import { reconstructCalctable } from './utils/db';
+import { getAllSettings, putAllSettings, reconstructCalctable } from './utils/db';
+import { TableUserSettingRow, UserSettingType } from './utils/db-type';
 
 
 export const Pages = {
@@ -121,23 +122,88 @@ function App(props: any) {
   const moreOptionRender = () => {
     return (
       <div className="popover-menu-opts popover-opts">
+        <li onClick={importSetting}><ImportOutlined />导入规划</li>
+        <li onClick={exportSetting}><ExportOutlined />导出规划</li>
         <li onClick={reCalc}><CalculatorOutlined />重新统计</li>
+        <li onClick={handleClickFetch}><CloudDownloadOutlined />更新数据包</li>
       </div>
     )
   }
 
   function reCalc() {
-    reconstructCalctable().then( () => {
-      message.success({ content: '统计成功', className: state.isDark ? 'message-restyle-dark' : ''})
-      if(window.location.pathname.includes(Pages.statistic)){
+    reconstructCalctable().then(() => {
+      message.success({ content: '统计成功', className: state.isDark ? 'message-restyle-dark' : '' })
+      if (window.location.pathname.includes(Pages.statistic)) {
         setTimeout(() => {
           window.location.reload()
         }, 500)
       }
     }).catch(e => {
       console.error(e)
-      message.error({ content: '统计失败，错误信息:' + e, className: state.isDark ? 'message-restyle-dark' : ''})
+      message.error({ content: '统计失败，错误信息:' + e, className: state.isDark ? 'message-restyle-dark' : '' })
     })
+  }
+
+  function exportSetting() {
+    getAllSettings().then(results => {
+      const blob = new Blob([JSON.stringify(results)], { type: 'application/json' })
+
+      const eleLink = document.createElement('a');
+      eleLink.download = 'fgomerlin-userdata.json';
+      eleLink.style.display = 'none';
+      eleLink.href = URL.createObjectURL(blob);
+      document.body.appendChild(eleLink);
+      eleLink.click(); // trigger download
+      document.body.removeChild(eleLink);
+    })
+  }
+
+  function importSetting() {
+    // <input type="file" id="btn_file" accept='application/json' style={{display:'none'}}></input>
+    const eleLink = document.createElement("input")
+    eleLink.type = 'file'
+    eleLink.style.display = 'none'
+    eleLink.accept = 'application/json'
+    document.body.appendChild(eleLink);
+    eleLink.click();
+    eleLink.onchange = (e) => {
+      if (eleLink.value === "" || eleLink.files === null || eleLink.files.length === 0) {
+        alert("文件为空")
+      } else {
+        const blob = eleLink.files[0]
+        console.debug(blob.name, blob.size);
+        blob.text().then(text => {
+          const obj = (JSON.parse(text)) as TableUserSettingRow[]
+          if (!(obj instanceof Array)) {
+            throw new Error('数据格式有误')
+          } else if (obj.length !== 0 && (
+            obj[0].id === undefined ||
+            obj[0].name === undefined ||
+            obj[0].type !== (UserSettingType.Item || UserSettingType.Servant) ||
+            obj[0].setting === undefined
+            // TODO obj[0].setting 之后找个库进行 run time 类型验证
+          )) {
+            throw new Error('数据格式有误')
+          }
+          putAllSettings(obj, 'overlay').then(() => {
+            message.success({
+              content: '导入成功',
+              className: state.isDark ? 'message-restyle-dark' : '',
+            });
+            setTimeout(() => {
+              window.location.reload()
+            }, 500)
+          })
+        }).catch(e => {
+          console.error(e)
+          message.error({
+            content: '导入错误：' + e,
+            className: state.isDark ? 'message-restyle-dark' : '',
+          });
+        })
+      }
+    }
+    document.body.removeChild(eleLink);
   }
 
   return (
@@ -155,9 +221,6 @@ function App(props: any) {
           </Menu.Item>
           <Menu.Item style={{ marginLeft: "auto" }} key="theme" className="menu-button">
             <button className="clear-button" onClick={switchTheme}><BulbOutlined /></button>
-          </Menu.Item>
-          <Menu.Item key="fetch-data" className="menu-button">
-            <button className="clear-button" onClick={handleClickFetch}><CloudDownloadOutlined /></button>
           </Menu.Item>
           <Menu.Item style={{ marginRight: "10px" }} key="more" className="menu-button">
             <Popover placement="bottom" content={moreOptionRender} trigger="click">

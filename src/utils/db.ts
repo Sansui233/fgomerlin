@@ -52,7 +52,7 @@ export function initdb() {
         message.success({ content: `数据版本已更新至${version}, 刷新后生效`, className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : '' })
         console.log('[db.ts] database upgraded to ' + version)
       }).catch((e) => {
-        message.error({ content: "数据版本未更新，错误信息：" + e + ".请尝试点击右上角更新", className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : '' }, 5)
+        message.error({ content: "数据版本未更新，请尝试点击右上角手动更新. \n 错误信息：" + e, className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : '' }, 5)
         throw e
       })
     })
@@ -262,6 +262,19 @@ export async function getCalcCells(): Promise<Cell[]> {
   })
 }
 
+export async function getAllSettings(): Promise<TableUserSettingRow[]> {
+  return (await db.table(TableNames.user_setting).toArray()) as TableUserSettingRow[]
+}
+
+export function putAllSettings(rows: TableUserSettingRow[], mode: 'merge' | 'overlay') {
+  return db.transaction('rw', db.table(TableNames.user_setting), async () => {
+    if (mode === "overlay") {
+      db.table(TableNames.user_setting).clear()
+    }
+    db.table(TableNames.user_setting).bulkPut(rows)
+  })
+}
+
 export async function getGlpkObj(itemName: string): Promise<TableGlpkRow> {
   const result = await db.table(TableNames.glpk).where('item').equals(itemName).toArray()
   if (result.length === 0) {
@@ -295,7 +308,7 @@ export async function reconstructCalctable() {
         cells: composeCalcCells({ basicInfo: info, userSettings: mapServantSetting(settings[i]) })
       }
     })
-    db.transaction('rw', db.table(TableNames.calculator), async() => {
+    db.transaction('rw', db.table(TableNames.calculator), async () => {
       await db.table(TableNames.calculator).clear()
       cellRows.forEach((r) => {
         db.table(TableNames.calculator).put(r)
