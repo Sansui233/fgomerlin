@@ -7,7 +7,7 @@ import { Content } from 'antd/lib/layout/layout';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, Redirect, Route, Switch, withRouter } from 'react-router-dom';
 
-import cookies from './lib/cookies';
+import cookies, { CookieKey } from './lib/cookies';
 import ItemCategory from './pages/ItemCategory';
 import ItemContents from './pages/ItemContents';
 import ServantCard from './pages/ServantCard';
@@ -40,18 +40,20 @@ let navCurrent: string = Pages.servantList // header selection controller
 let pageCurrent: string = Pages.servantList // class controller
 
 function App(props: any) {
+  console.debug('======= render app =======')
   const servantSiderEl = useRef<HTMLDivElement>(null);
 
   const [state, setState] = useState({
     navCurrent,
     pageCurrent,
-    isDark: cookies.getCookie('isdark') === "true" ? true : false,
+    isDark: cookies.getCookie(CookieKey.isDark) === "true" ? true : false,
   })
   const [infoModal, setInfoModel] = useState(false)
   const [showmenu, setshowmenu] = useState(false)
 
   // pageOnChange
   useEffect(() => {
+    console.debug('% App on Change',props.location.pathname)
     const paths = window.location.pathname.split('/') // Format: ["", "servants", "100100"]
     if (paths.length === 2) {
       setState(s => { return { ...s, navCurrent: paths[1], pageCurrent: paths[1] } })
@@ -91,7 +93,7 @@ function App(props: any) {
 
 
   function switchTheme() {
-    cookies.setCookie("isdark", (!state.isDark).toString())
+    cookies.setCookie(CookieKey.isDark, (!state.isDark).toString())
     setState({ ...state, isDark: !state.isDark })
   }
 

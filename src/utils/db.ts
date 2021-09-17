@@ -1,6 +1,6 @@
 import { message } from 'antd';
 import Dexie from 'dexie';
-import cookies from '../lib/cookies';
+import cookies, { CookieKey } from '../lib/cookies';
 
 import { ItemInfo } from '../pages/ItemContents';
 import { ServantBasic, ServantDetail } from '../pages/ServantCard';
@@ -47,12 +47,12 @@ export function initdb() {
     [TableNames.freequests]: FREEQUESTS_TABLE
   }).upgrade(async trans => {
     Dexie.ignoreTransaction(() => {
-      message.info({ content: "正在更新数据", className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : '', })
+      message.info({ content: "正在更新数据", className: cookies.getCookie(CookieKey.isDark) === 'true' ? 'message-restyle-dark' : '', })
       parseZipDataset().then(() => {
-        message.success({ content: `数据版本已更新至${version}, 刷新后生效`, className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : '' })
+        message.success({ content: `数据版本已更新至${version}, 刷新后生效`, className: cookies.getCookie(CookieKey.isDark) === 'true' ? 'message-restyle-dark' : '' })
         console.log('[db.ts] database upgraded to ' + version)
       }).catch((e) => {
-        message.error({ content: "数据版本未更新，请尝试点击右上角手动更新. \n 错误信息：" + e, className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : '' }, 5)
+        message.error({ content: "数据版本未更新，请尝试点击右上角手动更新. \n 错误信息：" + e, className: cookies.getCookie(CookieKey.isDark) === 'true' ? 'message-restyle-dark' : '' }, 5)
         throw e
       })
     })
@@ -65,13 +65,13 @@ export function initdb() {
       parseZipDataset().then(() => {
         return reconstructCalctable()
       }).then(() => {
-        message.success({ content: "数据导入成功", className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : '' })
+        message.success({ content: "数据导入成功", className: cookies.getCookie(CookieKey.isDark) === 'true' ? 'message-restyle-dark' : '' })
         console.log("[db.ts] Database is successfully created")
         setTimeout(() => {
           window.location.reload()
         }, 500)
       }).catch((e) => {
-        message.error({ content: "数据未初始化，错误信息：" + e, className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : '' })
+        message.error({ content: "数据未初始化，错误信息：" + e, className: cookies.getCookie(CookieKey.isDark) === 'true' ? 'message-restyle-dark' : '' })
       })
     })
   });

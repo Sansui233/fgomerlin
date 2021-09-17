@@ -1,7 +1,7 @@
 import { message } from "antd";
 import axios from "axios";
 import JSZip from "jszip"
-import cookies from "../lib/cookies";
+import cookies, { CookieKey } from "../lib/cookies";
 import { DATASET_TEXT } from "./dataset-conf";
 import { DataSetFormat, GlpkFormat } from "./dataset-type";
 import { db, putFreeQuest, putGlpkObj, putItem, putServant, putVersion } from "./db";
@@ -12,7 +12,7 @@ async function fetchTextDataSet(): Promise<{ [key: string]: JSZip.JSZipObject; }
   const msgKey = 'download'
   let refreshFlag = ''
   console.log("[dataset-resolve] getting text pack...")
-  const hide = message.loading({ content: '正在获取最新数据...', key: msgKey, duration: 0,className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : ''})
+  const hide = message.loading({ content: '正在获取最新数据...', key: msgKey, duration: 0,className: cookies.getCookie(CookieKey.isDark) === 'true' ? 'message-restyle-dark' : ''})
   try {
     const response = await axios({
       method: 'get',
@@ -24,13 +24,13 @@ async function fetchTextDataSet(): Promise<{ [key: string]: JSZip.JSZipObject; }
         if(loaded !== refreshFlag){// limit refresh rate
           refreshFlag = loaded
           message.loading({
-            content: `正在获取最新数据 ${loaded}MB/${total}MB`, key: msgKey, duration: 0, className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : ''
+            content: `正在获取最新数据 ${loaded}MB/${total}MB`, key: msgKey, duration: 0, className: cookies.getCookie(CookieKey.isDark) === 'true' ? 'message-restyle-dark' : ''
           })
         }
       }
     })
     const zipData = await JSZip.loadAsync(response.data);
-    message.success({ content: '下载完成', key: msgKey, duration: 1, className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : '', })
+    message.success({ content: '下载完成', key: msgKey, duration: 1, className: cookies.getCookie(CookieKey.isDark) === 'true' ? 'message-restyle-dark' : '', })
     return zipData.files;
   } catch (error) {
     hide()
@@ -40,7 +40,7 @@ async function fetchTextDataSet(): Promise<{ [key: string]: JSZip.JSZipObject; }
 
 export async function parseZipDataset() {
   const files = await fetchTextDataSet()
-  message.info({ content: '正在导入数据...', duration: 1.5, className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : '' })
+  message.info({ content: '正在导入数据...', duration: 1.5, className: cookies.getCookie(CookieKey.isDark) === 'true' ? 'message-restyle-dark' : '' })
   console.debug('[dataset-resolve] parsing files...')
   for (const filename of Object.keys(files)) {
     console.debug('[dataset-resolve] parsing', filename)

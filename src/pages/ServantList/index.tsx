@@ -11,7 +11,7 @@ import Search from 'antd/lib/input/Search';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import VirtualList from '../../components/VirtualList';
 
-import cookies from '../../lib/cookies';
+import cookies, { CookieKey as C } from '../../lib/cookies';
 import { PhantasmCategory, PhantasmColor, ServantClass } from '../../utils/dataset-type';
 import { getServantList, getServantSetting, putSetting } from '../../utils/db';
 import { UserSettingType } from '../../utils/db-type';
@@ -52,18 +52,17 @@ const initFilter: FilterOption = {
 const sortOptions = ['rareasc', 'raredsc', 'noasc', 'nodsc', 'classasc', 'classdsc'] as const
 type sortTuple = typeof sortOptions;
 type SortOption = sortTuple[number]
-const initSortopt: SortOption = cookies.getCookie('sort_option') as SortOption || 'noasc'
-const initNeedFollow = cookies.getCookie('filter_follow') === 'true' ? true : false
 
 export default function ServantList(props: { rmCurrentOnSidebar: () => void }) {
+  console.debug('---- render servant list ----')
   const [state, setState] = useState({
     servants: initServants,
     isLoaded: false,
     query: "",
   })
-  const [needFollow, setneedFollow] = useState(initNeedFollow)
+  const [needFollow, setneedFollow] = useState(false)
   const [filterOptions, setfilterOptions] = useState(initFilter)
-  const [sortOption, setSort] = useState(initSortopt)
+  const [sortOption, setSort] = useState('noasc' as SortOption)
   const [filterVisible, setfiltervisible] = useState(false)
   // const [sorterVisible, setsortervisible] = useState(false)
 
@@ -87,7 +86,10 @@ export default function ServantList(props: { rmCurrentOnSidebar: () => void }) {
 
   // Load when mounted
   useEffect(() => {
+    console.debug('% servant list on Change')
     reloadFromDB().then()
+    setSort(cookies.getCookie(C.svtSort) as SortOption || 'noasc' as SortOption)
+    setneedFollow(cookies.getCookie(C.svtFollow) === 'true' ? true : false)
   }, [reloadFromDB])
 
   // Subscribe event
@@ -147,13 +149,13 @@ export default function ServantList(props: { rmCurrentOnSidebar: () => void }) {
   }
 
   function changeFilterFollow() {
-    cookies.setCookie('filter_follow', (!needFollow).toString())
+    cookies.setCookie(C.svtFollow, (!needFollow).toString())
     setneedFollow(s => !s)
   }
 
   function setSortopt(opt: SortOption) {
+    cookies.setCookie(C.svtSort, opt)
     setSort(opt)
-    cookies.setCookie('sort_option', opt)
   }
 
   function matchQueryString(servant: Servant, query: string) {
@@ -323,7 +325,7 @@ export default function ServantList(props: { rmCurrentOnSidebar: () => void }) {
 }
 
 function FilterRenderer(props: { filterOpt: FilterOption, setFilteropt: (opt: FilterOption) => any, visible: boolean }) {
-  console.debug('filter mount')
+  console.debug('++ filter renderer ++')
   type ClassMap = { [name: string]: ServantClass | 'Other' }
   type ColorMap = { [name: string]: PhantasmColor }
   type CategoryMap = { [name: string]: PhantasmCategory }

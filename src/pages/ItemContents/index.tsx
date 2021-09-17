@@ -43,14 +43,12 @@ export default function ItemContents(props: any) {
       let i = 0
       while (3 * i < qpstr.length) {
         if(i === 0){
-          console.log('qpstr', qpstr)
           result = qpstr.slice(-3 * (i+1))
         }else {
           result = qpstr.slice(-3 * (i+1), -3 * i) + ',' + result
         }
         i++
       }
-      console.log('qp result', result)
       if (result === '') result = '0'
       setqpstate(result)
     },

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import ItemDrawer from '../../components/ItemDrawer';
 import { countItemsNeeded } from '../../utils/calculator';
@@ -18,6 +18,7 @@ const initItemCount: {
 }[] = []
 
 export default function Statistic() {
+  console.debug('---- render statistic ----')
   const [itemsNeeded, setItemsNeed] = useState(initItems)
   const [itemsCounts, setItemsCount] = useState(initItemCount)
   const [viewState, setView] = useState({
@@ -27,6 +28,7 @@ export default function Statistic() {
   const [isShowDrawer, setShowDrawer] = useState(false)
 
   useEffect(() => {
+    console.debug('% statistic on Change')
     getCalcCells().then((cells) => {
       countItemsNeeded(cells).then(results => setItemsNeed(results))
       getItemSettings().then(results => {
@@ -43,31 +45,35 @@ export default function Statistic() {
   }, [])
 
   function handleSetView(e: any) {
+    console.debug('set view opt')
     setView({ ...viewState, isInsufficientOnly: e.target.checked })
   }
 
-  const filter = (category: number, rarity?: number): { itemName: string, itemIconWithSuffix: string, itemNeeded: number, itemCount: number, }[] => {
-    const items = itemsNeeded.filter((item) => {
-      if (rarity && item.itemInfo.rarity !== rarity) {
-        return false
-      }
-      return item.itemInfo.category === category
-    })
+  const filter = useCallback(
+    (category: number, rarity?: number): { itemName: string, itemIconWithSuffix: string, itemNeeded: number, itemCount: number, }[] => {
+      const items = itemsNeeded.filter((item) => {
+        if (rarity && item.itemInfo.rarity !== rarity) {
+          return false
+        }
+        return item.itemInfo.category === category
+      })
 
-    return items.map(item => {
-      let itemCount = 0
-      const it = itemsCounts.find(it => it.itemName === item.itemName)
-      if (it) {
-        itemCount = it.itemCount
-      }
-      return {
-        itemName: item.itemName,
-        itemIconWithSuffix: item.itemInfo.iconWithSuffix,
-        itemNeeded: item.itemNeeded,
-        itemCount,
-      }
-    })
-  }
+      return items.map(item => {
+        let itemCount = 0
+        const it = itemsCounts.find(it => it.itemName === item.itemName)
+        if (it) {
+          itemCount = it.itemCount
+        }
+        return {
+          itemName: item.itemName,
+          itemIconWithSuffix: item.itemInfo.iconWithSuffix,
+          itemNeeded: item.itemNeeded,
+          itemCount,
+        }
+      })
+    },
+    [itemsCounts, itemsNeeded],
+  )
 
   const qpNeeded = () => {
     const qpItem = itemsNeeded.find(item => { return item.itemName === "QP" })
@@ -111,12 +117,12 @@ export default function Statistic() {
             <span>剩余：<span className={qpLeft() < 0 ? 'insufficient' : ''}>{qpLeft().toLocaleString()}</span></span>
           </div>
         </div>
-        <ItemStat showDrawer={showDrawer} title="铜素材" items={filter(2, 1)} isInsufficientOnly={viewState.isInsufficientOnly} />
-        <ItemStat showDrawer={showDrawer} title="银素材" items={filter(2, 2)} isInsufficientOnly={viewState.isInsufficientOnly} />
-        <ItemStat showDrawer={showDrawer} title="金素材" items={filter(2, 3)} isInsufficientOnly={viewState.isInsufficientOnly} />
-        <ItemStat showDrawer={showDrawer} title="技能石" items={filter(1)} isInsufficientOnly={viewState.isInsufficientOnly} />
-        <ItemStat showDrawer={showDrawer} title="职阶棋子" items={filter(3)} isInsufficientOnly={viewState.isInsufficientOnly} />
-        <ItemStat showDrawer={showDrawer} title="其他素材" items={filter(2, 4)} isInsufficientOnly={viewState.isInsufficientOnly} />
+        <ItemStat showDrawer={showDrawer} title="铜素材" items={useMemo(() => {console.debug('filter items 铜');return filter(2, 1)}, [filter])} isInsufficientOnly={viewState.isInsufficientOnly} />
+        <ItemStat showDrawer={showDrawer} title="银素材" items={useMemo(() => filter(2, 2), [filter])} isInsufficientOnly={viewState.isInsufficientOnly} />
+        <ItemStat showDrawer={showDrawer} title="金素材" items={useMemo(() => filter(2, 3), [filter])} isInsufficientOnly={viewState.isInsufficientOnly} />
+        <ItemStat showDrawer={showDrawer} title="技能石" items={useMemo(() => filter(1), [filter])} isInsufficientOnly={viewState.isInsufficientOnly} />
+        <ItemStat showDrawer={showDrawer} title="职阶棋子" items={useMemo(() => filter(3), [filter])} isInsufficientOnly={viewState.isInsufficientOnly} />
+        <ItemStat showDrawer={showDrawer} title="其他素材" items={useMemo(() => filter(2, 4), [filter])} isInsufficientOnly={viewState.isInsufficientOnly} />
       </div>
       <ItemDrawer item={{ name: currentItem, iconWithSuffix: `${currentItem}.jpg` }} onClose={hideDrawer} visible={isShowDrawer} />
     </React.Fragment>
