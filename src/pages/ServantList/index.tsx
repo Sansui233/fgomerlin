@@ -318,15 +318,6 @@ export default function ServantList(props: { rmCurrentOnSidebar: () => void }) {
           itemSize={76 + 7}
           rowRender={rowRender}
         /> : <p className="loading-placeholder">Loading……</p>}
-        {/* <VirtualList
-          className="servant-list-content"
-          itemCount={sortFilteredServants.length}
-          itemData={sortFilteredServants}
-          height={1080}
-          width={374}
-          itemSize={76 + 7}
-          rowRender={rowRender}
-        /> */}
     </div>
   )
 }
