@@ -272,7 +272,7 @@ function App(props: any) {
           <Switch>
             <Route path={`/${Pages.servantList}`}>
               <aside ref={servantSiderEl} className={state.pageCurrent === Pages.servantList ? "sider current-page" : "sider"}>
-                <ServantList removeCurrentOnSidebar={removeCurrentOnSidebar} />
+                <ServantList rmCurrentOnSidebar={removeCurrentOnSidebar} />
               </aside>
               <Content className={state.pageCurrent === Pages.servantContent ? "content current-page" : "content"}>
                 <Route path={`/${Pages.servantList}/:id`} component={ServantCard} />

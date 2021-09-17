@@ -1,11 +1,12 @@
 import { HeartFilled, HeartOutlined } from '@ant-design/icons';
-import React from 'react';
+import { Link } from 'react-router-dom';
 
 import { Servant } from '..';
+import { Pages } from '../../../App';
 import SidebarItem from '../../../components/SidebarItemContainer';
 import { ICONBASE } from '../../../utils/dataset-conf';
 
-export default function ServantItem(props: { servant: Servant, changeFollow: (sId: number) => void }) {
+function ServantItem(props: { servant: Servant, changeFollow: (sId: number) => void }) {
   const { sId, sNo, sName, sNameJp, sClass, sImg, skill1, skill2, skill3, isFollow } = props.servant
 
   return (
@@ -27,3 +28,18 @@ export default function ServantItem(props: { servant: Servant, changeFollow: (sI
     </SidebarItem>
   )
 }
+
+type Props = {
+  s: Servant,
+  changeFollow: (sId:number)=>void,
+  removeCurrentOnSidebar: () => void
+}
+
+export function servantItemRenderer({s, changeFollow, removeCurrentOnSidebar}: Props) {
+  return (
+    <Link key={s.sId} to={`/${Pages.servantList}/${s.sId}`} onClick={removeCurrentOnSidebar}>
+      <ServantItem servant={s} changeFollow={changeFollow}></ServantItem>
+    </Link>
+  )
+}
+
