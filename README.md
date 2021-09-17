@@ -1,87 +1,38 @@
-## Thanks
-- Chaldea
-- fontawesome.com [License](https://fontawesome.com/license)
 
-# Getting Started with Create React App
+# FGO Merlin
+一个 Web 版的 FGO 素材规划 App。  
+FGO material caculator.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+在线使用： [FGO Merlin](https://fgomerlin.vercel.app/)
+## 功能
 
-## Available Scripts
+规划从者技能所需材料，查素材free本的掉率
 
-In the project directory, you can run:
+## 特点
 
-### `npm start`
+1. 一次加载，可断网使用
+  离线可用，和普通App无区别。首次加载相当于安装，之后不依赖网络。IOS、Android 可尝试添加网页到主屏幕。  
+  > 兼容性：不支持 IE。其他的应该都行，只要不是三年没更新过浏览器。
+2. 数据存储在浏览器本地
+  所有数据本地存储，支持导入导出（目前仅限此工具数据格式）（~~因为别的没格式参考~~)
+  > 换浏览器数据就会没有。需要重新导入
+3. 素材数据连续录入
+  素材按游戏内顺序排列，按 tab/换行/确认 可连续录入数据
+4. 多端适配
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+~~其实就是没什么特点~~
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## 数据来源
 
-### `npm test`
+*   [Chaldea Center](https://github.com/chaldea-center)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more
-information.
+## 感谢
 
-### `npm run build`
+*   [narumishi](https://github.com/narumishi)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 设计
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+部分UI库的相应版权声明如下
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will
-remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right
-into your project so you have full control over them. All of the commands except `eject` will still work, but they will
-point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you
-shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t
-customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in
-the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved
-here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved
-here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved
-here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved
-here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved
-here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved
-here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+*   [Ant Design](https://ant.design/) MIT License
+*   [Font Awesome](https://fontawesome.com/) Free Icon License
