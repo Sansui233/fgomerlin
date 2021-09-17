@@ -398,6 +398,26 @@ svg {
   background-color: var(--item-bg);
   color: var(--text-primary);
 }
+
+.modal-dark .ant-modal-content {
+  background-color: #313131;
+}
+.modal-dark .ant-modal-confirm-body .ant-modal-confirm-title {
+  color: #ddd;
+}
+.modal-dark .ant-modal-confirm-body .ant-modal-confirm-content {
+  color: #ddd;
+}
+.modal-dark .ant-btn {
+  background-color: #313131;
+  border-color: #666;
+  color: #ddd;
+}
+.modal-dark .ant-btn-primary {
+  color: #fff;
+  border-color: #1890ff;
+  background: #1890ff;
+}
 /***********************************************************
 ***********************************************************
 ************************ Servant List *********************

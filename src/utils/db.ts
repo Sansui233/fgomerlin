@@ -62,7 +62,7 @@ export function initdb() {
   db.on("populate", function () {
     Dexie.ignoreTransaction(() => {
       // Init your DB with some default statuses:
-      parseZipDataset().then(()=>{
+      parseZipDataset().then(() => {
         return reconstructCalctable()
       }).then(() => {
         message.success({ content: "数据导入成功", className: cookies.getCookie('isdark') === 'true' ? 'message-restyle-dark' : '' })
@@ -75,6 +75,10 @@ export function initdb() {
       })
     })
   });
+}
+
+export function deletedb() {
+  return db.delete()
 }
 
 export async function putVersion(dataVer: string) {

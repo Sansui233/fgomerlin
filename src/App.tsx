@@ -1,8 +1,8 @@
 import 'antd/dist/antd.css';
 import './App.css';
 
-import { BulbOutlined, CalculatorOutlined, CloudDownloadOutlined, ExportOutlined, ImportOutlined, InfoCircleOutlined, MenuOutlined } from '@ant-design/icons';
-import { ConfigProvider, Menu, message, Popover } from 'antd';
+import { BulbOutlined, CalculatorOutlined, ClearOutlined, CloudDownloadOutlined, ExclamationCircleOutlined, ExportOutlined, ImportOutlined, InfoCircleOutlined, MenuOutlined } from '@ant-design/icons';
+import { ConfigProvider, Menu, message, Popover, Modal } from 'antd';
 import { Content } from 'antd/lib/layout/layout';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, Redirect, Route, Switch, withRouter } from 'react-router-dom';
@@ -14,11 +14,12 @@ import ServantCard from './pages/ServantCard';
 import ServantList from './pages/ServantList';
 import Statistic from './pages/Statistic';
 import { parseZipDataset } from './utils/dataset-resolve';
-import { getAllSettings, putAllSettings, reconstructCalctable } from './utils/db';
+import { deletedb, getAllSettings, putAllSettings, reconstructCalctable } from './utils/db';
 import { TableUserSettingRow, UserSettingType } from './utils/db-type';
 import AppInfoModal from './components/AppInfoModal';
 import bgimg from './assets/imgs/merlin-line.png'
 
+const { confirm } = Modal;
 
 export const Pages = {
   // For router
@@ -126,11 +127,12 @@ function App(props: any) {
   const moreOptionRender = () => {
     return (
       <div className="popover-menu-opts popover-opts">
-        <li onClick={()=>{importSetting();setshowmenu(false)}}><ImportOutlined />导入规划</li>
-        <li onClick={()=>{exportSetting();setshowmenu(false)}}><ExportOutlined />导出规划</li>
-        <li onClick={()=>{reCalc();setshowmenu(false)}}><CalculatorOutlined />重新统计</li>
-        <li onClick={()=>{handleClickFetch();setshowmenu(false)}}><CloudDownloadOutlined />更新数据包</li>
-        <li onClick={()=>{setInfoModel(true);setshowmenu(false)}}><InfoCircleOutlined />App信息</li>
+        <li onClick={() => { importSetting(); setshowmenu(false) }}><ImportOutlined />导入规划</li>
+        <li onClick={() => { exportSetting(); setshowmenu(false) }}><ExportOutlined />导出规划</li>
+        <li onClick={() => { handleClickFetch(); setshowmenu(false) }}><CloudDownloadOutlined />更新数据包</li>
+        <li onClick={() => { reCalc(); setshowmenu(false) }}><CalculatorOutlined />重新统计</li>
+        <li onClick={() => { resetAll(); setshowmenu(false) }}><ClearOutlined />重置App</li>
+        <li onClick={() => { setInfoModel(true); setshowmenu(false) }}><InfoCircleOutlined />App信息</li>
       </div>
     )
   }
@@ -213,6 +215,37 @@ function App(props: any) {
     document.body.removeChild(eleLink);
   }
 
+  function resetAll() {
+    confirm({
+      title: '确认清空所有数据？',
+      icon: <ExclamationCircleOutlined style={{ color: '#ff5757 !important' }} />,
+      content: '这将导致您的所有规划数据丢失，建议导出规划数据以备份',
+      okText: '已知风险，确认清空',
+      cancelText: '取消',
+      className: state.isDark ? 'modal-dark' : 'modal-light',
+      onOk() {
+        deletedb().then(() => {
+          message.success({
+            content: 'App已清空',
+            className: state.isDark ? 'message-restyle-dark' : '',
+          });
+          setTimeout(() => {
+            window.location.reload()
+          }, 500)
+        }).catch((e) => {
+          console.error(e)
+          message.error({
+            content: 'App清空失败：' + e,
+            className: state.isDark ? 'message-restyle-dark' : '',
+          });
+        })
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
+  }
+
   return (
     <ConfigProvider getPopupContainer={() => document.getElementById('popover-anchor')!}>
       <div className={state.isDark ? "app dark" : "app light"}>
@@ -231,7 +264,7 @@ function App(props: any) {
           </Menu.Item>
           <Menu.Item style={{ marginRight: "10px" }} key="more" className="menu-button">
             <Popover placement="bottom" content={moreOptionRender} trigger="click" visible={showmenu}>
-              <button className="clear-button" onClick={()=> setshowmenu(!showmenu)}><MenuOutlined /></button>
+              <button className="clear-button" onClick={() => setshowmenu(!showmenu)}><MenuOutlined /></button>
             </Popover>
           </Menu.Item>
         </Menu>
@@ -243,7 +276,7 @@ function App(props: any) {
               </aside>
               <Content className={state.pageCurrent === Pages.servantContent ? "content current-page" : "content"}>
                 <Route path={`/${Pages.servantList}/:id`} component={ServantCard} />
-                {window.location.pathname===`/${Pages.servantList}`?<img src={bgimg} alt='' className='bgimg'/>:''}
+                {window.location.pathname === `/${Pages.servantList}` ? <img src={bgimg} alt='' className='bgimg' /> : ''}
               </Content>
             </Route>
             <Route path={`/${Pages.itemList}`}>

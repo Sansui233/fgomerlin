@@ -136,6 +136,7 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
     const s = state.servants[i]
     const newServants = [...state.servants]
     newServants[i] = { ...s, isFollow: !s.isFollow }
+    console.debug('follow change')
     getServantSetting(sId).then((setting) => {
       putSetting(sId, s.sName, UserSettingType.Servant, { ...setting, isFollow: !s.isFollow }).then(() => {
         setState({ ...state, servants: newServants })
@@ -222,6 +223,7 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
   const filteredServants = useMemo(
     () =>
       ((query: string, servants: Servant[], needFollow: boolean, options: FilterOption): Servant[] => {
+        console.debug('re-filtered')
         return servants.filter(servant => {
           const matchFollow = !(needFollow === true && servant.isFollow === false)
           const matchQuery = matchQueryString(servant, query)
@@ -234,6 +236,7 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
 
   const sortFilteredServants = useMemo(
     () => {
+      console.debug('re-sort')
       const classSort: ServantClass[] = ['Shielder', 'Saber', 'Archer', 'Lancer', 'Rider', 'Caster', 'Assassin', 'Berserker', 'Ruler', 'Avenger', 'MoonCancer', 'Alterego', 'Foreigner', 'Pretender', 'Beast']
       if (filteredServants.length <= 1) return filteredServants;
       switch (state.sort_option) {
@@ -318,14 +321,16 @@ export default function ServantList(props: { removeCurrentOnSidebar: () => void 
         <FixedSizeList
           className="servant-list-content"
           itemCount={sortFilteredServants.length}
+          itemData={sortFilteredServants}
           height={1080}
           width={374}
           itemSize={76 + 7}
         >
-          {({ index, style }) => {
+          {({ index, style, data }) => {
+            console.debug('re-rendered')
             return (
               <div style={style}>
-                {servantItemRenderer(sortFilteredServants[index])}
+                {servantItemRenderer(data[index])}
               </div>
             )
           }}
