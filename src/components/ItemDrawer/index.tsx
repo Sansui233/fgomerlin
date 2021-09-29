@@ -80,7 +80,7 @@ const ItemDrawer: React.FC<Props> = ({ item, onClose, visible }: Props) => {
     }
     Emitter.addDataListener(EvtNames.ModifyItem, updateObtained)
     return () => {
-      Emitter.removeListener(EvtNames.ModifyServant, updateObtained)
+      Emitter.removeListener(EvtNames.ModifyItem, updateObtained)
     }
   }, [item.name])
 
