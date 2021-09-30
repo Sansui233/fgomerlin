@@ -709,7 +709,6 @@ p.servant-item-info-other {
 }
 .sevant-card-quickset-skill {
   float: right;
-  font-size: 1rem;
   cursor: pointer;
 }
 .sevant-card-quickset-skill svg {
